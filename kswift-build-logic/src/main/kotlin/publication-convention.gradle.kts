@@ -5,7 +5,6 @@
 import java.util.Base64
 
 plugins {
-    id("javadoc-stub-convention")
     id("org.gradle.maven-publish")
     id("signing")
 }
@@ -23,14 +22,14 @@ publishing {
     publications.withType<MavenPublication> {
         // Provide artifacts information requited by Maven Central
         pom {
-            name.set("MOKO {{name}}")
+            name.set("MOKO KSwift")
             description.set("Add description")
-            url.set("https://github.com/icerockdev/moko-{{name}}")
+            url.set("https://github.com/icerockdev/moko-kswift")
             licenses {
                 license {
                     name.set("Apache-2.0")
                     distribution.set("repo")
-                    url.set("https://github.com/icerockdev/moko-{{name}}/blob/master/LICENSE.md")
+                    url.set("https://github.com/icerockdev/moko-kswift/blob/master/LICENSE.md")
                 }
             }
 
@@ -43,9 +42,9 @@ publishing {
             }
 
             scm {
-                connection.set("scm:git:ssh://github.com/icerockdev/moko-{{name}}.git")
-                developerConnection.set("scm:git:ssh://github.com/icerockdev/moko-{{name}}.git")
-                url.set("https://github.com/icerockdev/moko-{{name}}")
+                connection.set("scm:git:ssh://github.com/icerockdev/moko-kswift.git")
+                developerConnection.set("scm:git:ssh://github.com/icerockdev/moko-kswift.git")
+                url.set("https://github.com/icerockdev/moko-kswift")
             }
         }
     }

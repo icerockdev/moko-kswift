@@ -3,7 +3,7 @@
  */
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
+    id("gradle-plugin-convention")
     id("detekt-convention")
     id("publication-convention")
 }
@@ -14,21 +14,20 @@ version = libs.versions.mokoKSwiftVersion.get()
 dependencies {
     implementation(gradleKotlinDsl())
     compileOnly(libs.kotlinGradlePlugin)
-    implementation(libs.kotlinPoet)
+    implementation(libs.swiftPoet)
     implementation(libs.kotlinCompilerEmbeddable)
+    implementation(files("libs/kotlinx-metadata-klib-1.5.20.jar"))
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withJavadocJar()
-    withSourcesJar()
+gradlePlugin {
+    plugins {
+        create("kswift") {
+            id = "dev.icerock.moko.kswift"
+            implementationClass = "dev.icerock.moko.kswift.plugin.KSwiftPlugin"
+        }
+    }
 }
 
 publishing.publications.register("mavenJava", MavenPublication::class) {
     from(components["java"])
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
 }
