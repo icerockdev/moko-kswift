@@ -9,6 +9,8 @@ coroutinesVersion = "1.5.0-native-mt"
 mokoTestVersion = "0.4.0"
 mokoKSwiftVersion = "0.1.0"
 
+kotlinxMetadataKLibVersion = "0.0.1-dev-10"
+
 kotlinPoetVersion = "1.6.0"
 swiftPoetVersion = "1.1.0"
 
@@ -22,6 +24,8 @@ mokoTest = { module = "dev.icerock.moko:test-core", version.ref = "mokoTestVersi
 kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoetVersion" }
 swiftPoet = { module = "io.outfoxx:swiftpoet", version.ref = "swiftPoetVersion" }
 
+#kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion" }
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradleVersion" }
 kotlinCompilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
+kotlinxMetadataKLib = { module = "org.jetbrains.kotlinx:kotlinx-metadata-klib", version.ref = "kotlinxMetadataKLibVersion" }

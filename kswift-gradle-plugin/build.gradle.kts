@@ -16,7 +16,7 @@ dependencies {
     compileOnly(libs.kotlinGradlePlugin)
     implementation(libs.swiftPoet)
     implementation(libs.kotlinCompilerEmbeddable)
-    implementation(files("libs/kotlinx-metadata-klib-1.5.20.jar"))
+    implementation(libs.kotlinxMetadataKLib)
 }
 
 gradlePlugin {

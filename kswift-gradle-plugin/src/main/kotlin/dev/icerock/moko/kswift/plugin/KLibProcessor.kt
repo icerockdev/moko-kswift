@@ -4,139 +4,65 @@
 
 package dev.icerock.moko.kswift.plugin
 
-import io.outfoxx.swiftpoet.DeclaredTypeName
-import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
-import io.outfoxx.swiftpoet.FunctionSpec
-import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.ParameterSpec
-import io.outfoxx.swiftpoet.TypeName
-import io.outfoxx.swiftpoet.VOID
-import io.outfoxx.swiftpoet.parameterizedBy
-import kotlinx.metadata.ClassName
-import kotlinx.metadata.KmClass
-import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.KmFunction
-import kotlinx.metadata.KmModuleFragment
-import kotlinx.metadata.KmPackage
-import kotlinx.metadata.KmType
 import kotlinx.metadata.klib.KlibModuleMetadata
-import kotlinx.metadata.klib.file
-import org.slf4j.Logger
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.util.Logger
 import java.io.File
+import kotlin.reflect.KClass
 
 class KLibProcessor(
-    private val kotlinFrameworkName: String,
-    private val outputDir: File,
-    private val library: File,
-    private val logger: Logger
+    private val logger: Logger,
+    config: Builder.() -> Unit
 ) {
-    fun process() {
+    private val features: Map<KClass<out FeatureContext>, List<ProcessorFeature<*>>> =
+        Builder().apply(config).build()
+
+    fun processFeatureContext(library: File, outputDir: File, framework: Framework) {
         val metadata: KlibModuleMetadata =
             KotlinMetadataLibraryProvider.readLibraryMetadata(library)
 
-        logger.debug("metadata $metadata")
+        logger.log("metadata $metadata")
 
-        metadata.annotations.forEach { annotation ->
-            logger.debug("annotation metadata $annotation")
-        }
-        metadata.fragments.forEach { processFragment(it) }
-    }
+        val fileSpecBuilder: FileSpec.Builder = FileSpec.builder(library.nameWithoutExtension)
 
-    private fun processFragment(fragment: KmModuleFragment) {
-        logger.debug("fragment metadata $fragment")
+        val processorContext = ProcessorContext(
+            fileSpecBuilder = fileSpecBuilder,
+            framework = framework
+        )
 
-        fragment.pkg?.let { processPackage(it) }
-        fragment.classes.forEach { processClass(it) }
-    }
+        val libraryContext = LibraryContext(metadata)
+        libraryContext.visit { processFeatureContext(this, processorContext) }
 
-    private fun processPackage(pkg: KmPackage) {
-        logger.debug("pkg metadata $pkg")
-
-        pkg.functions.forEach { processFunction(it) }
-    }
-
-    private fun processFunction(func: KmFunction) {
-        processPlatformExtensionFunction(func)
-    }
-
-    private fun processPlatformExtensionFunction(func: KmFunction) {
-        val receiver = func.receiverParameterType ?: return
-
-        val classifier = receiver.classifier
-        if (classifier !is KmClassifier.Class) return
-
-        val receiverName: String = classifier.name
-        val receiverParts: List<String> = receiverName.split("/")
-        if (receiverParts.size < 3) return
-        if (receiverParts[0] != "platform") return
-
-        val frameworkName: String = receiverParts[1]
-        val className: String = receiverParts[2]
-        val funcName: String = func.name
-        val fileName: String = func.file?.name ?: return
-        val swiftedClass: String = fileName.replace(".kt", "Kt")
-        val callParams: List<String> = func.valueParameters.map { param ->
-            buildString {
-                append(param.name)
-                append(": ")
-                append(param.name)
-            }
-        }
-        val callParamsLine: String = callParams.joinToString(", ")
-
-        val declaredType = DeclaredTypeName(moduleName = frameworkName, simpleName = className)
-        val extensionSpec: ExtensionSpec = ExtensionSpec.builder(declaredType)
-            .addFunction(
-                FunctionSpec.builder(funcName)
-                    .addParameters(func.valueParameters.map { param ->
-                        val type = param.type?.toTypeName()
-                            ?: throw IllegalArgumentException("extension $funcName have null type for $param")
-                        ParameterSpec.builder(parameterName = param.name, type = type)
-                            .build()
-                    })
-                    .returns(func.returnType.toTypeName())
-                    .addCode("return $swiftedClass.$funcName(self, $callParamsLine)\n")
-                    .build()
-            )
-            .addModifiers(Modifier.PUBLIC)
-            .build()
-
-        val fileSpec: FileSpec = FileSpec.builder(library.nameWithoutExtension)
-            .addExtension(extensionSpec)
-            .build()
-
+        val fileSpec: FileSpec = fileSpecBuilder.build()
         fileSpec.writeTo(outputDir)
     }
 
-    private fun KmType.toTypeName(): TypeName {
-        val classifier = classifier
-        if (classifier !is KmClassifier.Class) {
-            throw IllegalArgumentException("illegal type classifier $this $classifier")
-        }
-
-        return when (val classifierName = classifier.name) {
-            "kotlin/String" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
-            "kotlin/Int" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSNumber")
-            "kotlin/Unit" -> VOID
-            else -> kotlinTypeToTypeName(classifierName)
-        }
+    private fun <T : FeatureContext> processFeatureContext(
+        featureContext: T,
+        processorContext: ProcessorContext
+    ) {
+        val kclass: KClass<out T> = featureContext::class
+        val processors: List<ProcessorFeature<T>> =
+            features[kclass].orEmpty() as List<ProcessorFeature<T>>
+        processors.forEach { it.process(featureContext, processorContext) }
     }
 
-    private fun KmType.kotlinTypeToTypeName(classifierName: ClassName): TypeName {
-        val typeName = DeclaredTypeName(
-            moduleName = kotlinFrameworkName,
-            simpleName = classifierName.split("/").last()
-        )
-        if (this.arguments.isEmpty()) return typeName
+    class Builder {
+        private val features = mutableMapOf<KClass<out FeatureContext>, List<ProcessorFeature<*>>>()
 
-        val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->
-            typeProj.type?.toTypeName()
+        fun <CTX : FeatureContext> install(
+            clazz: KClass<CTX>,
+            processor: ProcessorFeature<CTX>
+        ) {
+            val currentList: List<ProcessorFeature<*>> = features[clazz] ?: emptyList()
+            features[clazz] = currentList.plus(processor)
         }
-        return typeName.parameterizedBy(*arguments.toTypedArray())
-    }
 
-    private fun processClass(klass: KmClass) {
-        logger.debug("class metadata $klass")
+        inline fun <reified CTX : FeatureContext> install(processor: ProcessorFeature<CTX>) {
+            install(CTX::class, processor)
+        }
+
+        fun build() = features.toMap()
     }
 }

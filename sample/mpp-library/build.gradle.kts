@@ -9,6 +9,7 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("dev.icerock.mobile.multiplatform.android-manifest")
     id("dev.icerock.mobile.multiplatform.ios-framework")
+    id("dev.icerock.moko.kswift")
 }
 
 kotlin {

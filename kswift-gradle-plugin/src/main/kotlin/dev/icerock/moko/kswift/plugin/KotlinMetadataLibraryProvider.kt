@@ -26,7 +26,8 @@ class KotlinMetadataLibraryProvider(
         fun readLibraryMetadata(libraryPath: File): KlibModuleMetadata {
             check(libraryPath.exists()) { "Library does not exist: $libraryPath" }
 
-            val library = resolveSingleFileKlib(KonanFile(libraryPath.absolutePath))
+            val libraryKonanFile = KonanFile(libraryPath.absolutePath)
+            val library = resolveSingleFileKlib(libraryKonanFile)
 
             return KlibModuleMetadata.read(KotlinMetadataLibraryProvider(library))
         }

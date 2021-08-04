@@ -4,6 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin
 
+import dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,36 +17,55 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import java.io.File
 
+@Suppress("unused")
 open class KSwiftPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.plugins.withType(KotlinMultiplatformPluginWrapper::class.java) { pluginWrapper ->
-            val multiplatformExtension = target.extensions
-                .getByType(pluginWrapper.projectExtensionClass.java)
-
-            applyToKotlinMultiplatform(multiplatformExtension)
+        val processor = KLibProcessor(
+            logger = GradleLogger(target.logger)
+        ) {
+            install(PlatformExtensionFunctionsFeature())
         }
+
+        target.plugins
+            .withType<KotlinMultiplatformPluginWrapper>()
+            .configureEach { pluginWrapper ->
+                val multiplatformExtension = target.extensions
+                    .getByType(pluginWrapper.projectExtensionClass.java)
+
+                applyToKotlinMultiplatform(multiplatformExtension, processor)
+            }
     }
 
-    private fun applyToKotlinMultiplatform(extension: KotlinMultiplatformExtension) {
+    private fun applyToKotlinMultiplatform(
+        extension: KotlinMultiplatformExtension,
+        processor: KLibProcessor
+    ) {
         extension.targets
             .withType<KotlinNativeTarget>()
             .matching { it.konanTarget.family.isAppleFamily }
-            .configureEach { applyToAppleTarget(it) }
+            .configureEach { applyToAppleTarget(it, processor) }
     }
 
-    private fun applyToAppleTarget(target: KotlinNativeTarget) {
+    private fun applyToAppleTarget(
+        target: KotlinNativeTarget,
+        processor: KLibProcessor
+    ) {
         target.binaries
             .withType<Framework>()
-            .configureEach { applyToAppleFramework(it) }
+            .configureEach { applyToAppleFramework(it, processor) }
     }
 
-    private fun applyToAppleFramework(framework: Framework) {
+    private fun applyToAppleFramework(
+        framework: Framework,
+        processor: KLibProcessor
+    ) {
         val linkTask: KotlinNativeLink = framework.linkTask
-        linkTask.doLast(PostProcessLinkTask(framework = framework))
+        linkTask.doLast(PostProcessLinkTask(framework, processor))
     }
 
     private class PostProcessLinkTask(
         private val framework: Framework,
+        private val processor: KLibProcessor,
     ) : Action<Task> {
 
         override fun execute(task: Task) {
@@ -53,16 +73,12 @@ open class KSwiftPlugin : Plugin<Project> {
 
             val kotlinFrameworkName = framework.baseName
             val swiftFrameworkName = "${kotlinFrameworkName}Swift"
+            val outputDir = File(framework.outputDirectory, swiftFrameworkName)
 
-            linkTask.libraries
+            linkTask.exportLibraries
                 .plus(linkTask.intermediateLibrary.get())
                 .forEach { library ->
-                    KLibProcessor(
-                        kotlinFrameworkName = framework.baseName,
-                        outputDir = File(framework.outputDirectory, swiftFrameworkName),
-                        library = library,
-                        logger = framework.project.logger
-                    ).process()
+                    processor.processFeatureContext(library, outputDir, framework)
                 }
         }
     }
