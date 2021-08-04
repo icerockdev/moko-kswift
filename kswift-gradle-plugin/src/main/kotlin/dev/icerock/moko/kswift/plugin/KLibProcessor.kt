@@ -35,7 +35,7 @@ class KLibProcessor(
         libraryContext.visit { processFeatureContext(this, processorContext) }
 
         val fileSpec: FileSpec = fileSpecBuilder.build()
-        fileSpec.writeTo(outputDir)
+        if (fileSpec.members.isNotEmpty()) fileSpec.writeTo(outputDir)
     }
 
     private fun <T : FeatureContext> processFeatureContext(

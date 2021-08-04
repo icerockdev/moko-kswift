@@ -54,6 +54,7 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(declaredType)
             .addFunction(
                 FunctionSpec.builder(funcName)
+                    .addModifiers(Modifier.PUBLIC)
                     .addParameters(func.valueParameters.map { param ->
                         val type = param.type?.toTypeName(kotlinFrameworkName)
                             ?: throw IllegalArgumentException("extension $funcName have null type for $param")
@@ -69,6 +70,7 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
 
         val fileSpecBuilder: FileSpec.Builder = processorContext.fileSpecBuilder
 
+        fileSpecBuilder.addImport(declaredType.moduleName)
         fileSpecBuilder.addExtension(extensionSpec)
     }
 }

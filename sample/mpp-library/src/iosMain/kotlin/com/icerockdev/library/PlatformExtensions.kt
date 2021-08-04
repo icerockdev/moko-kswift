@@ -6,9 +6,9 @@ package com.icerockdev.library
 
 import platform.UIKit.UILabel
 
-fun UILabel.fillByKotlin() {
-    this.text = "filled by kotlin"
-}
+//fun UILabel.fillByKotlin() {
+//    this.text = "filled by kotlin"
+//}
 
 fun UILabel.fillByKotlin(text: String) {
     this.text = text
@@ -17,10 +17,10 @@ fun UILabel.fillByKotlin(text: String) {
 interface IDataProvider<T> {
     fun getData(): T
 }
-
-fun UILabel.fillByKotlin(provider: IDataProvider<String>) {
-    this.text = provider.getData()
-}
+//
+//fun UILabel.fillByKotlin(provider: IDataProvider<String>) {
+//    this.text = provider.getData()
+//}
 
 class CDataProvider<T>(private val data: T): IDataProvider<T> {
     override fun getData(): T = data
