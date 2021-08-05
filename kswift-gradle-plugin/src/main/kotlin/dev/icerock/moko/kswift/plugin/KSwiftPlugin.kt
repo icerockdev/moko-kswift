@@ -21,7 +21,7 @@ import java.io.File
 open class KSwiftPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val processor = KLibProcessor(
-            logger = GradleLogger(target.logger)
+            logger = target.logger
         ) {
             install(PlatformExtensionFunctionsFeature())
         }

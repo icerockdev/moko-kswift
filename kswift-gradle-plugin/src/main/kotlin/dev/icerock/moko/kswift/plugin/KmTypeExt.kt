@@ -4,15 +4,17 @@
 
 package dev.icerock.moko.kswift.plugin
 
+import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
+import io.outfoxx.swiftpoet.FunctionTypeName
+import io.outfoxx.swiftpoet.ParameterSpec
+import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
-import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
-import kotlinx.metadata.klib.annotations
 
 fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): TypeName {
     val classifier = classifier
@@ -24,10 +26,23 @@ fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): Ty
         "kotlin/String" -> if (isUsedInGenerics) {
             DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
         } else {
-            DeclaredTypeName(moduleName = "Swift", simpleName = "String")
+            STRING
         }
         "kotlin/Int" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSNumber")
+        "kotlin/Boolean" -> if (isUsedInGenerics) {
+            DeclaredTypeName(moduleName = moduleName, simpleName = "KotlinBoolean")
+        } else {
+            BOOL
+        }
         "kotlin/Unit" -> VOID
+        "kotlin/Function1" -> {
+            val inputType: TypeName = arguments[0].type?.toTypeName(moduleName, false)!!
+            val outputType: TypeName = arguments[1].type?.toTypeName(moduleName, false)!!
+            FunctionTypeName.get(
+                parameters = listOf(ParameterSpec.unnamed(inputType)),
+                returnType = outputType
+            ).makeEscaping()
+        }
         else -> kotlinTypeToTypeName(moduleName, classifierName)
     }
 }

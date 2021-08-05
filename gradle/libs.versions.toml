@@ -9,6 +9,9 @@ coroutinesVersion = "1.5.0-native-mt"
 mokoTestVersion = "0.4.0"
 mokoKSwiftVersion = "0.1.0"
 
+mokoMvvmVersion = "0.11.0"
+mokoResourcesVersion = "0.16.2"
+
 kotlinxMetadataKLibVersion = "0.0.1-dev-10"
 
 kotlinPoetVersion = "1.6.0"
@@ -20,6 +23,12 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 lifecycle = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "androidLifecycleVersion" }
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 mokoTest = { module = "dev.icerock.moko:test-core", version.ref = "mokoTestVersion" }
+
+mokoMvvmCore = { module = "dev.icerock.moko:mvvm-core" , version.ref = "mokoMvvmVersion" }
+mokoMvvmLiveData = { module = "dev.icerock.moko:mvvm-livedata" , version.ref = "mokoMvvmVersion" }
+mokoMvvmState = { module = "dev.icerock.moko:mvvm-state" , version.ref = "mokoMvvmVersion" }
+
+mokoResources = { module = "dev.icerock.moko:resources" , version.ref = "mokoResourcesVersion" }
 
 kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoetVersion" }
 swiftPoet = { module = "io.outfoxx:swiftpoet", version.ref = "swiftPoetVersion" }

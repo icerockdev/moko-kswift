@@ -9,5 +9,5 @@ Pod::Spec.new do |spec|
 
     spec.dependency 'MultiPlatformLibrary'
 
-    spec.source_files = "build/bin/iosX64/MultiPlatformLibraryDebugFramework/MultiPlatformLibrarySwift/**/*.{h,m,swift}"
+    spec.source_files = "build/cocoapods/framework/MultiPlatformLibrarySwift/**/*.{h,m,swift}"
 end

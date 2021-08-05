@@ -33,6 +33,11 @@ publishing {
                 }
             }
 
+            organization {
+                name.set("IceRock Development")
+                url.set("https://icerockdev.com")
+            }
+
             developers {
                 developer {
                     id.set("Alex009")

@@ -1,0 +1,3 @@
+[submodule "swiftpoet"]
+	path = swiftpoet
+	url = https://github.com/icerockdev/swiftpoet.git

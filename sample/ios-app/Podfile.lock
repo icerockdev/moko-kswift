@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   MultiPlatformLibrary: e778b00f0244457dbfd60a071e6dea6822d72d24
-  MultiPlatformLibrarySwift: 4e0fbfe3ee95b97f2830b123af8d20764da84703
+  MultiPlatformLibrarySwift: 4d3a8ac5c5d6b2408cffcad3ac1bb9fe69a9816f
 
 PODFILE CHECKSUM: 862ed5a8f8aa878483e7c17198ac3c8fd345b547
 

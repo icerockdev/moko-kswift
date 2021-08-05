@@ -21,6 +21,7 @@ dependencyResolutionManagement {
 }
 
 includeBuild("kswift-build-logic")
+includeBuild("swiftpoet")
 includeBuild("kswift-gradle-plugin")
 
 include(":kswift-runtime")

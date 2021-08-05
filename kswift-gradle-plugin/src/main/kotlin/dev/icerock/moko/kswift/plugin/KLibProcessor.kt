@@ -8,8 +8,8 @@ import dev.icerock.moko.kswift.plugin.context.FeatureContext
 import dev.icerock.moko.kswift.plugin.context.LibraryContext
 import io.outfoxx.swiftpoet.FileSpec
 import kotlinx.metadata.klib.KlibModuleMetadata
+import org.gradle.api.logging.Logger
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.util.Logger
 import java.io.File
 import kotlin.reflect.KClass
 
@@ -21,8 +21,12 @@ class KLibProcessor(
         Builder().apply(config).build()
 
     fun processFeatureContext(library: File, outputDir: File, framework: Framework) {
-        val metadata: KlibModuleMetadata =
+        val metadata: KlibModuleMetadata = try {
             KotlinMetadataLibraryProvider.readLibraryMetadata(library)
+        } catch (exc: Exception) {
+            logger.error("can't parse metadata", exc)
+            return
+        }
 
         val fileSpecBuilder: FileSpec.Builder = FileSpec.builder(library.nameWithoutExtension)
 
@@ -33,12 +37,14 @@ class KLibProcessor(
 
         val libraryContext = LibraryContext(metadata)
         libraryContext.visit { featureContext ->
-            logger.log("visit $featureContext")
+            logger.lifecycle("visit $featureContext")
             processFeatureContext(featureContext, processorContext)
         }
 
         val fileSpec: FileSpec = fileSpecBuilder.build()
-        if (fileSpec.members.isNotEmpty()) fileSpec.writeTo(outputDir)
+        if (fileSpec.members.isNotEmpty()) {
+            fileSpec.writeTo(outputDir)
+        }
     }
 
     private fun <T : FeatureContext> processFeatureContext(
@@ -51,7 +57,13 @@ class KLibProcessor(
         val processors: List<ProcessorFeature<T>> =
             features[kclass].orEmpty() as List<ProcessorFeature<T>>
 
-        processors.forEach { it.process(featureContext, processorContext) }
+        processors.forEach { featureProcessor ->
+            try {
+                featureProcessor.process(featureContext, processorContext)
+            } catch (exc: Exception) {
+                logger.error("can't process context $featureContext", exc)
+            }
+        }
     }
 
     class Builder {

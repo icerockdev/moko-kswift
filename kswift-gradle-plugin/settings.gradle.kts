@@ -37,3 +37,4 @@ dependencyResolutionManagement {
 }
 
 includeBuild("../kswift-build-logic")
+includeBuild("../swiftpoet")

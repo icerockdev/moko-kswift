@@ -20,11 +20,20 @@ kotlin {
 dependencies {
     commonMainApi(libs.coroutines)
 
+    commonMainApi(libs.mokoMvvmCore)
+    commonMainApi(libs.mokoMvvmLiveData)
+    commonMainApi(libs.mokoMvvmState)
+    commonMainApi(libs.mokoResources)
+
     commonMainApi(projects.kswiftRuntime)
 }
 
 framework {
     export(projects.kswiftRuntime)
+    export(libs.mokoMvvmCore)
+    export(libs.mokoMvvmLiveData)
+    export(libs.mokoMvvmState)
+    export(libs.mokoResources)
 }
 
 val syncMultiPlatformLibraryDebugFrameworkIosX64 by tasks
