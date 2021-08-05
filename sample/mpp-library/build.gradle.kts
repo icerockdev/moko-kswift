@@ -2,6 +2,7 @@
  * Copyright 2021 IceRock MAG Inc. Use of this source code is governed by the Apache 2.0 license.
  */
 
+import dev.icerock.moko.kswift.plugin.ProcessorFeature.Filter
 import dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature
 
 plugins {
@@ -20,12 +21,14 @@ kotlin {
 }
 
 kswift {
-    install(PlatformExtensionFunctionsFeature {
-        exclude("PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UILabel)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>")
-        exclude("PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextField)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>")
-        exclude("PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextView)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>")
-        exclude("PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UIButton)/bindTitle/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>")
-    })
+    install(PlatformExtensionFunctionsFeature) {
+        filter = Filter.Exclude(
+            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UILabel)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
+            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextField)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
+            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextView)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
+            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UIButton)/bindTitle/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>"
+        )
+    }
 }
 
 dependencies {

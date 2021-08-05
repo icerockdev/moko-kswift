@@ -24,8 +24,8 @@ import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
 
 class PlatformExtensionFunctionsFeature(
-    config: Builder.() -> Unit = {}
-) : ProcessorFeature<PackageFunctionContext>(config) {
+    filter: Filter<PackageFunctionContext>
+) : ProcessorFeature<PackageFunctionContext>(filter) {
     override fun doProcess(
         featureContext: PackageFunctionContext,
         processorContext: ProcessorContext
@@ -142,5 +142,16 @@ class PlatformExtensionFunctionsFeature(
         }
         val newParamName: String? = overrideName?.arguments?.get("newParamName")?.value as? String
         return newParamName ?: param.name
+    }
+
+    class Config {
+        var filter: Filter<PackageFunctionContext> = Filter.Exclude(emptySet())
+    }
+
+    companion object : Factory<PackageFunctionContext, PlatformExtensionFunctionsFeature, Config> {
+        override fun create(block: Config.() -> Unit): PlatformExtensionFunctionsFeature {
+            val config = Config().apply(block)
+            return PlatformExtensionFunctionsFeature(config.filter)
+        }
     }
 }

@@ -8,29 +8,37 @@ import dev.icerock.moko.kswift.plugin.context.FeatureContext
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 
-abstract class ProcessorFeature<CTX : FeatureContext>(config: Builder.() -> Unit) {
-    protected val excludeNames: Set<String>
-
-    init {
-        val excludes = mutableSetOf<String>()
-        val builder = Builder(excludes)
-        builder.config()
-
-        excludeNames = excludes.toSet()
-    }
-
+abstract class ProcessorFeature<CTX : FeatureContext>(private val filter: Filter<CTX>) {
     fun process(featureContext: CTX, processorContext: ProcessorContext) {
-        if (excludeNames.contains(featureContext.prefixedUniqueId)) return
+        if (filter.isShouldProcess(featureContext).not()) return
 
         doProcess(featureContext, processorContext)
     }
 
     protected abstract fun doProcess(featureContext: CTX, processorContext: ProcessorContext)
 
-    class Builder(private val excludes: MutableSet<String>) {
-        fun exclude(name: String) {
-            excludes.add(name)
+    sealed interface Filter<CTX : FeatureContext> {
+        fun isShouldProcess(featureContext: CTX): Boolean
+
+        data class Exclude<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
+            override fun isShouldProcess(featureContext: CTX): Boolean {
+                return names.contains(featureContext.prefixedUniqueId).not()
+            }
+
+            constructor(vararg names: String) : this(names.toSet())
         }
+
+        data class Include<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
+            override fun isShouldProcess(featureContext: CTX): Boolean {
+                return names.contains(featureContext.prefixedUniqueId)
+            }
+
+            constructor(vararg names: String) : this(names.toSet())
+        }
+    }
+
+    interface Factory<CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> {
+        fun create(block: Config.() -> Unit): F
     }
 }
 

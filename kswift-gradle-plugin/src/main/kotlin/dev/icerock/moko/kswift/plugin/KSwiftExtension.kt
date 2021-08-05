@@ -11,15 +11,20 @@ open class KSwiftExtension {
     internal val features: MutableMap<KClass<out FeatureContext>, List<ProcessorFeature<*>>> =
         mutableMapOf()
 
-    fun <CTX : FeatureContext> install(
+    fun <CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
         featureContext: KClass<out CTX>,
-        processorFeature: ProcessorFeature<CTX>
+        featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
+        config: Config.() -> Unit
     ) {
         val currentList: List<ProcessorFeature<*>> = features[featureContext] ?: emptyList()
+        val processorFeature: ProcessorFeature<CTX> = featureFactory.create(config)
         features[featureContext] = currentList.plus(processorFeature)
     }
 
-    inline fun <reified CTX : FeatureContext> install(processor: ProcessorFeature<CTX>) {
-        install(CTX::class, processor)
+    inline fun <reified CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
+        featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
+        noinline config: Config.() -> Unit
+    ) {
+        install(CTX::class, featureFactory, config)
     }
 }
