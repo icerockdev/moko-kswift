@@ -4,9 +4,9 @@
 
 package dev.icerock.moko.kswift.plugin.feature
 
-import dev.icerock.moko.kswift.plugin.PackageFunctionContext
 import dev.icerock.moko.kswift.plugin.ProcessorContext
 import dev.icerock.moko.kswift.plugin.ProcessorFeature
+import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec

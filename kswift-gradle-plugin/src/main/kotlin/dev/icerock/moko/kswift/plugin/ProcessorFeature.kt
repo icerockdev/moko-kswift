@@ -4,6 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin
 
+import dev.icerock.moko.kswift.plugin.context.FeatureContext
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 

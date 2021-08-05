@@ -4,6 +4,8 @@
 
 package dev.icerock.moko.kswift.plugin
 
+import dev.icerock.moko.kswift.plugin.context.FeatureContext
+import dev.icerock.moko.kswift.plugin.context.LibraryContext
 import io.outfoxx.swiftpoet.FileSpec
 import kotlinx.metadata.klib.KlibModuleMetadata
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
@@ -22,8 +24,6 @@ class KLibProcessor(
         val metadata: KlibModuleMetadata =
             KotlinMetadataLibraryProvider.readLibraryMetadata(library)
 
-        logger.log("metadata $metadata")
-
         val fileSpecBuilder: FileSpec.Builder = FileSpec.builder(library.nameWithoutExtension)
 
         val processorContext = ProcessorContext(
@@ -32,7 +32,10 @@ class KLibProcessor(
         )
 
         val libraryContext = LibraryContext(metadata)
-        libraryContext.visit { processFeatureContext(this, processorContext) }
+        libraryContext.visit { featureContext ->
+            logger.log("visit $featureContext")
+            processFeatureContext(featureContext, processorContext)
+        }
 
         val fileSpec: FileSpec = fileSpecBuilder.build()
         if (fileSpec.members.isNotEmpty()) fileSpec.writeTo(outputDir)
@@ -43,8 +46,11 @@ class KLibProcessor(
         processorContext: ProcessorContext
     ) {
         val kclass: KClass<out T> = featureContext::class
+
+        @Suppress("UNCHECKED_CAST")
         val processors: List<ProcessorFeature<T>> =
             features[kclass].orEmpty() as List<ProcessorFeature<T>>
+
         processors.forEach { it.process(featureContext, processorContext) }
     }
 
