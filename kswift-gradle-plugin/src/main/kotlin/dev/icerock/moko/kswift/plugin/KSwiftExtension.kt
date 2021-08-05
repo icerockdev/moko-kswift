@@ -27,4 +27,12 @@ open class KSwiftExtension {
     ) {
         install(CTX::class, featureFactory, config)
     }
+
+    fun <CTX : FeatureContext> excludeFilter(vararg names: String): ProcessorFeature.Filter.Exclude<CTX> {
+        return ProcessorFeature.Filter.Exclude(names.toSet())
+    }
+
+    fun <CTX : FeatureContext> includeFilter(vararg names: String): ProcessorFeature.Filter.Include<CTX> {
+        return ProcessorFeature.Filter.Include(names.toSet())
+    }
 }

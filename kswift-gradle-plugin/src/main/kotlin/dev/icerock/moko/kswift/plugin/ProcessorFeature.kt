@@ -24,16 +24,12 @@ abstract class ProcessorFeature<CTX : FeatureContext>(private val filter: Filter
             override fun isShouldProcess(featureContext: CTX): Boolean {
                 return names.contains(featureContext.prefixedUniqueId).not()
             }
-
-            constructor(vararg names: String) : this(names.toSet())
         }
 
         data class Include<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
             override fun isShouldProcess(featureContext: CTX): Boolean {
                 return names.contains(featureContext.prefixedUniqueId)
             }
-
-            constructor(vararg names: String) : this(names.toSet())
         }
     }
 
