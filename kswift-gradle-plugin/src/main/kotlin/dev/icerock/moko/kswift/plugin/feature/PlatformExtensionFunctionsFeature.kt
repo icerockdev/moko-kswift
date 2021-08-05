@@ -48,7 +48,7 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
                 append(param.name)
             }
         }
-        val callParamsLine: String = callParams.joinToString(", ")
+        val callParamsLine: String = listOf("self").plus(callParams).joinToString(", ")
 
         val declaredType = DeclaredTypeName(moduleName = frameworkName, simpleName = className)
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(declaredType)
@@ -62,7 +62,7 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
                             .build()
                     })
                     .returns(func.returnType.toTypeName(kotlinFrameworkName))
-                    .addCode("return $swiftedClass.$funcName(self, $callParamsLine)\n")
+                    .addCode("return $swiftedClass.$funcName($callParamsLine)\n")
                     .build()
             )
             .addModifiers(Modifier.PUBLIC)

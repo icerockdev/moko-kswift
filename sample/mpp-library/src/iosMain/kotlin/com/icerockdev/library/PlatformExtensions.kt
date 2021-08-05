@@ -6,9 +6,9 @@ package com.icerockdev.library
 
 import platform.UIKit.UILabel
 
-//fun UILabel.fillByKotlin() {
-//    this.text = "filled by kotlin"
-//}
+fun UILabel.fillByKotlin() {
+    this.text = "filled by kotlin"
+}
 
 fun UILabel.fillByKotlin(text: String) {
     this.text = text
