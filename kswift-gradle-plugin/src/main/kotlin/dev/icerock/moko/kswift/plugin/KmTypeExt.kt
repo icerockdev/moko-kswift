@@ -12,21 +12,28 @@ import kotlinx.metadata.ClassName
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 
-fun KmType.toTypeName(moduleName: String): TypeName {
+fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): TypeName {
     val classifier = classifier
     if (classifier !is KmClassifier.Class) {
         throw IllegalArgumentException("illegal type classifier $this $classifier")
     }
 
     return when (val classifierName = classifier.name) {
-        "kotlin/String" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
+        "kotlin/String" -> if (isUsedInGenerics) {
+            DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
+        } else {
+            DeclaredTypeName(moduleName = "Swift", simpleName = "String")
+        }
         "kotlin/Int" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSNumber")
         "kotlin/Unit" -> VOID
         else -> kotlinTypeToTypeName(moduleName, classifierName)
     }
 }
 
-fun KmType.kotlinTypeToTypeName(moduleName: String, classifierName: ClassName): TypeName {
+fun KmType.kotlinTypeToTypeName(
+    moduleName: String,
+    classifierName: ClassName
+): TypeName {
     val typeName = DeclaredTypeName(
         moduleName = moduleName,
         simpleName = classifierName.split("/").last()
@@ -34,7 +41,7 @@ fun KmType.kotlinTypeToTypeName(moduleName: String, classifierName: ClassName): 
     if (this.arguments.isEmpty()) return typeName
 
     val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->
-        typeProj.type?.toTypeName(moduleName)
+        typeProj.type?.toTypeName(moduleName = moduleName, isUsedInGenerics = true)
     }
     return typeName.parameterizedBy(*arguments.toTypedArray())
 }
