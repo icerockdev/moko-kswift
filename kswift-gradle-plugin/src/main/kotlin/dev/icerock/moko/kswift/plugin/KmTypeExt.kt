@@ -9,8 +9,10 @@ import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
+import kotlinx.metadata.klib.annotations
 
 fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): TypeName {
     val classifier = classifier

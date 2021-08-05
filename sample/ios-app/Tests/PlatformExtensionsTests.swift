@@ -37,4 +37,17 @@ class PlatformExtensionsTests: XCTestCase {
         
         XCTAssertEqual(label.text, "test")
     }
+    
+    func testInterfaceProviderExtension() throws {
+        let interfaceProvider: IDataProvider = TestProvider()
+        label.fillByKotlin(provider: interfaceProvider)
+        
+        XCTAssertEqual(label.text, "test interface")
+    }
+}
+
+class TestProvider: NSObject, IDataProvider {
+    func getData() -> Any? {
+        return "test interface"
+    }
 }

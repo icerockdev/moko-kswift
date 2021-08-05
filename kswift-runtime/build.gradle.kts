@@ -7,9 +7,3 @@ plugins {
     id("dev.icerock.mobile.multiplatform.android-manifest")
     id("publication-convention")
 }
-
-dependencies {
-    commonMainApi(libs.coroutines)
-
-    commonTestImplementation(libs.mokoTest)
-}

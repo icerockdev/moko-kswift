@@ -14,8 +14,12 @@ import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
+import io.outfoxx.swiftpoet.ParameterizedTypeName
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
+import kotlinx.metadata.KmValueParameter
+import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
 
 class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContext> {
@@ -43,24 +47,21 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
         val swiftedClass: String = fileName.replace(".kt", "Kt")
         val callParams: List<String> = func.valueParameters.map { param ->
             buildString {
-                append(param.name)
+                append(buildFunctionParameterName(param))
                 append(": ")
                 append(param.name)
             }
         }
         val callParamsLine: String = listOf("self").plus(callParams).joinToString(", ")
 
+        val funcParams: List<ParameterSpec> = buildFunctionParameters(func, kotlinFrameworkName)
+
         val declaredType = DeclaredTypeName(moduleName = frameworkName, simpleName = className)
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(declaredType)
             .addFunction(
                 FunctionSpec.builder(funcName)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameters(func.valueParameters.map { param ->
-                        val type = param.type?.toTypeName(kotlinFrameworkName)
-                            ?: throw IllegalArgumentException("extension $funcName have null type for $param")
-                        ParameterSpec.builder(parameterName = param.name, type = type)
-                            .build()
-                    })
+                    .addParameters(funcParams)
                     .returns(func.returnType.toTypeName(kotlinFrameworkName))
                     .addCode("return $swiftedClass.$funcName($callParamsLine)\n")
                     .build()
@@ -72,5 +73,36 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
 
         fileSpecBuilder.addImport(declaredType.moduleName)
         fileSpecBuilder.addExtension(extensionSpec)
+    }
+
+    private fun buildFunctionParameters(
+        func: KmFunction,
+        kotlinFrameworkName: String
+    ): List<ParameterSpec> {
+        return func.valueParameters.map { param ->
+            val type = param.type?.toTypeName(kotlinFrameworkName)
+                ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
+
+            val withoutGenericsAnnotation = param.annotations
+                .firstOrNull { it.className == "dev/icerock/moko/kswift/KSwiftWithoutGenerics" }
+
+            val usedType = if (withoutGenericsAnnotation != null) {
+                if (type is ParameterizedTypeName) type.rawType
+                else type
+            } else {
+                type
+            }
+
+            ParameterSpec.builder(parameterName = param.name, type = usedType)
+                .build()
+        }
+    }
+
+    private fun buildFunctionParameterName(param: KmValueParameter): String {
+        val overrideName: KmAnnotation? = param.annotations.firstOrNull {
+            it.className == "dev/icerock/moko/kswift/KSwiftOverrideName"
+        }
+        val newParamName: String? = overrideName?.arguments?.get("newParamName")?.value as? String
+        return newParamName ?: param.name
     }
 }
