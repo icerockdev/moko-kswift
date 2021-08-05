@@ -7,6 +7,7 @@ package dev.icerock.moko.kswift.plugin.feature
 import dev.icerock.moko.kswift.plugin.ProcessorContext
 import dev.icerock.moko.kswift.plugin.ProcessorFeature
 import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
+import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
@@ -33,15 +34,8 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
         val receiver = func.receiverParameterType ?: return
 
         val classifier = receiver.classifier
-        if (classifier !is KmClassifier.Class) return
+        val classTypeName = buildClassTypeName(classifier) ?: return
 
-        val receiverName: String = classifier.name
-        val receiverParts: List<String> = receiverName.split("/")
-        if (receiverParts.size < 3) return
-        if (receiverParts[0] != "platform") return
-
-        val frameworkName: String = receiverParts[1]
-        val className: String = receiverParts[2]
         val funcName: String = func.name
         val fileName: String = func.file?.name ?: return
         val swiftedClass: String = fileName.replace(".kt", "Kt")
@@ -56,11 +50,15 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
 
         val funcParams: List<ParameterSpec> = buildFunctionParameters(func, kotlinFrameworkName)
 
-        val declaredType = DeclaredTypeName(moduleName = frameworkName, simpleName = className)
-        val extensionSpec: ExtensionSpec = ExtensionSpec.builder(declaredType)
+        val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
             .addFunction(
                 FunctionSpec.builder(funcName)
                     .addModifiers(Modifier.PUBLIC)
+                    .apply {
+                        if (classTypeName is PlatformClassTypeName.Companion) {
+                            addModifiers(Modifier.CLASS)
+                        }
+                    }
                     .addParameters(funcParams)
                     .returns(func.returnType.toTypeName(kotlinFrameworkName))
                     .addCode("return $swiftedClass.$funcName($callParamsLine)\n")
@@ -71,8 +69,40 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
 
         val fileSpecBuilder: FileSpec.Builder = processorContext.fileSpecBuilder
 
-        fileSpecBuilder.addImport(declaredType.moduleName)
+        fileSpecBuilder.addImport(classTypeName.typeName.moduleName)
+        fileSpecBuilder.addImport(kotlinFrameworkName)
         fileSpecBuilder.addExtension(extensionSpec)
+    }
+
+    private fun buildClassTypeName(classifier: KmClassifier): PlatformClassTypeName? {
+        if (classifier !is KmClassifier.Class) return null
+
+        val receiverName: String = classifier.name
+        val receiverParts: List<String> = receiverName.split("/")
+        if (receiverParts.size < 3) return null
+        if (receiverParts[0] != "platform") return null
+
+        val frameworkName: String = receiverParts[1]
+        val className: String = receiverParts[2]
+
+        val (simpleName, isCompanion) = if (className.endsWith(".Companion")) {
+            className.removeSuffix(".Companion") to true
+        } else {
+            className to false
+        }
+
+        val declaredTypeName = DeclaredTypeName(moduleName = frameworkName, simpleName = simpleName)
+
+        return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
+        else PlatformClassTypeName.Normal(declaredTypeName)
+    }
+
+    sealed interface PlatformClassTypeName {
+        val typeName: DeclaredTypeName
+
+        data class Normal(override val typeName: DeclaredTypeName) : PlatformClassTypeName
+
+        data class Companion(override val typeName: DeclaredTypeName) : PlatformClassTypeName
     }
 
     private fun buildFunctionParameters(

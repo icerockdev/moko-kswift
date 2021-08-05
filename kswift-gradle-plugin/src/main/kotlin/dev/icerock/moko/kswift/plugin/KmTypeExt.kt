@@ -43,7 +43,15 @@ fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): Ty
                 returnType = outputType
             ).makeEscaping()
         }
-        else -> kotlinTypeToTypeName(moduleName, classifierName)
+        else -> {
+            if (classifierName.startsWith("platform/")) {
+                DeclaredTypeName.typeName(
+                    classifierName.split("/").drop(1).joinToString(".")
+                ).toSwift()
+            } else {
+                kotlinTypeToTypeName(moduleName, classifierName)
+            }
+        }
     }
 }
 
@@ -61,4 +69,11 @@ fun KmType.kotlinTypeToTypeName(
         typeProj.type?.toTypeName(moduleName = moduleName, isUsedInGenerics = true)
     }
     return typeName.parameterizedBy(*arguments.toTypedArray())
+}
+
+fun DeclaredTypeName.toSwift(): DeclaredTypeName {
+    return when {
+        moduleName == "Foundation" && simpleName == "NSBundle" -> peerType("Bundle")
+        else -> this
+    }
 }
