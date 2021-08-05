@@ -15,3 +15,9 @@ fun UILabel.bindText(
 ): Closeable {
     return this.originalBindText(liveData, formatter)
 }
+
+fun UILabel.bindText(
+    liveData: LiveData<String>
+): Closeable {
+    return this.originalBindText(liveData)
+}

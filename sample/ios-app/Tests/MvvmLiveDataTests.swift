@@ -21,7 +21,7 @@ class MvvmLiveDataTests: XCTestCase {
 
     func testLiveData() throws {
         let ld = MutableLiveData<NSString>(initialValue: "first")
-        _ = label.bindText(liveData: ld, formatter: { $0 })
+        _ = label.bindText(liveData: ld)
         XCTAssertEqual(label.text, "first")
         ld.value = "second"
         XCTAssertEqual(label.text, "second")
