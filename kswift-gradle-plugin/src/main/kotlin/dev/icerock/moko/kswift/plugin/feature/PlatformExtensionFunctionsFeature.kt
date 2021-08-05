@@ -23,8 +23,10 @@ import kotlinx.metadata.KmValueParameter
 import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
 
-class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContext> {
-    override fun process(
+class PlatformExtensionFunctionsFeature(
+    config: Builder.() -> Unit = {}
+) : ProcessorFeature<PackageFunctionContext>(config) {
+    override fun doProcess(
         featureContext: PackageFunctionContext,
         processorContext: ProcessorContext
     ) {
@@ -50,9 +52,15 @@ class PlatformExtensionFunctionsFeature : ProcessorFeature<PackageFunctionContex
 
         val funcParams: List<ParameterSpec> = buildFunctionParameters(func, kotlinFrameworkName)
 
+        val comment = """
+            you can exclude this function by:
+            exclude("${featureContext.prefixedUniqueId}")
+            """.trimIndent()
+
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
             .addFunction(
                 FunctionSpec.builder(funcName)
+                    .addDoc(comment + "\n")
                     .addModifiers(Modifier.PUBLIC)
                     .apply {
                         if (classTypeName is PlatformClassTypeName.Companion) {

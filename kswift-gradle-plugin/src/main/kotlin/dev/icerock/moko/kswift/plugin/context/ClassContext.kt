@@ -22,4 +22,11 @@ data class ClassContext(
             append(parentContext.toString())
         }
     }
+
+    override val uniqueId: String
+        get() = buildString {
+            append(parentContext.uniqueId)
+            append("/")
+            append(clazz.name)
+        }
 }

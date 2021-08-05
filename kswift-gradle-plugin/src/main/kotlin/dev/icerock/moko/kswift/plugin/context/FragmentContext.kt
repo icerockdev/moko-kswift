@@ -5,6 +5,7 @@
 package dev.icerock.moko.kswift.plugin.context
 
 import kotlinx.metadata.KmModuleFragment
+import kotlinx.metadata.klib.fqName
 import kotlinx.metadata.klib.moduleFragmentFiles
 
 data class FragmentContext(
@@ -24,4 +25,7 @@ data class FragmentContext(
             append(parentContext.toString())
         }
     }
+
+    override val uniqueId: String
+        get() = parentContext.uniqueId
 }

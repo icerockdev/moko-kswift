@@ -4,11 +4,11 @@
 
 package dev.icerock.moko.kswift.plugin
 
-import dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
@@ -20,11 +20,11 @@ import java.io.File
 @Suppress("unused")
 open class KSwiftPlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        val extension = target.extensions.create<KSwiftExtension>("kswift")
         val processor = KLibProcessor(
-            logger = target.logger
-        ) {
-            install(PlatformExtensionFunctionsFeature())
-        }
+            logger = target.logger,
+            extension = extension
+        )
 
         target.plugins
             .withType<KotlinMultiplatformPluginWrapper>()

@@ -24,4 +24,7 @@ data class LibraryContext(
             append(metadata.annotations.size)
         }
     }
+
+    override val uniqueId: String
+        get() = metadata.name.removeSurrounding("<", ">")
 }

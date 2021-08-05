@@ -11,4 +11,8 @@ abstract class FeatureContext {
     }
 
     protected abstract fun visitChildren(action: (FeatureContext) -> Unit)
+
+    abstract val uniqueId: String
+
+    val prefixedUniqueId: String get() = this::class.simpleName!! + "/" + uniqueId
 }
