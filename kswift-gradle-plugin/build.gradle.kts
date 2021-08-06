@@ -17,6 +17,14 @@ dependencies {
     implementation(libs.swiftPoet)
     implementation(libs.kotlinCompilerEmbeddable)
     implementation(libs.kotlinxMetadataKLib)
+
+    testImplementation(libs.kotlinTestJUnit)
+}
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 gradlePlugin {

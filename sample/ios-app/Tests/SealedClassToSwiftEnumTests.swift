@@ -11,27 +11,6 @@ import XCTest
 @testable import MultiPlatformLibrarySwift
 
 // ===> NEED TO GENERATE
-enum UIStateClassKs<T: AnyObject> {
-    case loading
-    case empty
-    case data(obj: UIStateClassData<T>)
-    case error(obj: UIStateClassError)
-    
-    init(_ obj: UIStateClass<T>) {
-        if obj is UIStateClassLoading {
-            self = .loading
-        } else if obj is UIStateClassEmpty {
-            self = .empty
-        } else if let obj = obj as? UIStateClassData<T> {
-            self = .data(obj: obj)
-        } else if let obj = obj as? UIStateClassError {
-            self = .error(obj: obj)
-        } else {
-            fatalError("UIStateClassKs not syncronized with UIStateClass class")
-        }
-    }
-}
-
 extension TestStateClassSource {
     var loadingKs: UIStateClassKs<NSString> {
         get {
