@@ -6,21 +6,20 @@ package dev.icerock.moko.kswift.plugin.feature
 
 import dev.icerock.moko.kswift.plugin.ProcessorContext
 import dev.icerock.moko.kswift.plugin.ProcessorFeature
+import dev.icerock.moko.kswift.plugin.buildTypeVariableNames
 import dev.icerock.moko.kswift.plugin.context.ClassContext
-import dev.icerock.moko.kswift.plugin.toTypeName
-import io.outfoxx.swiftpoet.ANY_OBJECT
-import io.outfoxx.swiftpoet.AttributeSpec
+import dev.icerock.moko.kswift.plugin.context.kLibClasses
+import dev.icerock.moko.kswift.plugin.getDeclaredTypeNameWithGenerics
+import dev.icerock.moko.kswift.plugin.getSimpleName
 import io.outfoxx.swiftpoet.CodeBlock
-import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
-import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
-import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import java.util.Locale
 
 class SealedToSwiftEnumFeature(
@@ -30,21 +29,13 @@ class SealedToSwiftEnumFeature(
         if (featureContext.clazz.sealedSubclasses.isEmpty()) return
 
         val kotlinFrameworkName: String = processorContext.framework.baseName
-        val kmclass: KmClass = featureContext.clazz
+        val kmClass: KmClass = featureContext.clazz
 
-        val isSealedInterface: Boolean = if (Flag.Class.IS_CLASS(kmclass.flags)) {
-            false
-        } else if (Flag.Class.IS_INTERFACE(kmclass.flags)) {
-            true
-        } else {
-            println("${kmclass.name} not class or interface - skip ${kmclass.flags}")
-            return
-        }
-        val sealedCases: List<EnumCase> = buildEnumCases(featureContext)
+        val sealedCases: List<EnumCase> = buildEnumCases(kotlinFrameworkName, featureContext)
         val typeVariables: List<TypeVariableName> =
-            buildTypeVariableNames(kmclass, kotlinFrameworkName)
+            kmClass.buildTypeVariableNames(kotlinFrameworkName)
 
-        val originalClassName: String = kmclass.name.getSimpleName(featureContext)
+        val originalClassName: String = getSimpleName(kmClass.name, featureContext.kLibClasses)
         val className: String = originalClassName.replace(".", "").plus("Ks")
         val enumType: TypeSpec = TypeSpec.enumBuilder(className)
             .addDoc("selector: ${featureContext.prefixedUniqueId}")
@@ -56,8 +47,6 @@ class SealedToSwiftEnumFeature(
                 buildEnumConstructor(
                     featureContext = featureContext,
                     kotlinFrameworkName = kotlinFrameworkName,
-                    typeVariables = typeVariables,
-                    isSealedInterface = isSealedInterface,
                     sealedCases = sealedCases,
                     className = className,
                     originalClassName = originalClassName
@@ -71,22 +60,18 @@ class SealedToSwiftEnumFeature(
     private fun buildEnumConstructor(
         featureContext: ClassContext,
         kotlinFrameworkName: String,
-        typeVariables: List<TypeVariableName>,
-        isSealedInterface: Boolean,
         sealedCases: List<EnumCase>,
         className: String,
         originalClassName: String
     ): FunctionSpec {
-        val kmclass = featureContext.clazz
         return FunctionSpec.builder("init")
             .addParameter(
                 label = "_",
                 name = "obj",
-                type = kmclass.getDeclaredTypeName(kotlinFrameworkName, featureContext)
-                    .let { type ->
-                        if (typeVariables.isEmpty() || isSealedInterface) type
-                        else type.parameterizedBy(*typeVariables.toTypedArray())
-                    }
+                type = featureContext.clazz.getDeclaredTypeNameWithGenerics(
+                    kotlinFrameworkName = kotlinFrameworkName,
+                    classes = featureContext.kLibClasses
+                )
             )
             .addCode(
                 CodeBlock.builder()
@@ -119,79 +104,62 @@ class SealedToSwiftEnumFeature(
             .build()
     }
 
-    private fun buildEnumCases(featureContext: ClassContext): List<EnumCase> {
-        val kmclass = featureContext.clazz
-        return kmclass.sealedSubclasses.map { sealedClassName ->
+    private fun buildEnumCases(
+        kotlinFrameworkName: String,
+        featureContext: ClassContext
+    ): List<EnumCase> {
+        val kmClass = featureContext.clazz
+        return kmClass.sealedSubclasses.map { sealedClassName ->
             val sealedClass: KmClass = featureContext.parentContext
                 .fragment.classes.first { it.name == sealedClassName }
-            buildEnumCase(featureContext, sealedClassName, sealedClass)
+            buildEnumCase(kotlinFrameworkName, featureContext, sealedClassName, sealedClass)
         }
     }
 
     private fun buildEnumCase(
+        kotlinFrameworkName: String,
         featureContext: ClassContext,
         subclassName: ClassName,
-        sealedClass: KmClass
+        sealedCaseClass: KmClass
     ): EnumCase {
-        val kmclass = featureContext.clazz
-        val enumCaseClassName: String = subclassName.getSimpleName(featureContext)
-        val name: String = if (subclassName.startsWith(kmclass.name)) {
-            subclassName.removePrefix(kmclass.name).removePrefix(".")
+        val kmClass = featureContext.clazz
+        val name: String = if (subclassName.startsWith(kmClass.name)) {
+            subclassName.removePrefix(kmClass.name).removePrefix(".")
         } else subclassName
         val decapitalizedName: String = name.decapitalize(Locale.ROOT)
 
-        val types: String = sealedClass.typeParameters.map {
-            it.name
-        }.ifNotEmpty { joinToString(",", "<", ">") }.orEmpty()
+        val isObject: Boolean = Flag.Class.IS_OBJECT(sealedCaseClass.flags)
+        val caseArg = sealedCaseClass.getDeclaredTypeNameWithGenerics(
+            kotlinFrameworkName = kotlinFrameworkName,
+            classes = featureContext.kLibClasses
+        )
 
         return EnumCase(
             name = decapitalizedName,
-            params = emptyList(),
-            initCheck = "obj is $enumCaseClassName$types",
-            initBlock = ""
-        )
-    }
-
-    private fun buildTypeVariableNames(
-        kmclass: KmClass,
-        kotlinFrameworkName: String
-    ) = kmclass.typeParameters.map { typeParam ->
-        val bounds: List<TypeVariableName.Bound> = typeParam.upperBounds
-            .map { it.toTypeName(kotlinFrameworkName, isUsedInGenerics = true) }
-            .map { TypeVariableName.Bound(it) }
-            .ifEmpty { listOf(TypeVariableName.Bound(ANY_OBJECT)) }
-        TypeVariableName.typeVariable(typeParam.name, bounds)
-    }
-
-    private fun KmClass.getDeclaredTypeName(
-        kotlinFrameworkName: String,
-        featureContext: ClassContext
-    ): DeclaredTypeName {
-        return DeclaredTypeName(
-            moduleName = kotlinFrameworkName,
-            simpleName = name.getSimpleName(featureContext)
-        )
-    }
-
-    private fun String.getSimpleName(featureContext: ClassContext): String {
-        return dev.icerock.moko.kswift.plugin.getSimpleName(
-            className = this,
-            classes = featureContext.parentContext.fragment.classes
+            param = if (isObject) null else caseArg,
+            initCheck = if (isObject) {
+                "obj is $caseArg"
+            } else {
+                "let obj = obj as? $caseArg"
+            },
+            initBlock = if (isObject) "" else "(obj)"
         )
     }
 
     data class EnumCase(
         val name: String,
-        val params: List<DeclaredTypeName>,
+        val param: TypeName?,
         val initCheck: String,
         val initBlock: String
     ) {
         val enumCaseSpec: EnumerationCaseSpec
-            get() = EnumerationCaseSpec.builder(name)
-                .apply {
-                    params.forEach { addAttribute(AttributeSpec.builder(it).build()) }
-                }
-                .build()
+            get() {
+                return if (param == null) {
+                    EnumerationCaseSpec.builder(name)
+                } else {
+                    EnumerationCaseSpec.builder(name, param)
+                }.build()
+            }
     }
 
     class Config {

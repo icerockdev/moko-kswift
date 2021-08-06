@@ -30,3 +30,6 @@ data class ClassContext(
             append(clazz.name)
         }
 }
+
+val ClassContext.kLibClasses: List<KmClass>
+    get() = parentContext.parentContext.metadata.fragments.flatMap { it.classes }
