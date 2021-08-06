@@ -52,15 +52,10 @@ class PlatformExtensionFunctionsFeature(
 
         val funcParams: List<ParameterSpec> = buildFunctionParameters(func, kotlinFrameworkName)
 
-        val comment = """
-            you can exclude this function by:
-            exclude("${featureContext.prefixedUniqueId}")
-            """.trimIndent()
-
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
             .addFunction(
                 FunctionSpec.builder(funcName)
-                    .addDoc(comment + "\n")
+                    .addDoc("selector: ${featureContext.prefixedUniqueId}")
                     .addModifiers(Modifier.PUBLIC)
                     .apply {
                         if (classTypeName is PlatformClassTypeName.Companion) {
