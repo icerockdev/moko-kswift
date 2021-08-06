@@ -4,9 +4,12 @@
 
 package com.icerockdev.library
 
+import dev.icerock.moko.mvvm.ResourceState
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import dev.icerock.moko.mvvm.livedata.mediatorOf
+import dev.icerock.moko.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.desc
 
 class TestViewModel {
     val login: MutableLiveData<String> = MutableLiveData(initialValue = "test")
@@ -14,6 +17,17 @@ class TestViewModel {
 
     val isFilled: LiveData<Boolean> = mediatorOf(login, password) { login, password ->
         login.isNotBlank() && password.isNotBlank()
+    }
+
+    var state: ResourceState<String, StringDesc> = ResourceState.Empty()
+
+    fun changeState() {
+        state = when (state) {
+            is ResourceState.Empty -> ResourceState.Loading()
+            is ResourceState.Loading -> ResourceState.Success("data")
+            is ResourceState.Success -> ResourceState.Failed("broke".desc())
+            is ResourceState.Failed -> ResourceState.Empty()
+        }
     }
 
     sealed interface ScreenState {

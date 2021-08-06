@@ -12,6 +12,7 @@
 		4531D99E26BC19E0006F6A8A /* MvvmLiveDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */; };
 		4531D9A026BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */; };
 		4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */; };
+		4531DAAC26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */; };
 		45D74FCC22BFDDFD00CAB0C8 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45D74FCB22BFDDFD00CAB0C8 /* TestViewController.swift */; };
 		45F4791D219463C7003D25FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45F47912219463C7003D25FA /* LaunchScreen.storyboard */; };
 		45F4791E219463C7003D25FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45F47914219463C7003D25FA /* Main.storyboard */; };
@@ -39,6 +40,7 @@
 		4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MvvmLiveDataTests.swift; sourceTree = "<group>"; };
 		4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SealedInterfaceToSwiftEnumTests.swift; sourceTree = "<group>"; };
 		4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SealedClassToSwiftEnumTests.swift; sourceTree = "<group>"; };
+		4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceStateSwiftEnumTests.swift; sourceTree = "<group>"; };
 		45964D362282A1FD00C16658 /* mpp-library */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "mpp-library"; path = "../mpp-library"; sourceTree = "<group>"; };
 		45D74FCB22BFDDFD00CAB0C8 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		45F47913219463C7003D25FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */,
 				4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */,
 				4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */,
+				4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -344,6 +347,7 @@
 			files = (
 				4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */,
 				4531D99626BAF83F006F6A8A /* PlatformExtensionsTests.swift in Sources */,
+				4531DAAC26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift in Sources */,
 				4531D9A026BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift in Sources */,
 				4531D99E26BC19E0006F6A8A /* MvvmLiveDataTests.swift in Sources */,
 			);
