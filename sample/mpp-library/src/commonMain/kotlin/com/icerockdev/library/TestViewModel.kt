@@ -15,4 +15,18 @@ class TestViewModel {
     val isFilled: LiveData<Boolean> = mediatorOf(login, password) { login, password ->
         login.isNotBlank() && password.isNotBlank()
     }
+
+    sealed interface ScreenState {
+        object Idle : ScreenState
+        object ReadyToSend : ScreenState
+        object WaitResponse : ScreenState
+        object Authorized : ScreenState
+    }
+
+    sealed class ScreenStateClass {
+        object Idle : ScreenStateClass()
+        object ReadyToSend : ScreenStateClass()
+        object WaitResponse : ScreenStateClass()
+        object Authorized : ScreenStateClass()
+    }
 }

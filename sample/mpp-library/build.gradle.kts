@@ -18,13 +18,16 @@ kotlin {
 }
 
 kswift {
-    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature.Companion) {
+    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature) {
         filter = excludeFilter(
             "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UILabel)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
             "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextField)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
             "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextView)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
             "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UIButton)/bindTitle/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>"
         )
+    }
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature) {
+
     }
 }
 
