@@ -5,7 +5,10 @@
 package dev.icerock.moko.kswift
 
 @Retention(AnnotationRetention.BINARY)
-annotation class KSwiftSkip
+annotation class KSwiftInclude
+
+@Retention(AnnotationRetention.BINARY)
+annotation class KSwiftExclude
 
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.VALUE_PARAMETER)

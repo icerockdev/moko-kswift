@@ -4,6 +4,8 @@
 
 package dev.icerock.moko.kswift.plugin.context
 
+import kotlinx.metadata.KmAnnotation
+
 abstract class FeatureContext {
     fun visit(action: (FeatureContext) -> Unit) {
         action(this)
@@ -15,4 +17,6 @@ abstract class FeatureContext {
     abstract val uniqueId: String
 
     val prefixedUniqueId: String get() = this::class.simpleName!! + "/" + uniqueId
+
+    abstract val annotations: List<KmAnnotation>
 }

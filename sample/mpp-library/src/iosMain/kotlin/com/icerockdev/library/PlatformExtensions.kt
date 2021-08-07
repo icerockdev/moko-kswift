@@ -4,6 +4,7 @@
 
 package com.icerockdev.library
 
+import dev.icerock.moko.kswift.KSwiftExclude
 import dev.icerock.moko.kswift.KSwiftOverrideName
 import dev.icerock.moko.kswift.KSwiftWithoutGenerics
 import platform.UIKit.UILabel
@@ -34,4 +35,9 @@ class CDataProvider<T>(private val data: T) : IDataProvider<T> {
 
 fun UILabel.fillByKotlin(provider: CDataProvider<String>) {
     this.text = provider.getData()
+}
+
+@KSwiftExclude
+fun UILabel.excludedFun() {
+
 }

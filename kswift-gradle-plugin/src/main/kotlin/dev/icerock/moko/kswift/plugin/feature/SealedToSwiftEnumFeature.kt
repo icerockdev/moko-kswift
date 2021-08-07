@@ -4,8 +4,6 @@
 
 package dev.icerock.moko.kswift.plugin.feature
 
-import dev.icerock.moko.kswift.plugin.ProcessorContext
-import dev.icerock.moko.kswift.plugin.ProcessorFeature
 import dev.icerock.moko.kswift.plugin.buildTypeVariableNames
 import dev.icerock.moko.kswift.plugin.context.ClassContext
 import dev.icerock.moko.kswift.plugin.context.kLibClasses

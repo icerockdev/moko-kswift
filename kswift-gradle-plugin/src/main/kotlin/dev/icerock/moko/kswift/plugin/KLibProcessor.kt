@@ -6,6 +6,8 @@ package dev.icerock.moko.kswift.plugin
 
 import dev.icerock.moko.kswift.plugin.context.FeatureContext
 import dev.icerock.moko.kswift.plugin.context.LibraryContext
+import dev.icerock.moko.kswift.plugin.feature.ProcessorContext
+import dev.icerock.moko.kswift.plugin.feature.ProcessorFeature
 import io.outfoxx.swiftpoet.FileSpec
 import kotlinx.metadata.klib.KlibModuleMetadata
 import org.gradle.api.logging.Logger

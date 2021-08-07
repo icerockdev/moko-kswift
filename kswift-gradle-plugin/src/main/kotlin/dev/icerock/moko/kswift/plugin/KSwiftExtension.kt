@@ -5,6 +5,7 @@
 package dev.icerock.moko.kswift.plugin
 
 import dev.icerock.moko.kswift.plugin.context.FeatureContext
+import dev.icerock.moko.kswift.plugin.feature.ProcessorFeature
 import kotlin.reflect.KClass
 
 open class KSwiftExtension {

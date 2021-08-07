@@ -4,6 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin.context
 
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmModuleFragment
 import kotlinx.metadata.klib.fqName
 import kotlinx.metadata.klib.moduleFragmentFiles
@@ -28,4 +29,7 @@ data class FragmentContext(
 
     override val uniqueId: String
         get() = parentContext.uniqueId
+
+    override val annotations: List<KmAnnotation>
+        get() = emptyList()
 }

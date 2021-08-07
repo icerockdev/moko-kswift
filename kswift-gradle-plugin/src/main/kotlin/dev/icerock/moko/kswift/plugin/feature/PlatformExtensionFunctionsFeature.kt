@@ -4,8 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin.feature
 
-import dev.icerock.moko.kswift.plugin.ProcessorContext
-import dev.icerock.moko.kswift.plugin.ProcessorFeature
+import dev.icerock.moko.kswift.plugin.KSwiftRuntimeAnnotations
 import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
@@ -117,7 +116,7 @@ class PlatformExtensionFunctionsFeature(
                 ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
 
             val withoutGenericsAnnotation = param.annotations
-                .firstOrNull { it.className == "dev/icerock/moko/kswift/KSwiftWithoutGenerics" }
+                .firstOrNull { it.className == KSwiftRuntimeAnnotations.KSWIFT_WITHOUT_GENERICS.className }
 
             val usedType = if (withoutGenericsAnnotation != null) {
                 if (type is ParameterizedTypeName) type.rawType
@@ -133,7 +132,7 @@ class PlatformExtensionFunctionsFeature(
 
     private fun buildFunctionParameterName(param: KmValueParameter): String {
         val overrideName: KmAnnotation? = param.annotations.firstOrNull {
-            it.className == "dev/icerock/moko/kswift/KSwiftOverrideName"
+            it.className == KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME.className
         }
         val newParamName: String? = overrideName?.arguments?.get("newParamName")?.value as? String
         return newParamName ?: param.name

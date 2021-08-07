@@ -74,6 +74,7 @@ open class KSwiftPlugin : Plugin<Project> {
             val kotlinFrameworkName = framework.baseName
             val swiftFrameworkName = "${kotlinFrameworkName}Swift"
             val outputDir = File(framework.outputDirectory, swiftFrameworkName)
+            outputDir.deleteRecursively()
 
             linkTask.exportLibraries
                 .plus(linkTask.intermediateLibrary.get())

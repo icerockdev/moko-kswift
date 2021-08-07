@@ -4,6 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin.context
 
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmPackage
 import kotlinx.metadata.klib.fqName
 
@@ -30,4 +31,7 @@ data class PackageContext(
             append('/')
             append(pkg.fqName)
         }
+
+    override val annotations: List<KmAnnotation>
+        get() = emptyList()
 }

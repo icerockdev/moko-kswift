@@ -4,9 +4,11 @@
 
 package dev.icerock.moko.kswift.plugin.context
 
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmFunction
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
+import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.uniqId
 
 data class PackageFunctionContext(
@@ -56,4 +58,7 @@ data class PackageFunctionContext(
                 append(args)
             }
         }
+
+    override val annotations: List<KmAnnotation>
+        get() = func.annotations
 }

@@ -4,7 +4,9 @@
 
 package dev.icerock.moko.kswift.plugin.context
 
+import kotlinx.metadata.KmAnnotation
 import kotlinx.metadata.KmClass
+import kotlinx.metadata.klib.annotations
 
 data class ClassContext(
     override val parentContext: FragmentContext,
@@ -29,6 +31,9 @@ data class ClassContext(
             append("/")
             append(clazz.name)
         }
+
+    override val annotations: List<KmAnnotation>
+        get() = clazz.annotations
 }
 
 val ClassContext.kLibClasses: List<KmClass>
