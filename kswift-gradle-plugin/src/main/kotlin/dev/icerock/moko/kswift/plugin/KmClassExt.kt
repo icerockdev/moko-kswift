@@ -31,6 +31,7 @@ fun KmClass.getDeclaredTypeNameWithGenerics(
     val haveGenerics: Boolean = typeVariables.isNotEmpty()
     val isInterface: Boolean = Flag.Class.IS_INTERFACE(flags)
 
+    @Suppress("SpreadOperator")
     return getDeclaredTypeName(kotlinFrameworkName, classes)
         .let { type ->
             if (haveGenerics.not() || isInterface) type

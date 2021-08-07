@@ -56,6 +56,7 @@ open class KSwiftPodspecTask : DefaultTask() {
 
         val isStatic = linkTask.isStaticFramework
 
+        @Suppress("MaxLineLength")
         outputPodspec.writeText(
             """
                 Pod::Spec.new do |spec|

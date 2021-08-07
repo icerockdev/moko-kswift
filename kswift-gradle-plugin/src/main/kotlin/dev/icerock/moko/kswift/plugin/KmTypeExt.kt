@@ -68,6 +68,7 @@ fun KmType.kotlinTypeToTypeName(
     val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->
         typeProj.type?.toTypeName(moduleName = moduleName, isUsedInGenerics = true)
     }
+    @Suppress("SpreadOperator")
     return typeName.parameterizedBy(*arguments.toTypedArray())
 }
 

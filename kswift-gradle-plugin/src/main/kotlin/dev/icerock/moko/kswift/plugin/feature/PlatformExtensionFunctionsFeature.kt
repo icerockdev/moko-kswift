@@ -25,6 +25,7 @@ import kotlinx.metadata.klib.file
 class PlatformExtensionFunctionsFeature(
     filter: Filter<PackageFunctionContext>
 ) : ProcessorFeature<PackageFunctionContext>(filter) {
+    @Suppress("ReturnCount")
     override fun doProcess(
         featureContext: PackageFunctionContext,
         processorContext: ProcessorContext
@@ -76,12 +77,13 @@ class PlatformExtensionFunctionsFeature(
         fileSpecBuilder.addExtension(extensionSpec)
     }
 
+    @Suppress("ReturnCount")
     private fun buildClassTypeName(classifier: KmClassifier): PlatformClassTypeName? {
         if (classifier !is KmClassifier.Class) return null
 
         val receiverName: String = classifier.name
         val receiverParts: List<String> = receiverName.split("/")
-        if (receiverParts.size < 3) return null
+        if (receiverParts.size < PLATFORM_CLASS_PARTS_COUNT) return null
         if (receiverParts[0] != "platform") return null
 
         val frameworkName: String = receiverParts[1]
@@ -147,5 +149,7 @@ class PlatformExtensionFunctionsFeature(
             val config = Config().apply(block)
             return PlatformExtensionFunctionsFeature(config.filter)
         }
+
+        private const val PLATFORM_CLASS_PARTS_COUNT = 3
     }
 }

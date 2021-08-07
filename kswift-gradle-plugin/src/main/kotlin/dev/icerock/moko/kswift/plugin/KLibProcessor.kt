@@ -23,6 +23,7 @@ class KLibProcessor(
         get() = extension.features
 
     fun processFeatureContext(library: File, outputDir: File, framework: Framework) {
+        @Suppress("TooGenericExceptionCaught")
         val metadata: KlibModuleMetadata = try {
             KotlinMetadataLibraryProvider.readLibraryMetadata(library)
         } catch (exc: IllegalStateException) {
@@ -63,6 +64,7 @@ class KLibProcessor(
             features[kclass].orEmpty() as List<ProcessorFeature<T>>
 
         processors.forEach { featureProcessor ->
+            @Suppress("TooGenericExceptionCaught")
             try {
                 featureProcessor.process(featureContext, processorContext)
             } catch (exc: Exception) {
