@@ -24,6 +24,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
       - name: Check build
         run: ./gradlew build publishToMavenLocal syncMultiPlatformLibraryDebugFrameworkIosX64 podspec kSwiftMultiPlatformLibraryPodspec kSwiftmpp_library_podsPodspec
+        if: matrix.os == 'macOS-latest'
+      - name: Check build
+        run: ./gradlew build publishToMavenLocal
+        if: matrix.os != 'macOS-latest'
       - name: Install pods
         run: cd sample/ios-app && pod install
         if: matrix.os == 'macOS-latest'
