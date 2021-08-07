@@ -19,12 +19,35 @@ publishing {
         }
     }
 
+    // Make sure to avoid duplicate publications
+    val publicationsFromMainHost = listOf(
+        "wasm32",
+        "jvm",
+        "js",
+        "kotlinMultiplatform",
+        "androidRelease",
+        "androidDebug",
+        "linuxArm64",
+        "linuxArm32Hfp",
+        "linuxX64"
+    )
+
+    publications
+        .matching { it.name in publicationsFromMainHost }
+        .all {
+            val targetPublication = this@all
+            tasks.withType<AbstractPublishToMaven>()
+                .matching { it.publication == targetPublication }
+                .all { onlyIf { System.getProperty("IS_MAIN_HOST") == "true" } }
+        }
+
     publications.withType<MavenPublication> {
         // Provide artifacts information requited by Maven Central
         pom {
             name.set("MOKO KSwift")
-            description.set("Add description")
+            description.set("Swift-friendly api generator for Kotlin/Native frameworks")
             url.set("https://github.com/icerockdev/moko-kswift")
+
             licenses {
                 license {
                     name.set("Apache-2.0")

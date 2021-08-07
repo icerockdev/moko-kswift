@@ -8,17 +8,25 @@ on:
 
 jobs:
   build:
-    runs-on: macOS-latest
+    runs-on: ${{ matrix.os }}
 
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    - name: Check library
-      run: ./gradlew build publishToMavenLocal syncMultiPlatformLibraryDebugFrameworkIosX64
-    - name: Install pods with kotlin
-      run: cd sample/ios-app && pod install
-    - name: build ios sample
-      run: cd sample/ios-app && xcodebuild -scheme ios-app -workspace ios-app.xcworkspace -configuration Debug -sdk iphonesimulator -arch x86_64 build CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+      - uses: actions/checkout@v1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Plugin check
+        run: ./gradlew -p kswift-gradle-plugin build publishToMavenLocal
+        if: matrix.os == 'ubuntu-latest'
+      - name: Check build
+        run: ./gradlew build publishToMavenLocal syncMultiPlatformLibraryDebugFrameworkIosX64 podspec kSwiftMultiPlatformLibraryPodspec kSwiftmpp_library_podsPodspec
+      - name: Install pods
+        run: cd sample/ios-app && pod install
+        if: matrix.os == 'macOS-latest'
+      - name: Check iOS
+        run: cd sample/ios-app && xcodebuild -scheme ios-app -workspace ios-app.xcworkspace -configuration Debug -sdk iphonesimulator -arch x86_64 build CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+        if: matrix.os == 'macOS-latest'

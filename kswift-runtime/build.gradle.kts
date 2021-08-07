@@ -5,5 +5,6 @@
 plugins {
     id("multiplatform-library-convention")
     id("dev.icerock.mobile.multiplatform.android-manifest")
+    id("javadoc-stub-convention")
     id("publication-convention")
 }

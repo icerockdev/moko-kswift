@@ -11,13 +11,16 @@ on:
 jobs:
   publish:
     name: Publish library at mavenCentral
-    runs-on: macOS-latest
+    runs-on: ${{ matrix.os }}
     env:
       OSSRH_USER: ${{ secrets.OSSRH_USER }}
       OSSRH_KEY: ${{ secrets.OSSRH_KEY }}
       SIGNING_KEY_ID: ${{ secrets.SIGNING_KEYID }}
       SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
       SIGNING_KEY: ${{ secrets.GPG_KEY_CONTENTS }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v1
@@ -25,8 +28,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Publish
-        run: ./gradlew publish
+      - name: Plugin publish
+        run: ./gradlew -p kswift-gradle-plugin publishPlugins -Pgradle.publish.key=${{ secrets.GRADLE_PLUGIN_PORTAL_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PLUGIN_PORTAL_SECRET }}
+        if: matrix.os == 'ubuntu-latest'
+      - name: Runtime publish
+        run: ./gradlew publish -DIS_MAIN_HOST=${{ matrix.os == 'ubuntu-latest' }}
 
   release:
     name: Create release

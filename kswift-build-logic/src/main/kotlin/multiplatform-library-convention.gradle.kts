@@ -14,4 +14,25 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     ios()
+
+    macosX64("macOS")
+    tvos()
+    watchos()
+
+    jvm()
+    js(BOTH) {
+        nodejs()
+        browser()
+    }
+
+    linuxArm64()
+    linuxArm32Hfp()
+    linuxMips32()
+    linuxMipsel32()
+    linuxX64()
+
+    mingwX64()
+    mingwX86()
+
+    wasm32()
 }

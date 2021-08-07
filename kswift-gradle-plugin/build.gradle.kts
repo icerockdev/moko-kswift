@@ -6,6 +6,8 @@ plugins {
     id("gradle-plugin-convention")
     id("detekt-convention")
     id("publication-convention")
+    id("com.gradle.plugin-publish") version ("0.15.0")
+    id("java-gradle-plugin")
 }
 
 group = "dev.icerock.moko"
@@ -33,6 +35,25 @@ gradlePlugin {
             id = "dev.icerock.moko.kswift"
             implementationClass = "dev.icerock.moko.kswift.plugin.KSwiftPlugin"
         }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/icerockdev/moko-kswift"
+    vcsUrl = "https://github.com/icerockdev/moko-kswift"
+    description = "Swift-friendly api generator for Kotlin/Native frameworks"
+    tags = listOf("moko-kswift", "moko", "kotlin", "kotlin-multiplatform", "codegen", "swift")
+
+    plugins {
+        getByName("kswift") {
+            displayName = "MOKO KSwift generator plugin"
+        }
+    }
+
+    mavenCoordinates {
+        groupId = project.group as String
+        artifactId = project.name
+        version = project.version as String
     }
 }
 
