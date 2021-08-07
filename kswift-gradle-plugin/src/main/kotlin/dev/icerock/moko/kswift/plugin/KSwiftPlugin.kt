@@ -32,40 +32,44 @@ open class KSwiftPlugin : Plugin<Project> {
                 val multiplatformExtension = target.extensions
                     .getByType(pluginWrapper.projectExtensionClass.java)
 
-                applyToKotlinMultiplatform(multiplatformExtension, processor)
+                applyToKotlinMultiplatform(multiplatformExtension, processor, extension)
             }
     }
 
     private fun applyToKotlinMultiplatform(
         extension: KotlinMultiplatformExtension,
-        processor: KLibProcessor
+        processor: KLibProcessor,
+        kSwiftExtension: KSwiftExtension
     ) {
         extension.targets
             .withType<KotlinNativeTarget>()
             .matching { it.konanTarget.family.isAppleFamily }
-            .configureEach { applyToAppleTarget(it, processor) }
+            .configureEach { applyToAppleTarget(it, processor, kSwiftExtension) }
     }
 
     private fun applyToAppleTarget(
         target: KotlinNativeTarget,
-        processor: KLibProcessor
+        processor: KLibProcessor,
+        kSwiftExtension: KSwiftExtension
     ) {
         target.binaries
             .withType<Framework>()
-            .configureEach { applyToAppleFramework(it, processor) }
+            .configureEach { applyToAppleFramework(it, processor, kSwiftExtension) }
     }
 
     private fun applyToAppleFramework(
         framework: Framework,
-        processor: KLibProcessor
+        processor: KLibProcessor,
+        kSwiftExtension: KSwiftExtension
     ) {
         val linkTask: KotlinNativeLink = framework.linkTask
-        linkTask.doLast(PostProcessLinkTask(framework, processor))
+        linkTask.doLast(PostProcessLinkTask(framework, processor, kSwiftExtension))
     }
 
     private class PostProcessLinkTask(
         private val framework: Framework,
         private val processor: KLibProcessor,
+        private val kSwiftExtension: KSwiftExtension,
     ) : Action<Task> {
 
         override fun execute(task: Task) {
@@ -78,6 +82,13 @@ open class KSwiftPlugin : Plugin<Project> {
 
             linkTask.exportLibraries
                 .plus(linkTask.intermediateLibrary.get())
+                .filter { file ->
+                    val name = file.nameWithoutExtension
+                    if (kSwiftExtension.includedLibs.isNotEmpty()) {
+                        if (kSwiftExtension.includedLibs.contains(name).not()) return@filter false
+                    }
+                    kSwiftExtension.excludedLibs.contains(name).not()
+                }
                 .forEach { library ->
                     processor.processFeatureContext(library, outputDir, framework)
                 }

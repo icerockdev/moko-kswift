@@ -12,6 +12,9 @@ open class KSwiftExtension {
     internal val features: MutableMap<KClass<out FeatureContext>, List<ProcessorFeature<*>>> =
         mutableMapOf()
 
+    internal val excludedLibs = mutableListOf<String>()
+    internal val includedLibs = mutableListOf<String>()
+
     fun <CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
         featureContext: KClass<out CTX>,
         featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
@@ -35,5 +38,13 @@ open class KSwiftExtension {
 
     fun <CTX : FeatureContext> includeFilter(vararg names: String): ProcessorFeature.Filter.Include<CTX> {
         return ProcessorFeature.Filter.Include(names.toSet())
+    }
+
+    fun includeLibrary(libraryName: String) {
+        includedLibs.add(libraryName)
+    }
+
+    fun excludeLibrary(libraryName: String) {
+        excludedLibs.add(libraryName)
     }
 }
