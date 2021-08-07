@@ -47,4 +47,6 @@ open class KSwiftExtension {
     fun excludeLibrary(libraryName: String) {
         excludedLibs.add(libraryName)
     }
+
+    lateinit var projectPodspecName: String
 }

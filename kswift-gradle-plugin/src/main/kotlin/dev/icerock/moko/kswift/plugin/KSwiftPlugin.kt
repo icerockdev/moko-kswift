@@ -4,10 +4,8 @@
 
 package dev.icerock.moko.kswift.plugin
 
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -15,12 +13,13 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import java.io.File
 
 @Suppress("unused")
 open class KSwiftPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create<KSwiftExtension>("kswift")
+        extension.projectPodspecName = target.name.replace('-', '_')
+
         val processor = KLibProcessor(
             logger = target.logger,
             extension = extension
@@ -64,34 +63,23 @@ open class KSwiftPlugin : Plugin<Project> {
     ) {
         val linkTask: KotlinNativeLink = framework.linkTask
         linkTask.doLast(PostProcessLinkTask(framework, processor, kSwiftExtension))
+        registerPodspecTask(linkTask, kSwiftExtension)
     }
 
-    private class PostProcessLinkTask(
-        private val framework: Framework,
-        private val processor: KLibProcessor,
-        private val kSwiftExtension: KSwiftExtension,
-    ) : Action<Task> {
+    private fun registerPodspecTask(
+        linkTask: KotlinNativeLink,
+        kSwiftExtension: KSwiftExtension
+    ) {
+        val project: Project = linkTask.project
+        val frameworkName: String = linkTask.baseName
+        val podspecTaskName = "kSwift${frameworkName}Podspec"
 
-        override fun execute(task: Task) {
-            val linkTask: KotlinNativeLink = task as KotlinNativeLink
+        if (project.tasks.findByName(podspecTaskName) != null) return
 
-            val kotlinFrameworkName = framework.baseName
-            val swiftFrameworkName = "${kotlinFrameworkName}Swift"
-            val outputDir = File(framework.outputDirectory, swiftFrameworkName)
-            outputDir.deleteRecursively()
-
-            linkTask.exportLibraries
-                .plus(linkTask.intermediateLibrary.get())
-                .filter { file ->
-                    val name = file.nameWithoutExtension
-                    if (kSwiftExtension.includedLibs.isNotEmpty()) {
-                        if (kSwiftExtension.includedLibs.contains(name).not()) return@filter false
-                    }
-                    kSwiftExtension.excludedLibs.contains(name).not()
-                }
-                .forEach { library ->
-                    processor.processFeatureContext(library, outputDir, framework)
-                }
+        project.tasks.create(podspecTaskName, KSwiftPodspecTask::class) {
+            it.linkTask = linkTask
+            it.kSwiftExtension = kSwiftExtension
+            it.dependsOn(linkTask)
         }
     }
 }
