@@ -25,6 +25,9 @@ class KLibProcessor(
     fun processFeatureContext(library: File, outputDir: File, framework: Framework) {
         val metadata: KlibModuleMetadata = try {
             KotlinMetadataLibraryProvider.readLibraryMetadata(library)
+        } catch (exc: IllegalStateException) {
+            logger.info("library can't be read", exc)
+            return
         } catch (exc: Exception) {
             logger.error("can't parse metadata", exc)
             return
@@ -39,7 +42,7 @@ class KLibProcessor(
 
         val libraryContext = LibraryContext(metadata)
         libraryContext.visit { featureContext ->
-            logger.lifecycle("visit ${featureContext.prefixedUniqueId} - $featureContext")
+            logger.info("visit ${featureContext.prefixedUniqueId} - $featureContext")
             processFeatureContext(featureContext, processorContext)
         }
 
