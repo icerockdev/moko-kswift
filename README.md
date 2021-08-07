@@ -22,6 +22,7 @@ KSwift give you API for adding your own generator based on KLib metadata informa
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+- [FAQ](#faq)
 - [Samples](#samples)
 - [Set Up Locally](#set-up-locally)
 - [Contributing](#contributing)
