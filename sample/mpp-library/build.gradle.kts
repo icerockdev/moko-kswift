@@ -50,29 +50,3 @@ framework {
     export(libs.mokoMvvmState)
     export(libs.mokoResources)
 }
-
-val syncMultiPlatformLibraryDebugFrameworkIosX64 by tasks
-
-val podInstall = tasks.create("podInstall", Exec::class) {
-    workingDir = File(projectDir.parent, "ios-app")
-    commandLine = listOf("pod", "install")
-
-    dependsOn(syncMultiPlatformLibraryDebugFrameworkIosX64)
-}
-
-val xcodeUnitTest = tasks.create("xcodeUnitTest", Exec::class) {
-    group = JavaBasePlugin.VERIFICATION_GROUP
-
-    workingDir = File(projectDir.parent, "ios-app")
-    commandLine = listOf(
-        "xcodebuild",
-        "test",
-        "-workspace", "ios-app.xcworkspace",
-        "-scheme", "ios-app",
-        "-destination", "platform=iOS Simulator,name=iPhone 12 mini"
-    )
-
-    dependsOn(podInstall)
-}
-
-tasks.getByName("check").dependsOn(xcodeUnitTest)
