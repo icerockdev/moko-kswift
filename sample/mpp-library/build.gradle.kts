@@ -29,6 +29,8 @@ kswift {
     install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature) {
     }
 
+
+
     projectPodspecName = "MultiPlatformLibrary"
 }
 
@@ -44,6 +46,7 @@ dependencies {
 }
 
 framework {
+    export(libs.coroutines)
     export(projects.kswiftRuntime)
     export(libs.mokoMvvmCore)
     export(libs.mokoMvvmLiveData)
