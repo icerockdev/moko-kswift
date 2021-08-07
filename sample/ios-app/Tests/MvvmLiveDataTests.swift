@@ -1,10 +1,6 @@
-//
-//  MvvmLiveDataTests.swift
-//  Tests
-//
-//  Created by Aleksey Mikhailov on 05.08.2021.
-//  Copyright © 2021 IceRock Development. All rights reserved.
-//
+/*
+ * Copyright 2021 IceRock MAG Inc. Use of this source code is governed by the Apache 2.0 license.
+ */
 
 import XCTest
 @testable import MultiPlatformLibrary

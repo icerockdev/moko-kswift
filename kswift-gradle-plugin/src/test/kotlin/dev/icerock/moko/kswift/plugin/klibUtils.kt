@@ -17,5 +17,7 @@ fun readKLib(name: String): KlibModuleMetadata {
             input.copyTo(output)
         }
     }
-    return KotlinMetadataLibraryProvider.readLibraryMetadata(tempFile)
+    return KotlinMetadataLibraryProvider.readLibraryMetadata(tempFile).also {
+        tempFile.delete()
+    }
 }
