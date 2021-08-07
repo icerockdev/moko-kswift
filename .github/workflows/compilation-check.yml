@@ -32,5 +32,5 @@ jobs:
         run: cd sample/ios-app && pod install
         if: matrix.os == 'macOS-latest'
       - name: Check iOS
-        run: cd sample/ios-app && xcodebuild -scheme ios-app -workspace ios-app.xcworkspace -configuration Debug -sdk iphonesimulator -arch x86_64 test -destination "platform=iOS Simulator,name=iPhone 12 mini" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+        run: cd sample/ios-app && set -o pipefail && xcodebuild -scheme ios-app -workspace ios-app.xcworkspace test -destination "platform=iOS Simulator,name=iPhone 12 mini" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
         if: matrix.os == 'macOS-latest'
