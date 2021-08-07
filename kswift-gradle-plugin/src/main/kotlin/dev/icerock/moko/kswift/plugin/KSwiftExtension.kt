@@ -18,7 +18,7 @@ open class KSwiftExtension {
     fun <CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
         featureContext: KClass<out CTX>,
         featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
-        config: Config.() -> Unit
+        config: Config.() -> Unit = {}
     ) {
         val currentList: List<ProcessorFeature<*>> = features[featureContext] ?: emptyList()
         val processorFeature: ProcessorFeature<CTX> = featureFactory.create(config)
@@ -27,7 +27,7 @@ open class KSwiftExtension {
 
     inline fun <reified CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
         featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
-        noinline config: Config.() -> Unit
+        noinline config: Config.() -> Unit = {}
     ) {
         install(CTX::class, featureFactory, config)
     }

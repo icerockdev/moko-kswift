@@ -12,6 +12,7 @@ import dev.icerock.moko.kswift.plugin.getSimpleName
 import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
@@ -41,6 +42,7 @@ class SealedToSwiftEnumFeature(
                 typeVariables.forEach { addTypeVariable(it) }
                 sealedCases.forEach { addEnumCase(it.enumCaseSpec) }
             }
+            .addModifiers(Modifier.PUBLIC)
             .addFunction(
                 buildEnumConstructor(
                     featureContext = featureContext,
@@ -63,6 +65,7 @@ class SealedToSwiftEnumFeature(
         originalClassName: String
     ): FunctionSpec {
         return FunctionSpec.builder("init")
+            .addModifiers(Modifier.PUBLIC)
             .addParameter(
                 label = "_",
                 name = "obj",

@@ -17,3 +17,8 @@ target 'ios-app' do
 
   target :Tests
 end
+
+target 'pods-test' do
+  pod 'mpp_library_pods', :path => '../mpp-library-pods'
+  pod 'mpp_library_podsSwift', :path => '../mpp-library-pods'
+end
