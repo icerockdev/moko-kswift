@@ -1,16 +1,33 @@
 PODS:
+  - mpp_library_pods (1.0)
+  - mpp_library_podsSwift (1.0):
+    - mpp_library_pods
   - MultiPlatformLibrary (0.1.0)
+  - MultiPlatformLibrarySwift (1.0):
+    - MultiPlatformLibrary
 
 DEPENDENCIES:
+  - mpp_library_pods (from `../mpp-library-pods`)
+  - mpp_library_podsSwift (from `../mpp-library-pods`)
   - MultiPlatformLibrary (from `../mpp-library`)
+  - MultiPlatformLibrarySwift (from `../mpp-library`)
 
 EXTERNAL SOURCES:
+  mpp_library_pods:
+    :path: "../mpp-library-pods"
+  mpp_library_podsSwift:
+    :path: "../mpp-library-pods"
   MultiPlatformLibrary:
+    :path: "../mpp-library"
+  MultiPlatformLibrarySwift:
     :path: "../mpp-library"
 
 SPEC CHECKSUMS:
+  mpp_library_pods: 1832be3e7967e1e8a0fc564777a5b7b2df1fd116
+  mpp_library_podsSwift: 61a3b520b6c9f8f88be78338579d08ccc5c2113c
   MultiPlatformLibrary: e778b00f0244457dbfd60a071e6dea6822d72d24
+  MultiPlatformLibrarySwift: 5fd18f0349a2f6561deb6d8be3f7fe35fec6cd9a
 
-PODFILE CHECKSUM: eabca3897015b3326d5a5f2fac159f4b385f5302
+PODFILE CHECKSUM: a97fc6edc5e9b73e7270e05c66045254f3a80c87
 
 COCOAPODS: 1.10.0

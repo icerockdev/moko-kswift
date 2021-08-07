@@ -7,10 +7,14 @@ buildscript {
         mavenCentral()
         google()
         gradlePluginPortal()
+
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
+        maven("https://jitpack.io")
     }
 
     dependencies {
         classpath(":kswift-build-logic")
+        classpath("dev.icerock.moko:kswift-gradle-plugin")
     }
 }
 

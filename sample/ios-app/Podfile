@@ -13,4 +13,12 @@ install! 'cocoapods', :disable_input_output_paths => true
 target 'ios-app' do
   # MultiPlatformLibrary
   pod 'MultiPlatformLibrary', :path => '../mpp-library'
+  pod 'MultiPlatformLibrarySwift', :path => '../mpp-library'
+
+  target :Tests
+end
+
+target 'pods-test' do
+  pod 'mpp_library_pods', :path => '../mpp-library-pods'
+  pod 'mpp_library_podsSwift', :path => '../mpp-library-pods'
 end

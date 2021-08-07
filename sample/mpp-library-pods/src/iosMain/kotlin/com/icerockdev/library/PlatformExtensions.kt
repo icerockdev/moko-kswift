@@ -4,10 +4,8 @@
 
 package com.icerockdev.library
 
-import dev.icerock.moko.kswift.multiply
+import platform.UIKit.UILabel
 
-class Calculator {
-    fun run() {
-        println(multiply(a = 2, b = 3))
-    }
+fun UILabel.fillByKotlin() {
+    this.text = "filled by kotlin"
 }

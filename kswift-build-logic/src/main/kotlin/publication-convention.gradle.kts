@@ -5,7 +5,6 @@
 import java.util.Base64
 
 plugins {
-    id("javadoc-stub-convention")
     id("org.gradle.maven-publish")
     id("signing")
 }
@@ -20,18 +19,46 @@ publishing {
         }
     }
 
+    // Make sure to avoid duplicate publications
+    val publicationsFromMainHost = listOf(
+        "wasm32",
+        "jvm",
+        "js",
+        "kotlinMultiplatform",
+        "androidRelease",
+        "androidDebug",
+        "linuxArm64",
+        "linuxArm32Hfp",
+        "linuxX64"
+    )
+
+    publications
+        .matching { it.name in publicationsFromMainHost }
+        .all {
+            val targetPublication = this@all
+            tasks.withType<AbstractPublishToMaven>()
+                .matching { it.publication == targetPublication }
+                .all { onlyIf { System.getProperty("IS_MAIN_HOST") == "true" } }
+        }
+
     publications.withType<MavenPublication> {
         // Provide artifacts information requited by Maven Central
         pom {
-            name.set("MOKO {{name}}")
-            description.set("Add description")
-            url.set("https://github.com/icerockdev/moko-{{name}}")
+            name.set("MOKO KSwift")
+            description.set("Swift-friendly api generator for Kotlin/Native frameworks")
+            url.set("https://github.com/icerockdev/moko-kswift")
+
             licenses {
                 license {
                     name.set("Apache-2.0")
                     distribution.set("repo")
-                    url.set("https://github.com/icerockdev/moko-{{name}}/blob/master/LICENSE.md")
+                    url.set("https://github.com/icerockdev/moko-kswift/blob/master/LICENSE.md")
                 }
+            }
+
+            organization {
+                name.set("IceRock Development")
+                url.set("https://icerockdev.com")
             }
 
             developers {
@@ -43,9 +70,9 @@ publishing {
             }
 
             scm {
-                connection.set("scm:git:ssh://github.com/icerockdev/moko-{{name}}.git")
-                developerConnection.set("scm:git:ssh://github.com/icerockdev/moko-{{name}}.git")
-                url.set("https://github.com/icerockdev/moko-{{name}}")
+                connection.set("scm:git:ssh://github.com/icerockdev/moko-kswift.git")
+                developerConnection.set("scm:git:ssh://github.com/icerockdev/moko-kswift.git")
+                url.set("https://github.com/icerockdev/moko-kswift")
             }
         }
     }

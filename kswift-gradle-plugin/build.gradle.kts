@@ -3,9 +3,11 @@
  */
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
+    id("gradle-plugin-convention")
     id("detekt-convention")
     id("publication-convention")
+    id("com.gradle.plugin-publish") version ("0.15.0")
+    id("java-gradle-plugin")
 }
 
 group = "dev.icerock.moko"
@@ -14,21 +16,47 @@ version = libs.versions.mokoKSwiftVersion.get()
 dependencies {
     implementation(gradleKotlinDsl())
     compileOnly(libs.kotlinGradlePlugin)
-    implementation(libs.kotlinPoet)
+    implementation(libs.swiftPoet)
     implementation(libs.kotlinCompilerEmbeddable)
+    implementation(libs.kotlinxMetadataKLib)
+
+    testImplementation(libs.kotlinTestJUnit)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withJavadocJar()
-    withSourcesJar()
+tasks.withType<Test>().configureEach {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+gradlePlugin {
+    plugins {
+        create("kswift") {
+            id = "dev.icerock.moko.kswift"
+            implementationClass = "dev.icerock.moko.kswift.plugin.KSwiftPlugin"
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/icerockdev/moko-kswift"
+    vcsUrl = "https://github.com/icerockdev/moko-kswift"
+    description = "Swift-friendly api generator for Kotlin/Native frameworks"
+    tags = listOf("moko-kswift", "moko", "kotlin", "kotlin-multiplatform", "codegen", "swift")
+
+    plugins {
+        getByName("kswift") {
+            displayName = "MOKO KSwift generator plugin"
+        }
+    }
+
+    mavenCoordinates {
+        groupId = project.group as String
+        artifactId = project.name
+        version = project.version as String
+    }
 }
 
 publishing.publications.register("mavenJava", MavenPublication::class) {
     from(components["java"])
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
 }
