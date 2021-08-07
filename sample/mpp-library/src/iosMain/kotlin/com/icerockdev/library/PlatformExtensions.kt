@@ -6,7 +6,6 @@ package com.icerockdev.library
 
 import dev.icerock.moko.kswift.KSwiftExclude
 import dev.icerock.moko.kswift.KSwiftOverrideName
-import dev.icerock.moko.kswift.KSwiftWithoutGenerics
 import platform.UIKit.UILabel
 
 fun UILabel.fillByKotlin() {
@@ -23,7 +22,6 @@ interface IDataProvider<T> {
 
 fun UILabel.fillByKotlin(
     @KSwiftOverrideName("provider_")
-    @KSwiftWithoutGenerics
     provider: IDataProvider<String>
 ) {
     this.text = provider.getData()

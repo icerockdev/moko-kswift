@@ -6,6 +6,7 @@ package dev.icerock.moko.kswift.plugin.feature
 
 import dev.icerock.moko.kswift.plugin.KSwiftRuntimeAnnotations
 import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
+import dev.icerock.moko.kswift.plugin.context.classes
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -15,9 +16,12 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
+import kotlinx.metadata.Flag
 import kotlinx.metadata.KmAnnotation
+import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
+import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
 import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
@@ -50,7 +54,8 @@ class PlatformExtensionFunctionsFeature(
         }
         val callParamsLine: String = listOf("self").plus(callParams).joinToString(", ")
 
-        val funcParams: List<ParameterSpec> = buildFunctionParameters(func, kotlinFrameworkName)
+        val funcParams: List<ParameterSpec> =
+            buildFunctionParameters(featureContext, kotlinFrameworkName)
 
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
             .addFunction(
@@ -110,19 +115,29 @@ class PlatformExtensionFunctionsFeature(
     }
 
     private fun buildFunctionParameters(
-        func: KmFunction,
+        featureContext: PackageFunctionContext,
         kotlinFrameworkName: String
     ): List<ParameterSpec> {
+        val func: KmFunction = featureContext.func
+        val classes: List<KmClass> = featureContext.classes
         return func.valueParameters.map { param ->
-            val type = param.type?.toTypeName(kotlinFrameworkName)
+            val paramType: KmType = param.type
                 ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
+            val type = paramType.toTypeName(kotlinFrameworkName)
 
-            val withoutGenericsAnnotation = param.annotations
-                .firstOrNull { it.className == KSwiftRuntimeAnnotations.KSWIFT_WITHOUT_GENERICS.className }
+            val paramTypeClassifier = paramType.classifier
+            if (paramTypeClassifier !is KmClassifier.Class) {
+                throw IllegalArgumentException("extension ${func.name} have not class param $param")
+            }
 
-            val usedType = if (withoutGenericsAnnotation != null) {
-                if (type is ParameterizedTypeName) type.rawType
-                else type
+            val paramClassName = paramTypeClassifier.name
+
+            val isWithoutGenerics = classes.firstOrNull { it.name == paramClassName }?.let {
+                Flag.Class.IS_INTERFACE(it.flags)
+            } ?: false
+
+            val usedType = if (isWithoutGenerics && type is ParameterizedTypeName) {
+                type.rawType
             } else {
                 type
             }

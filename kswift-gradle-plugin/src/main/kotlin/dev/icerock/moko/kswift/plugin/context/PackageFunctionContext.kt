@@ -5,6 +5,7 @@
 package dev.icerock.moko.kswift.plugin.context
 
 import kotlinx.metadata.KmAnnotation
+import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmFunction
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
@@ -62,3 +63,6 @@ data class PackageFunctionContext(
     override val annotations: List<KmAnnotation>
         get() = func.annotations
 }
+
+val PackageFunctionContext.classes: List<KmClass>
+    get() = parentContext.parentContext.parentContext.metadata.fragments.flatMap { it.classes }
