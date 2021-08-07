@@ -197,7 +197,7 @@ kswift {
 }
 ```
 
-## Extensions form platform classes
+## Extensions from platform classes
 
 Enable feature in project `build.gradle`:
 
