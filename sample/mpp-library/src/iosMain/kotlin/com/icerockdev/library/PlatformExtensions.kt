@@ -36,6 +36,4 @@ fun UILabel.fillByKotlin(provider: CDataProvider<String>) {
 }
 
 @KSwiftExclude
-fun UILabel.excludedFun() {
-
-}
+fun UILabel.excludedFun() = Unit

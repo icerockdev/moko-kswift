@@ -5,7 +5,6 @@
 package com.icerockdev.library
 
 import dev.icerock.moko.kswift.KSwiftExclude
-import dev.icerock.moko.kswift.KSwiftInclude
 import dev.icerock.moko.mvvm.ResourceState
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
@@ -49,6 +48,6 @@ class TestViewModel {
 
 @KSwiftExclude
 sealed interface ExcludedSealed {
-    object V1: ExcludedSealed
-    object V2: ExcludedSealed
+    object V1 : ExcludedSealed
+    object V2 : ExcludedSealed
 }
