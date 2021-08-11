@@ -8,7 +8,6 @@ buildscript {
         google()
         gradlePluginPortal()
 
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
         maven("https://jitpack.io")
     }
 
