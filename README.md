@@ -59,11 +59,10 @@ buildscript {
         google()
         gradlePluginPortal()
 
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("dev.icerock.moko:kswift-gradle-plugin:0.1.0")
+        classpath("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
     }
 }
 ```
@@ -87,7 +86,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
 
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
         maven("https://jitpack.io")
     }
 }
@@ -97,7 +95,7 @@ project where framework compiles `build.gradle`
 
 ```groovy
 plugins {
-    id("dev.icerock.moko.kswift") version "0.1.0"
+    id("dev.icerock.moko.kswift") version "0.2.0"
 }
 ```
 
@@ -117,7 +115,7 @@ project `build.gradle`
 
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:kswift-runtime:0.1.0") // if you want use annotations
+    commonMainApi("dev.icerock.moko:kswift-runtime:0.2.0") // if you want use annotations
 }
 ```
 

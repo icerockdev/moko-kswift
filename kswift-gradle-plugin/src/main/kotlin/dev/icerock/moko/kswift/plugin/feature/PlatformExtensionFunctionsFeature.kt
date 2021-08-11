@@ -18,6 +18,7 @@ import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmAnnotation
+import kotlinx.metadata.KmAnnotationArgument
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
@@ -148,11 +149,13 @@ class PlatformExtensionFunctionsFeature(
     }
 
     private fun buildFunctionParameterName(param: KmValueParameter): String {
-        val overrideName: KmAnnotation? = param.annotations.firstOrNull {
+        val overrideName: KmAnnotation = param.annotations.firstOrNull {
             it.className == KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME.className
-        }
-        val newParamName: String? = overrideName?.arguments?.get("newParamName")?.value as? String
-        return newParamName ?: param.name
+        } ?: return param.name
+        val annotationArgument: KmAnnotationArgument.StringValue =
+            overrideName.arguments["newParamName"] as? KmAnnotationArgument.StringValue
+                ?: return param.name
+        return annotationArgument.value
     }
 
     class Config {
