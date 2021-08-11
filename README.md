@@ -257,9 +257,9 @@ repositories {
 dependencies {
     implementation("com.android.tools.build:gradle:7.1.0-alpha06")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-    implementation("dev.icerock.moko:kswift-gradle-plugin:0.1.0")
+    implementation("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
     implementation("com.github.icerockdev:swiftpoet:1.1.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:0.0.1-dev-10")
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:0.0.1")
 }
 ```
 
