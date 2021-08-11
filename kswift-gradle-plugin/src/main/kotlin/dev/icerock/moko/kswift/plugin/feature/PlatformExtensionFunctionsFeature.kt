@@ -150,7 +150,7 @@ class PlatformExtensionFunctionsFeature(
 
     private fun buildFunctionParameterName(param: KmValueParameter): String {
         return param.annotations
-            .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME.className)
+            .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME)
             ?.getStringArgument("newParamName") ?: param.name
     }
 
