@@ -7,6 +7,8 @@ package dev.icerock.moko.kswift.plugin.feature
 import dev.icerock.moko.kswift.plugin.KSwiftRuntimeAnnotations
 import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
 import dev.icerock.moko.kswift.plugin.context.classes
+import dev.icerock.moko.kswift.plugin.findByClassName
+import dev.icerock.moko.kswift.plugin.getStringArgument
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.DeclaredTypeName
@@ -17,8 +19,6 @@ import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
 import kotlinx.metadata.Flag
-import kotlinx.metadata.KmAnnotation
-import kotlinx.metadata.KmAnnotationArgument
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
@@ -149,13 +149,9 @@ class PlatformExtensionFunctionsFeature(
     }
 
     private fun buildFunctionParameterName(param: KmValueParameter): String {
-        val overrideName: KmAnnotation = param.annotations.firstOrNull {
-            it.className == KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME.className
-        } ?: return param.name
-        val annotationArgument: KmAnnotationArgument.StringValue =
-            overrideName.arguments["newParamName"] as? KmAnnotationArgument.StringValue
-                ?: return param.name
-        return annotationArgument.value
+        return param.annotations
+            .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_OVERRIDE_NAME.className)
+            ?.getStringArgument("newParamName") ?: param.name
     }
 
     class Config {
