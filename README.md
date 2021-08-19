@@ -354,6 +354,24 @@ More examples can be found in the [sample directory](sample).
 Clone project and just open it. Gradle plugin attached to sample by gradle composite build, so you
 will see changes at each gradle build.
 
+```bash
+# clone repo
+git clone git@github.com:icerockdev/moko-kswift.git
+cd moko-kswift 
+# generate podspec files for cocopods intergration. with integration will be generated swift files for cocoapod
+./gradlew kSwiftmpp_library_podsPodspec
+./gradlew kSwiftMultiPlatformLibraryPodspec
+# go to ios dir
+cd sample/ios-app
+# install pods
+pod install
+# now we can open xcworkspace and build ios project
+open ios-app.xcworkspace
+# or run xcodebuild
+xcodebuild -scheme ios-app -workspace ios-app.xcworkspace test -destination "platform=iOS Simulator,name=iPhone 12 mini"
+xcodebuild -scheme pods-test -workspace ios-app.xcworkspace test -destination "platform=iOS Simulator,name=iPhone 12 mini"
+```
+
 # Contributing
 
 All development (both new features and bug fixes) is performed in `develop` branch. This
