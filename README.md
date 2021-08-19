@@ -17,6 +17,10 @@ KSwift it's gradle plugin for generation Swift-friendly API for Kotlin/Native fr
 
 KSwift give you API for adding your own generator based on KLib metadata information.
 
+# Posts
+
+- [How to implement Swift-friendly API with Kotlin Multiplatform Mobile](https://medium.com/icerock/how-to-implement-swift-friendly-api-with-kotlin-multiplatform-mobile-e68521a63b6d)
+
 # Table of Contents
 
 - [Features](#features)
@@ -251,16 +255,15 @@ repositories {
     google()
     gradlePluginPortal()
 
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies")
     maven("https://jitpack.io")
 }
 
 dependencies {
     implementation("com.android.tools.build:gradle:7.1.0-alpha06")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-    implementation("dev.icerock.moko:kswift-gradle-plugin:0.1.0")
+    implementation("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
     implementation("com.github.icerockdev:swiftpoet:1.1.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:0.0.1-dev-10")
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:0.0.1")
 }
 ```
 
