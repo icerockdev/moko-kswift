@@ -4,13 +4,15 @@
 
 package dev.icerock.moko.kswift.plugin.feature
 
-import dev.icerock.moko.kswift.plugin.KSwiftRuntimeAnnotations
 import dev.icerock.moko.kswift.plugin.context.FeatureContext
-import dev.icerock.moko.kswift.plugin.findByClassName
 import io.outfoxx.swiftpoet.FileSpec
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import kotlin.reflect.KClass
 
-abstract class ProcessorFeature<CTX : FeatureContext>(private val filter: Filter<CTX>) {
+abstract class ProcessorFeature<CTX : FeatureContext> {
+    abstract val featureContext: KClass<CTX>
+    abstract val filter: Filter<CTX>
+
     fun process(featureContext: CTX, processorContext: ProcessorContext) {
         if (filter.isShouldProcess(featureContext).not()) return
 
@@ -19,28 +21,12 @@ abstract class ProcessorFeature<CTX : FeatureContext>(private val filter: Filter
 
     protected abstract fun doProcess(featureContext: CTX, processorContext: ProcessorContext)
 
-    sealed interface Filter<CTX : FeatureContext> {
-        fun isShouldProcess(featureContext: CTX): Boolean
-
-        data class Exclude<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
-            override fun isShouldProcess(featureContext: CTX): Boolean {
-                return names.contains(featureContext.prefixedUniqueId).not() &&
-                        featureContext.annotations
-                            .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_EXCLUDE) == null
-            }
-        }
-
-        data class Include<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
-            override fun isShouldProcess(featureContext: CTX): Boolean {
-                return names.contains(featureContext.prefixedUniqueId) ||
-                        featureContext.annotations
-                            .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_INCLUDE) != null
-            }
-        }
-    }
-
-    interface Factory<CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> {
+    interface Factory<CTX : FeatureContext, F : ProcessorFeature<CTX>, Config : BaseConfig<CTX>> {
         fun create(block: Config.() -> Unit): F
+
+        val featureContext: KClass<CTX>
+
+        val factory: Factory<CTX, F, Config>
     }
 }
 

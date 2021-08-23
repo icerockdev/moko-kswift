@@ -7,6 +7,7 @@ package dev.icerock.moko.kswift.plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
@@ -18,7 +19,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 open class KSwiftPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create<KSwiftExtension>("kswift")
-        extension.projectPodspecName = target.name.replace('-', '_')
+        val podspecNameDefault = target.name.replace('-', '_')
+        extension.projectPodspecName.set(podspecNameDefault)
 
         val processor = KLibProcessor(
             logger = target.logger,
@@ -29,7 +31,7 @@ open class KSwiftPlugin : Plugin<Project> {
             .withType<KotlinMultiplatformPluginWrapper>()
             .configureEach { pluginWrapper ->
                 val multiplatformExtension = target.extensions
-                    .getByType(pluginWrapper.projectExtensionClass.java)
+                    .getByType(pluginWrapper.projectExtensionClass)
 
                 applyToKotlinMultiplatform(multiplatformExtension, processor, extension)
             }

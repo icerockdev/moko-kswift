@@ -20,10 +20,12 @@ import kotlinx.metadata.ClassName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
 import java.util.Locale
+import kotlin.reflect.KClass
 
 class SealedToSwiftEnumFeature(
-    filter: Filter<ClassContext>
-) : ProcessorFeature<ClassContext>(filter) {
+    override val featureContext: KClass<ClassContext>,
+    override val filter: Filter<ClassContext>
+) : ProcessorFeature<ClassContext>() {
     override fun doProcess(featureContext: ClassContext, processorContext: ProcessorContext) {
         if (featureContext.clazz.sealedSubclasses.isEmpty()) return
 
@@ -163,14 +165,19 @@ class SealedToSwiftEnumFeature(
             }
     }
 
-    class Config {
-        var filter: Filter<ClassContext> = Filter.Exclude(emptySet())
+    class Config : BaseConfig<ClassContext> {
+        override var filter: Filter<ClassContext> = Filter.Exclude(emptySet())
     }
 
     companion object : Factory<ClassContext, SealedToSwiftEnumFeature, Config> {
         override fun create(block: Config.() -> Unit): SealedToSwiftEnumFeature {
             val config = Config().apply(block)
-            return SealedToSwiftEnumFeature(config.filter)
+            return SealedToSwiftEnumFeature(featureContext, config.filter)
         }
+
+        override val featureContext: KClass<ClassContext> = ClassContext::class
+
+        @JvmStatic
+        override val factory = Companion
     }
 }
