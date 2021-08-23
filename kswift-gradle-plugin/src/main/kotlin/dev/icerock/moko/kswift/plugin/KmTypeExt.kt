@@ -4,6 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin
 
+import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.BOOL
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionTypeName
@@ -43,6 +44,7 @@ fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): Ty
                 returnType = outputType
             ).makeEscaping()
         }
+        "kotlin/Any" -> ANY_OBJECT
         else -> {
             if (classifierName.startsWith("platform/")) {
                 DeclaredTypeName.typeName(
