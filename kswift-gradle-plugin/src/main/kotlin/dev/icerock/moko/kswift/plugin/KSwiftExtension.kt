@@ -5,39 +5,30 @@
 package dev.icerock.moko.kswift.plugin
 
 import dev.icerock.moko.kswift.plugin.context.FeatureContext
+import dev.icerock.moko.kswift.plugin.feature.BaseConfig
 import dev.icerock.moko.kswift.plugin.feature.ProcessorFeature
-import kotlin.reflect.KClass
+import org.gradle.api.DomainObjectSet
+import org.gradle.api.provider.Property
 
-open class KSwiftExtension {
-    internal val features: MutableMap<KClass<out FeatureContext>, List<ProcessorFeature<*>>> =
-        mutableMapOf()
+abstract class KSwiftExtension {
+    abstract val features: DomainObjectSet<ProcessorFeature<*>>
 
-    internal val excludedLibs = mutableListOf<String>()
-    internal val includedLibs = mutableListOf<String>()
+    abstract val excludedLibs: DomainObjectSet<String>
+    abstract val includedLibs: DomainObjectSet<String>
 
-    fun <CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
-        featureContext: KClass<out CTX>,
-        featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
-        config: Config.() -> Unit = {}
+    abstract val projectPodspecName: Property<String>
+
+    fun <CTX : FeatureContext, Config : BaseConfig<CTX>> install(
+        featureFactory: ProcessorFeature.Factory<CTX, *, Config>
     ) {
-        val currentList: List<ProcessorFeature<*>> = features[featureContext] ?: emptyList()
-        val processorFeature: ProcessorFeature<CTX> = featureFactory.create(config)
-        features[featureContext] = currentList.plus(processorFeature)
+        features.add(featureFactory.create { })
     }
 
-    inline fun <reified CTX : FeatureContext, F : ProcessorFeature<CTX>, Config> install(
-        featureFactory: ProcessorFeature.Factory<CTX, F, Config>,
-        noinline config: Config.() -> Unit = {}
+    fun <CTX : FeatureContext, Config : BaseConfig<CTX>> install(
+        featureFactory: ProcessorFeature.Factory<CTX, *, Config>,
+        config: Config.() -> Unit
     ) {
-        install(CTX::class, featureFactory, config)
-    }
-
-    fun <CTX : FeatureContext> excludeFilter(vararg names: String): ProcessorFeature.Filter.Exclude<CTX> {
-        return ProcessorFeature.Filter.Exclude(names.toSet())
-    }
-
-    fun <CTX : FeatureContext> includeFilter(vararg names: String): ProcessorFeature.Filter.Include<CTX> {
-        return ProcessorFeature.Filter.Include(names.toSet())
+        features.add(featureFactory.create(config))
     }
 
     fun includeLibrary(libraryName: String) {
@@ -47,6 +38,4 @@ open class KSwiftExtension {
     fun excludeLibrary(libraryName: String) {
         excludedLibs.add(libraryName)
     }
-
-    lateinit var projectPodspecName: String
 }

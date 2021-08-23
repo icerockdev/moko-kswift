@@ -26,7 +26,7 @@ open class KSwiftPodspecTask : DefaultTask() {
     internal lateinit var kSwiftExtension: KSwiftExtension
 
     private val projectPodspecName: String
-        get() = kSwiftExtension.projectPodspecName
+        get() = kSwiftExtension.projectPodspecName.get()
 
     private val moduleName: String
         get() = "${linkTask.baseName}Swift"

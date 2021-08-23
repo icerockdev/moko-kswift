@@ -15,7 +15,7 @@ plugins {
 version = "1.0"
 
 android {
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets.main.manifest.srcFile("src/androidMain/AndroidManifest.xml")
 }
 
 kotlin {
@@ -30,7 +30,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(projects.kswiftRuntime)
             }
@@ -39,6 +39,8 @@ kotlin {
 }
 
 kswift {
-    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature)
-    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature)
+    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature.factory) {
+        it.filter = it.includeFilter("one", "two")
+    }
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature.factory)
 }

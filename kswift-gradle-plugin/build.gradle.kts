@@ -14,11 +14,13 @@ group = "dev.icerock.moko"
 version = libs.versions.mokoKSwiftVersion.get()
 
 dependencies {
-    implementation(gradleKotlinDsl())
     compileOnly(libs.kotlinGradlePlugin)
-    implementation(libs.swiftPoet)
+
+    implementation(gradleKotlinDsl())
     implementation(libs.kotlinCompilerEmbeddable)
-    implementation(libs.kotlinxMetadataKLib)
+
+    api(libs.swiftPoet)
+    api(libs.kotlinxMetadataKLib)
 
     testImplementation(libs.kotlinTestJUnit)
 }
