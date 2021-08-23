@@ -17,6 +17,7 @@ abstract class KSwiftExtension {
     abstract val includedLibs: DomainObjectSet<String>
 
     abstract val projectPodspecName: Property<String>
+    abstract val iosDeploymentTarget: Property<String>
 
     fun <CTX : FeatureContext, Config : BaseConfig<CTX>> install(
         featureFactory: ProcessorFeature.Factory<CTX, *, Config>
