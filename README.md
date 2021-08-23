@@ -367,6 +367,22 @@ kswift {
 }
 ```
 
+## Set iOS deployment target for podspec
+
+kotlin:
+```kotlin
+kswift {
+    iosDeploymentTarget.set("11.0")
+}
+```
+
+groovy:
+```groovy
+kswift {
+    iosDeploymentTarget = "11.0"
+}
+```
+
 # FAQ
 
 ## Where destination directory for all generated sources?
