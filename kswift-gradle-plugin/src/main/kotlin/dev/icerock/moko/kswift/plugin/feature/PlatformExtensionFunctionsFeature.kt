@@ -26,10 +26,12 @@ import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
 import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
+import kotlin.reflect.KClass
 
 class PlatformExtensionFunctionsFeature(
-    filter: Filter<PackageFunctionContext>
-) : ProcessorFeature<PackageFunctionContext>(filter) {
+    override val featureContext: KClass<PackageFunctionContext>,
+    override val filter: Filter<PackageFunctionContext>
+) : ProcessorFeature<PackageFunctionContext>() {
     @Suppress("ReturnCount")
     override fun doProcess(
         featureContext: PackageFunctionContext,
@@ -154,16 +156,21 @@ class PlatformExtensionFunctionsFeature(
             ?.getStringArgument("newParamName") ?: param.name
     }
 
-    class Config {
-        var filter: Filter<PackageFunctionContext> = Filter.Exclude(emptySet())
+    class Config : BaseConfig<PackageFunctionContext> {
+        override var filter: Filter<PackageFunctionContext> = Filter.Exclude(emptySet())
     }
 
     companion object : Factory<PackageFunctionContext, PlatformExtensionFunctionsFeature, Config> {
         override fun create(block: Config.() -> Unit): PlatformExtensionFunctionsFeature {
             val config = Config().apply(block)
-            return PlatformExtensionFunctionsFeature(config.filter)
+            return PlatformExtensionFunctionsFeature(featureContext, config.filter)
         }
 
+        override val featureContext: KClass<PackageFunctionContext> = PackageFunctionContext::class
+
         private const val PLATFORM_CLASS_PARTS_COUNT = 3
+
+        @JvmStatic
+        override val factory = Companion
     }
 }

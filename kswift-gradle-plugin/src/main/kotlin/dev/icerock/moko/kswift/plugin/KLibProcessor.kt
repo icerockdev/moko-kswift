@@ -20,7 +20,7 @@ class KLibProcessor(
     private val extension: KSwiftExtension
 ) {
     private val features: Map<KClass<out FeatureContext>, List<ProcessorFeature<*>>>
-        get() = extension.features
+        get() = extension.features.groupBy { it.featureContext }
 
     fun processFeatureContext(library: File, outputDir: File, framework: Framework) {
         @Suppress("TooGenericExceptionCaught")

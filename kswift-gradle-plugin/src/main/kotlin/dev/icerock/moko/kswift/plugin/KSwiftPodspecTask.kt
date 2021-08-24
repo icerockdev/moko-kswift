@@ -26,7 +26,10 @@ open class KSwiftPodspecTask : DefaultTask() {
     internal lateinit var kSwiftExtension: KSwiftExtension
 
     private val projectPodspecName: String
-        get() = kSwiftExtension.projectPodspecName
+        get() = kSwiftExtension.projectPodspecName.get()
+
+    private val iosDeploymentTarget: String?
+        get() = kSwiftExtension.iosDeploymentTarget.orNull
 
     private val moduleName: String
         get() = "${linkTask.baseName}Swift"
@@ -54,7 +57,10 @@ open class KSwiftPodspecTask : DefaultTask() {
     fun execute() {
         frameworkDir.copyRecursively(outputCocoapodsDir, true)
 
-        val isStatic = linkTask.isStaticFramework
+        val isStatic: Boolean = linkTask.isStaticFramework
+        val iosDeploymentString: String = iosDeploymentTarget?.let {
+            "spec.ios.deployment_target  = '$it'"
+        }.orEmpty()
 
         @Suppress("MaxLineLength")
         outputPodspec.writeText(
@@ -68,7 +74,8 @@ open class KSwiftPodspecTask : DefaultTask() {
                     spec.license                  = ''
                     spec.summary                  = 'Some description for a Kotlin/Native module'
                     spec.module_name              = "$moduleName"
-
+                    
+                    $iosDeploymentString
                     spec.static_framework         = $isStatic
                     spec.dependency '$projectPodspecName'
                     spec.source_files = "build/cocoapods/framework/$moduleName/**/*.{h,m,swift}"

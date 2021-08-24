@@ -26,12 +26,10 @@ kswift {
             "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UIButton)/bindTitle/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>"
         )
     }
-    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature) {
-    }
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature)
 
-
-
-    projectPodspecName = "MultiPlatformLibrary"
+    projectPodspecName.set("MultiPlatformLibrary")
+    iosDeploymentTarget.set("11.0")
 }
 
 dependencies {

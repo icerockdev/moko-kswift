@@ -66,7 +66,7 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
+        classpath("dev.icerock.moko:kswift-gradle-plugin:0.3.0")
     }
 }
 ```
@@ -99,7 +99,7 @@ project where framework compiles `build.gradle`
 
 ```groovy
 plugins {
-    id("dev.icerock.moko.kswift") version "0.2.0"
+    id("dev.icerock.moko.kswift") version "0.3.0"
 }
 ```
 
@@ -119,7 +119,7 @@ project `build.gradle`
 
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:kswift-runtime:0.2.0") // if you want use annotations
+    commonMainApi("dev.icerock.moko:kswift-runtime:0.3.0") // if you want use annotations
 }
 ```
 
@@ -129,9 +129,17 @@ dependencies {
 
 Enable feature in project `build.gradle`:
 
-```groovy
+kotlin:
+```kotlin
 kswift {
     install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature)
+}
+```
+
+groovy:
+```groovy
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature.factory)
 }
 ```
 
@@ -182,7 +190,8 @@ For each generated entry in comment generated `selector` - value of this selecto
 filter. By default all entries generated. But if generated code invalid (please report issue in this
 case) you can disable generation of this particular entry:
 
-```groovy
+kotlin:
+```kotlin
 kswift {
     install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature) {
         filter = excludeFilter("ClassContext/moko-kswift.sample:mpp-library-pods/com/icerockdev/library/UIState")
@@ -190,12 +199,31 @@ kswift {
 }
 ```
 
+groovy:
+```groovy
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature.factory) {
+        it.filter = it.excludeFilter("ClassContext/moko-kswift.sample:mpp-library-pods/com/icerockdev/library/UIState")
+    }
+}
+```
+
 As alternative you can use `includeFilter` to explicit setup each required for generation entries:
 
-```groovy
+kotlin:
+```kotlin
 kswift {
     install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature) {
         filter = includeFilter("ClassContext/moko-kswift.sample:mpp-library-pods/com/icerockdev/library/UIState")
+    }
+}
+```
+
+groovy:
+```groovy
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature.factory) {
+        it.filter = it.includeFilter("ClassContext/moko-kswift.sample:mpp-library-pods/com/icerockdev/library/UIState")
     }
 }
 ```
@@ -204,9 +232,17 @@ kswift {
 
 Enable feature in project `build.gradle`:
 
-```groovy
+kotlin:
+```kotlin
 kswift {
     install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature)
+}
+```
+
+groovy:
+```groovy
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature.factory)
 }
 ```
 
@@ -259,11 +295,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:7.1.0-alpha06")
+    implementation("com.android.tools.build:gradle:7.0.0")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
     implementation("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
-    implementation("com.github.icerockdev:swiftpoet:1.1.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:0.0.1")
 }
 ```
 
@@ -277,7 +311,10 @@ import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 
-class MyKSwiftGenerator(filter: Filter<ClassContext>) : ProcessorFeature<ClassContext>(filter) {
+class MyKSwiftGenerator(
+    override val featureContext: KClass<ClassContext>,
+    override val filter: Filter<ClassContext>
+) : ProcessorFeature<ClassContext>() {
     override fun doProcess(featureContext: ClassContext, processorContext: ProcessorContext) {
         val fileSpec: FileSpec.Builder = processorContext.fileSpecBuilder
         val frameworkName: String = processorContext.framework.baseName
@@ -293,15 +330,20 @@ class MyKSwiftGenerator(filter: Filter<ClassContext>) : ProcessorFeature<ClassCo
         )
     }
 
-    class Config(
-        var filter: Filter<ClassContext> = Filter.Exclude(emptySet())
-    )
+    class Config : BaseConfig<ClassContext> {
+        override var filter: Filter<ClassContext> = Filter.Exclude(emptySet())
+    }
 
     companion object : Factory<ClassContext, MyKSwiftGenerator, Config> {
         override fun create(block: Config.() -> Unit): MyKSwiftGenerator {
             val config = Config().apply(block)
-            return MyKSwiftGenerator(config.filter)
+            return MyKSwiftGenerator(featureContext, config.filter)
         }
+
+        override val featureContext: KClass<ClassContext> = ClassContext::class
+        
+        @JvmStatic
+        override val factory = Companion
     }
 }
 ```
@@ -311,9 +353,33 @@ required `Context` to got required info from klib metadata.
 
 last step - enable feature in gradle:
 
-```groovy
+kotlin:
+```kotlin
 kswift {
     install(MyKSwiftGenerator)
+}
+```
+
+groovy:
+```groovy
+kswift {
+    install(MyKSwiftGenerator.factory)
+}
+```
+
+## Set iOS deployment target for podspec
+
+kotlin:
+```kotlin
+kswift {
+    iosDeploymentTarget.set("11.0")
+}
+```
+
+groovy:
+```groovy
+kswift {
+    iosDeploymentTarget = "11.0"
 }
 ```
 
