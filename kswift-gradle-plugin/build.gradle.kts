@@ -5,7 +5,8 @@
 plugins {
     id("gradle-plugin-convention")
     id("detekt-convention")
-    id("publication-convention")
+    id("jvm-publication-convention")
+    id("com.github.gmazzo.buildconfig") version ("3.0.2")
     id("com.gradle.plugin-publish") version ("0.15.0")
     id("java-gradle-plugin")
 }
@@ -25,6 +26,14 @@ dependencies {
     testImplementation(libs.kotlinTestJUnit)
 }
 
+buildConfig {
+    sourceSets.getByName("main") {
+        buildConfig {
+            buildConfigField("String", "compilerPluginVersion", "\"${project.version}\"")
+        }
+    }
+}
+
 tasks.withType<Test>().configureEach {
     testLogging {
         showStandardStreams = true
@@ -36,6 +45,10 @@ gradlePlugin {
         create("kswift") {
             id = "dev.icerock.moko.kswift"
             implementationClass = "dev.icerock.moko.kswift.plugin.KSwiftPlugin"
+        }
+        create("kswift-flow") {
+            id = "dev.icerock.moko.kswift-flow"
+            implementationClass = "dev.icerock.moko.kswift.plugin.KSwiftFlowGradleSubplugin"
         }
     }
 }
@@ -57,8 +70,4 @@ pluginBundle {
         artifactId = project.name
         version = project.version as String
     }
-}
-
-publishing.publications.register("mavenJava", MavenPublication::class) {
-    from(components["java"])
 }
