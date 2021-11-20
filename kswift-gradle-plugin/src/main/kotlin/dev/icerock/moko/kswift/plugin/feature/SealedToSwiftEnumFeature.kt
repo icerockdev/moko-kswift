@@ -33,8 +33,10 @@ class SealedToSwiftEnumFeature(
         val kmClass: KmClass = featureContext.clazz
 
         val sealedCases: List<EnumCase> = buildEnumCases(kotlinFrameworkName, featureContext)
-        val typeVariables: List<TypeVariableName> =
-            kmClass.buildTypeVariableNames(kotlinFrameworkName)
+        val typeVariables: List<TypeVariableName> = kmClass.buildTypeVariableNames(
+            kotlinFrameworkName = kotlinFrameworkName,
+            classes = featureContext.kLibClasses
+        )
 
         val originalClassName: String = getSimpleName(kmClass.name, featureContext.kLibClasses)
         val className: String = originalClassName.replace(".", "").plus("Ks")
