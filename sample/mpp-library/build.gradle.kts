@@ -42,6 +42,8 @@ dependencies {
     commonMainApi(libs.mokoResources)
 
     commonMainApi(projects.kswiftRuntime)
+
+    commonMainApi(projects.sample.mppLibrary.cflow)
 }
 
 framework {
@@ -51,4 +53,5 @@ framework {
     export(libs.mokoMvvmLiveData)
     export(libs.mokoMvvmState)
     export(libs.mokoResources)
+    export(projects.sample.mppLibrary.cflow)
 }

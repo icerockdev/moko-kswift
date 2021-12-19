@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
-class TestViewModel : ViewModel() {
+class StateViewModel : ViewModel() {
     val login: MutableStateFlow<String> = MutableStateFlow(value = "test")
     val password: MutableStateFlow<String> = MutableStateFlow(value = "passwd")
 
