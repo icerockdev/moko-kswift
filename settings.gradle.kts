@@ -11,19 +11,15 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
-
-        jcenter {
-            content {
-                includeGroup("org.jetbrains.kotlinx")
-            }
-        }
     }
 }
 
 includeBuild("kswift-build-logic")
 includeBuild("kswift-gradle-plugin")
+includeBuild("kswift-compiler-native-plugin")
 
 include(":kswift-runtime")
 include(":sample:android-app")
 include(":sample:mpp-library")
+include(":sample:mpp-library:cflow")
 include(":sample:mpp-library-pods")

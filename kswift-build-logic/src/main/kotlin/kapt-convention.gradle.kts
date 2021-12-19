@@ -3,6 +3,5 @@
  */
 
 plugins {
-    id("jvm-convention")
-    `java-gradle-plugin`
+    id("kotlin-kapt")
 }

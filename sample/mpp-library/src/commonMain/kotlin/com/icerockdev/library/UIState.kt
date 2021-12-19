@@ -15,7 +15,7 @@ class TestStateSource {
     val loading: UIState<String> = UIState.Loading
     val empty: UIState<String> = UIState.Empty
     val data: UIState<String> = UIState.Data(value = "test")
-    val error: UIState<String> = UIState.Error(throwable = IllegalStateException())
+    val error: UIState<String> = UIState.Error(throwable = IllegalStateException("error"))
 }
 
 sealed class UIStateClass<out T> {
@@ -29,5 +29,5 @@ class TestStateClassSource {
     val loading: UIStateClass<String> = UIStateClass.Loading
     val empty: UIStateClass<String> = UIStateClass.Empty
     val data: UIStateClass<String> = UIStateClass.Data(value = "test")
-    val error: UIStateClass<String> = UIStateClass.Error(throwable = IllegalStateException())
+    val error: UIStateClass<String> = UIStateClass.Error(throwable = IllegalStateException("error"))
 }

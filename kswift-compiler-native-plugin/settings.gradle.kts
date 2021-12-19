@@ -4,7 +4,7 @@
 
 enableFeaturePreview("VERSION_CATALOGS")
 
-rootProject.name = "kswift-gradle-plugin"
+rootProject.name = "kswift-compiler-native-plugin"
 
 pluginManagement {
     repositories {

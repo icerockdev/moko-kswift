@@ -11,14 +11,16 @@ import dev.icerock.moko.kswift.plugin.findByClassName
 import dev.icerock.moko.kswift.plugin.getStringArgument
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
+import io.outfoxx.swiftpoet.AttributeSpec.Companion.ESCAPING
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
-import io.outfoxx.swiftpoet.ParameterizedTypeName
-import kotlinx.metadata.Flag
+import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
@@ -32,13 +34,14 @@ class PlatformExtensionFunctionsFeature(
     override val featureContext: KClass<PackageFunctionContext>,
     override val filter: Filter<PackageFunctionContext>
 ) : ProcessorFeature<PackageFunctionContext>() {
-    @Suppress("ReturnCount")
+    @Suppress("ReturnCount", "LongMethod")
     override fun doProcess(
         featureContext: PackageFunctionContext,
         processorContext: ProcessorContext
     ) {
         val func: KmFunction = featureContext.func
         val kotlinFrameworkName: String = processorContext.framework.baseName
+        val classes: List<KmClass> = featureContext.classes
 
         val receiver = func.receiverParameterType ?: return
 
@@ -48,17 +51,30 @@ class PlatformExtensionFunctionsFeature(
         val funcName: String = func.name
         val fileName: String = func.file?.name ?: return
         val swiftedClass: String = fileName.replace(".kt", "Kt")
-        val callParams: List<String> = func.valueParameters.map { param ->
+
+        val funcParams: List<ParameterSpec> =
+            buildFunctionParameters(featureContext, kotlinFrameworkName, classes)
+
+        val callParams: List<String> = func.valueParameters.mapIndexed { index, param ->
             buildString {
                 append(buildFunctionParameterName(param))
                 append(": ")
                 append(param.name)
+
+                if (param.type?.classifier is KmClassifier.TypeParameter) {
+                    append(" as Any")
+                }
+                val parameterSpec: ParameterSpec = funcParams[index]
+                val parameterType: TypeName = parameterSpec.type
+                if (parameterType is FunctionTypeName) {
+                    val lambdaCast = buildLambdaCast(parameterType)
+                    if (lambdaCast != null) {
+                        append(" as! $lambdaCast")
+                    }
+                }
             }
         }
         val callParamsLine: String = listOf("self").plus(callParams).joinToString(", ")
-
-        val funcParams: List<ParameterSpec> =
-            buildFunctionParameters(featureContext, kotlinFrameworkName)
 
         val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
             .addFunction(
@@ -71,7 +87,18 @@ class PlatformExtensionFunctionsFeature(
                         }
                     }
                     .addParameters(funcParams)
-                    .returns(func.returnType.toTypeName(kotlinFrameworkName))
+                    .addTypeVariables(
+                        func.typeParameters.map { typeParameter ->
+                            TypeVariableName.typeVariable(typeParameter.name)
+                        }
+                    )
+                    .returns(
+                        func.returnType.toTypeName(
+                            moduleName = kotlinFrameworkName,
+                            typeParameters = func.typeParameters,
+                            classes = classes
+                        )
+                    )
                     .addCode("return $swiftedClass.$funcName($callParamsLine)\n")
                     .build()
             )
@@ -83,6 +110,26 @@ class PlatformExtensionFunctionsFeature(
         fileSpecBuilder.addImport(classTypeName.typeName.moduleName)
         fileSpecBuilder.addImport(kotlinFrameworkName)
         fileSpecBuilder.addExtension(extensionSpec)
+    }
+
+    private fun buildLambdaCast(parameterType: FunctionTypeName): String? {
+        val hasParamsWithGenerics = parameterType.parameters.any { it.type is TypeVariableName }
+        val hasResultGeneric = parameterType.returnType is TypeVariableName
+
+        if (!hasParamsWithGenerics && !hasResultGeneric) return null
+
+        val params: List<String> = parameterType.parameters.map { parameter ->
+            if (parameter.type is TypeVariableName) "Any"
+            else parameter.type.toString()
+        }
+        val result: String = if (hasResultGeneric) "Any" else parameterType.returnType.toString()
+
+        return buildString {
+            append("(")
+            append(params.joinToString())
+            append(") -> ")
+            append(result)
+        }
     }
 
     @Suppress("ReturnCount")
@@ -103,7 +150,11 @@ class PlatformExtensionFunctionsFeature(
             className to false
         }
 
-        val declaredTypeName = DeclaredTypeName(moduleName = frameworkName, simpleName = simpleName)
+        val swiftedName: String = if (frameworkName == "Foundation") simpleName.removePrefix("NS")
+        else simpleName
+
+        val declaredTypeName =
+            DeclaredTypeName(moduleName = frameworkName, simpleName = swiftedName)
 
         return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
         else PlatformClassTypeName.Normal(declaredTypeName)
@@ -119,33 +170,21 @@ class PlatformExtensionFunctionsFeature(
 
     private fun buildFunctionParameters(
         featureContext: PackageFunctionContext,
-        kotlinFrameworkName: String
+        kotlinFrameworkName: String,
+        classes: List<KmClass>
     ): List<ParameterSpec> {
         val func: KmFunction = featureContext.func
-        val classes: List<KmClass> = featureContext.classes
         return func.valueParameters.map { param ->
             val paramType: KmType = param.type
                 ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
-            val type = paramType.toTypeName(kotlinFrameworkName)
+            val type = paramType.toTypeName(
+                moduleName = kotlinFrameworkName,
+                typeParameters = func.typeParameters,
+                classes = classes
+            )
 
-            val paramTypeClassifier = paramType.classifier
-            if (paramTypeClassifier !is KmClassifier.Class) {
-                throw IllegalArgumentException("extension ${func.name} have not class param $param")
-            }
-
-            val paramClassName = paramTypeClassifier.name
-
-            val isWithoutGenerics = classes.firstOrNull { it.name == paramClassName }?.let {
-                Flag.Class.IS_INTERFACE(it.flags)
-            } ?: false
-
-            val usedType = if (isWithoutGenerics && type is ParameterizedTypeName) {
-                type.rawType
-            } else {
-                type
-            }
-
-            ParameterSpec.builder(parameterName = param.name, type = usedType)
+            ParameterSpec.builder(parameterName = param.name, type = type)
+                .apply { if (type is FunctionTypeName) addAttribute(ESCAPING) }
                 .build()
         }
     }

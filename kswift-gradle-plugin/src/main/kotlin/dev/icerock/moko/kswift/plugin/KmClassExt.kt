@@ -14,10 +14,18 @@ import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
 
 fun KmClass.buildTypeVariableNames(
-    kotlinFrameworkName: String
+    kotlinFrameworkName: String,
+    classes: List<KmClass>
 ) = this.typeParameters.map { typeParam ->
     val bounds: List<TypeVariableName.Bound> = typeParam.upperBounds
-        .map { it.toTypeName(kotlinFrameworkName, isUsedInGenerics = true) }
+        .map { bound ->
+            bound.toTypeName(
+                moduleName = kotlinFrameworkName,
+                isUsedInGenerics = true,
+                typeParameters = typeParameters,
+                classes = classes
+            )
+        }
         .map { TypeVariableName.Bound(it) }
         .ifEmpty { listOf(TypeVariableName.Bound(ANY_OBJECT)) }
     TypeVariableName.typeVariable(typeParam.name, bounds)
@@ -27,7 +35,7 @@ fun KmClass.getDeclaredTypeNameWithGenerics(
     kotlinFrameworkName: String,
     classes: List<KmClass>
 ): TypeName {
-    val typeVariables: List<TypeVariableName> = buildTypeVariableNames(kotlinFrameworkName)
+    val typeVariables: List<TypeVariableName> = buildTypeVariableNames(kotlinFrameworkName, classes)
     val haveGenerics: Boolean = typeVariables.isNotEmpty()
     val isInterface: Boolean = Flag.Class.IS_INTERFACE(flags)
 
