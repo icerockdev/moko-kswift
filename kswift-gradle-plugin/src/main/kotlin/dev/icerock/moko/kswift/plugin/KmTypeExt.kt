@@ -18,6 +18,7 @@ import kotlinx.metadata.ClassName
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 
+@Suppress("ReturnCount")
 fun KmType.toTypeName(
     moduleName: String,
     isUsedInGenerics: Boolean = false,

@@ -97,6 +97,7 @@ internal object PackageFunctionReader {
             .build()
     }
 
+    @Suppress("ReturnCount")
     fun read(context: PackageFunctionContext, moduleName: String): Data? {
         val func: KmFunction = context.func
         val receiver: KmType = func.receiverParameterType ?: return null
@@ -150,7 +151,7 @@ internal object PackageFunctionReader {
             typeVariables = typeVariables.values.toList(),
             funcParams = funcParams,
             modifiers = modifiers,
-            returnType = func.returnType.toTypeName(moduleName),
+            returnType = func.returnType.toTypeName(moduleName, typeVariables = typeVariables),
             code = "return $swiftedClass.$funcName($callParamsLine)\n"
         )
     }

@@ -39,4 +39,4 @@ kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.r
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 mobileMultiplatformGradlePlugin = { module = "dev.icerock:mobile-multiplatform", version = "0.13.0" }
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version = "7.0.4" }
-detektGradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version = "1.19.0" }
+detektGradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version = "1.15.0" }
