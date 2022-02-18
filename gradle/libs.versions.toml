@@ -4,7 +4,7 @@ androidAppCompatVersion = "1.2.0"
 materialDesignVersion = "1.0.0"
 androidLifecycleVersion = "2.1.0"
 androidCoreTestingVersion = "2.1.0"
-coroutinesVersion = "1.5.0-native-mt"
+coroutinesVersion = "1.6.0-native-mt"
 mokoTestVersion = "0.4.0"
 mokoKSwiftVersion = "0.4.0"
 

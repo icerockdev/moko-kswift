@@ -4,27 +4,26 @@
 
 package com.icerockdev.library
 
-import dev.icerock.moko.mvvm.livedata.Closeable
-import dev.icerock.moko.mvvm.livedata.LiveData
-import dev.icerock.moko.mvvm.utils.bind
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import platform.UIKit.UILabel
-import dev.icerock.moko.mvvm.binding.bindText as originalBindText
+
+class LiveData<T>
+
+interface Closeable
 
 fun UILabel.bindText(
     liveData: LiveData<String>,
     formatter: (String) -> String
 ): Closeable {
-    return this.originalBindText(liveData, formatter)
+    TODO()
 }
 
 fun UILabel.bindText(
     liveData: LiveData<String>
 ): Closeable {
-    return this.originalBindText(liveData)
+    TODO()
 }
 
 class CFlow<T>(private val stateFlow: StateFlow<T>) : StateFlow<T> by stateFlow
@@ -38,9 +37,7 @@ fun UILabel.bindText(coroutineScope: CoroutineScope, flow: CFlow<String>) {
 }
 
 fun <T : String?> UILabel.bindGenericText(liveData: LiveData<T>): Closeable {
-    return liveData.bind(this) { value ->
-        this.text = value
-    }
+    TODO()
 }
 
 fun <T> UILabel.bindGenericAny(liveData: LiveData<T>): Closeable {

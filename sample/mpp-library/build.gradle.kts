@@ -15,22 +15,21 @@ plugins {
 kotlin {
     android()
     ios()
+    iosSimulatorArm64()
+
+    sourceSets {
+        val iosMain by getting
+        val iosSimulatorArm64Main by getting
+
+        iosSimulatorArm64Main.dependsOn(iosMain)
+    }
 }
 
 kswift {
-    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature) {
-        filter = excludeFilter(
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UILabel)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextField)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UITextView)/bindText/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>,formatter:Class(name=kotlin/Function1)<Class(name=kotlin/String),Class(name=kotlin/String)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.binding/Class(name=platform/UIKit/UIButton)/bindTitle/liveData:Class(name=dev/icerock/moko/mvvm/livedata/LiveData)<Class(name=kotlin/String)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.utils/TypeParameter(id=0)/setEventHandler/event:Class(name=kotlin/ULong),lambda:Class(name=kotlin/Function1)<TypeParameter(id=0),Class(name=kotlin/Unit)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-livedata/dev.icerock.moko.mvvm.utils/Class(name=platform/Foundation/NSNotificationCenter)/setEventHandler/notification:Class(name=kotlin/String),ref:TypeParameter(id=0),lambda:Class(name=kotlin/Function1)<TypeParameter(id=0),Class(name=kotlin/Unit)>",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-state/dev.icerock.moko.mvvm/TypeParameter(id=0)/asState/",
-            "PackageFunctionContext/dev.icerock.moko:mvvm-state/dev.icerock.moko.mvvm/TypeParameter(id=0)/asState/whenNull:Class(name=kotlin/Function0)<Class(name=dev/icerock/moko/mvvm/ResourceState)<TypeParameter(id=0),TypeParameter(id=1)>>"
-        )
-    }
+    install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature)
     install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature)
+
+    excludeLibrary("kotlinx-coroutines-core")
 
     projectPodspecName.set("MultiPlatformLibrary")
     iosDeploymentTarget.set("11.0")
@@ -39,19 +38,10 @@ kswift {
 dependencies {
     commonMainApi(libs.coroutines)
 
-    commonMainApi(libs.mokoMvvmCore)
-    commonMainApi(libs.mokoMvvmLiveData)
-    commonMainApi(libs.mokoMvvmState)
-    commonMainApi(libs.mokoResources)
-
     commonMainApi(projects.kswiftRuntime)
 }
 
 framework {
     export(libs.coroutines)
     export(projects.kswiftRuntime)
-    export(libs.mokoMvvmCore)
-    export(libs.mokoMvvmLiveData)
-    export(libs.mokoMvvmState)
-    export(libs.mokoResources)
 }
