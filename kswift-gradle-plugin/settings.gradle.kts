@@ -28,7 +28,7 @@ dependencyResolutionManagement {
 
         maven("https://jitpack.io")
     }
-// uncomment this on Windows. 
+// uncomment this on Windows.
 //
 //    versionCatalogs {
 //        create("libs") {

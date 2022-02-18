@@ -11,6 +11,7 @@ import dev.icerock.moko.kswift.plugin.findByClassName
 import dev.icerock.moko.kswift.plugin.getStringArgument
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
+import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
@@ -82,7 +83,8 @@ internal object PackageFunctionReader {
         return ExtensionSpec.builder(functionData.classTypeName.toSwift())
             .addFunction(
                 FunctionSpec.builder(functionData.funcName)
-                    .addDoc(doc)
+                    .addDoc(doc + "\n")
+                    .addAttribute(AttributeSpec.DISCARDABLE_RESULT)
                     .addModifiers(Modifier.PUBLIC)
                     .addTypeVariables(functionData.typeVariables)
                     .addModifiers(functionData.modifiers)
@@ -99,17 +101,23 @@ internal object PackageFunctionReader {
         val func: KmFunction = context.func
         val receiver: KmType = func.receiverParameterType ?: return null
 
-        val classifier: KmClassifier = receiver.classifier
-        val classTypeName: PlatformClassTypeName = buildClassTypeName(classifier) ?: return null
+        val typeVariables: Map<Int, TypeVariableName> = buildTypeVariables(context, moduleName)
+
+        val classTypeName: PlatformClassTypeName = buildClassTypeName(
+            type = receiver,
+            moduleName = moduleName,
+            typeVariables = typeVariables
+        ) ?: return null
 
         val funcName: String = func.name
         val fileName: String = func.file?.name ?: return null
         val swiftedClass: String = fileName.replace(".kt", "Kt")
 
-        val typeVariables: Map<Int, TypeVariableName> = buildTypeVariables(context, moduleName)
-
-        val funcParams: List<ParameterSpec> =
-            buildFunctionParameters(context, moduleName, typeVariables)
+        val funcParams: List<ParameterSpec> = buildFunctionParameters(
+            featureContext = context,
+            kotlinFrameworkName = moduleName,
+            typeVariables = typeVariables
+        )
 
         val modifiers: List<Modifier> = if (classTypeName is PlatformClassTypeName.Companion) {
             listOf(Modifier.CLASS)
@@ -153,45 +161,71 @@ internal object PackageFunctionReader {
     ): Map<Int, TypeVariableName> {
         val func: KmFunction = context.func
 
-        return func.typeParameters.associate { ktTypeParam ->
-            ktTypeParam.id to when (ktTypeParam.variance) {
+        val resultMap: MutableMap<Int, TypeVariableName> = mutableMapOf()
+
+        func.typeParameters.forEach { typeParam ->
+            when (typeParam.variance) {
                 KmVariance.INVARIANT -> TypeVariableName.typeVariable(
-                    ktTypeParam.name,
-                    ktTypeParam.upperBounds.map { type ->
+                    typeParam.name,
+                    typeParam.upperBounds.map { type ->
                         TypeVariableName.bound(
                             Constraint.CONFORMS_TO,
-                            type.toTypeName(moduleName, isUsedInGenerics = true)
+                            type.toTypeName(
+                                moduleName = moduleName,
+                                isUsedInGenerics = true,
+                                typeVariables = resultMap
+                            )
                         )
                     }
-                )
+                ).also { resultMap[typeParam.id] = it }
                 KmVariance.IN -> TODO()
                 KmVariance.OUT -> TODO()
             }
         }
+
+        return resultMap
     }
 
     @Suppress("ReturnCount")
-    private fun buildClassTypeName(classifier: KmClassifier): PlatformClassTypeName? {
-        if (classifier !is KmClassifier.Class) return null
+    private fun buildClassTypeName(
+        type: KmType,
+        moduleName: String,
+        typeVariables: Map<Int, TypeVariableName>
+    ): PlatformClassTypeName? {
+        val classifier: KmClassifier = type.classifier
 
-        val receiverName: String = classifier.name
-        val receiverParts: List<String> = receiverName.split("/")
-        if (receiverParts.size < PLATFORM_CLASS_PARTS_COUNT) return null
-        if (receiverParts[0] != "platform") return null
+        if (classifier is KmClassifier.Class) {
+            val receiverName: String = classifier.name
+            val receiverParts: List<String> = receiverName.split("/")
+            if (receiverParts.size < PLATFORM_CLASS_PARTS_COUNT) return null
+            if (receiverParts[0] != "platform") return null
 
-        val frameworkName: String = receiverParts[1]
-        val className: String = receiverParts[2]
+            val frameworkName: String = receiverParts[1]
+            val className: String = receiverParts[2]
 
-        val (simpleName, isCompanion) = if (className.endsWith(".Companion")) {
-            className.removeSuffix(".Companion") to true
-        } else {
-            className to false
+            val (simpleName, isCompanion) = if (className.endsWith(".Companion")) {
+                className.removeSuffix(".Companion") to true
+            } else {
+                className to false
+            }
+
+            val declaredTypeName = DeclaredTypeName(
+                moduleName = frameworkName,
+                simpleName = simpleName
+            )
+
+            return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
+            else PlatformClassTypeName.Normal(declaredTypeName)
         }
 
-        val declaredTypeName = DeclaredTypeName(moduleName = frameworkName, simpleName = simpleName)
+        val typeName: TypeName = type.toTypeName(
+            moduleName = moduleName,
+            typeVariables = typeVariables,
+            removeTypeVariables = true
+        )
 
-        return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
-        else PlatformClassTypeName.Normal(declaredTypeName)
+        val declaredTypeName: DeclaredTypeName? = typeName as? DeclaredTypeName
+        return declaredTypeName?.let { PlatformClassTypeName.Normal(it) }
     }
 
     private fun buildFunctionParameters(
@@ -204,23 +238,28 @@ internal object PackageFunctionReader {
         return func.valueParameters.map { param ->
             val paramType: KmType = param.type
                 ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
-            val type = paramType.toTypeName(kotlinFrameworkName, typeVariables = typeVariables)
+            val type: TypeName = paramType.toTypeName(
+                kotlinFrameworkName,
+                typeVariables = typeVariables
+            )
 
-            val paramTypeClassifier = paramType.classifier
-            if (paramTypeClassifier !is KmClassifier.Class) {
-                throw IllegalArgumentException("extension ${func.name} have not class param $param")
-            }
+            val usedType: TypeName = when (type) {
+                is ParameterizedTypeName -> {
+                    val paramTypeClassifier = paramType.classifier
+                    if (paramTypeClassifier !is KmClassifier.Class) {
+                        throw IllegalArgumentException("extension ${func.name} have not class param $param")
+                    }
 
-            val paramClassName = paramTypeClassifier.name
+                    val paramClassName = paramTypeClassifier.name
 
-            val isWithoutGenerics = classes.firstOrNull { it.name == paramClassName }?.let {
-                Flag.Class.IS_INTERFACE(it.flags)
-            } ?: false
+                    val isWithoutGenerics = classes.firstOrNull { it.name == paramClassName }?.let {
+                        Flag.Class.IS_INTERFACE(it.flags)
+                    } ?: false
 
-            val usedType = if (isWithoutGenerics && type is ParameterizedTypeName) {
-                type.rawType
-            } else {
-                type
+                    if (isWithoutGenerics) type.rawType
+                    else type
+                }
+                else -> type
             }
 
             ParameterSpec.builder(parameterName = param.name, type = usedType)
