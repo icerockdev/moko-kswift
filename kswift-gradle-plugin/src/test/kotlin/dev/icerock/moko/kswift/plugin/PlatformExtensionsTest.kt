@@ -1,8 +1,12 @@
+/*
+ * Copyright 2022 IceRock MAG Inc. Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.icerock.moko.kswift.plugin
 
 import dev.icerock.moko.kswift.plugin.context.LibraryContext
 import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
-import dev.icerock.moko.kswift.plugin.feature.PackageFunctionReader
+import dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature
 import io.outfoxx.swiftpoet.ExtensionSpec
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.klib.KlibModuleMetadata
@@ -10,7 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ExtensionsReader {
+class PlatformExtensionsTest {
     @Test
     fun testBindExtensions() {
         val metadata: KlibModuleMetadata = readKLib("mpp-library.klib")
@@ -38,17 +42,19 @@ class ExtensionsReader {
     }
 
     private fun testUILabelBindGenericText(featureContext: PackageFunctionContext) {
-        val data: PackageFunctionReader.Data? = PackageFunctionReader.read(
-            featureContext,
-            "shared"
-        )
+        val data: PlatformExtensionFunctionsFeature.Data? =
+            PlatformExtensionFunctionsFeature.Processing.read(
+                context = featureContext,
+                moduleName = "shared"
+            )
 
         assertNotNull(data)
 
-        val extensionSpec: ExtensionSpec = PackageFunctionReader.buildExtensionSpec(
-            functionData = data,
-            doc = "test doc"
-        )
+        val extensionSpec: ExtensionSpec =
+            PlatformExtensionFunctionsFeature.Processing.buildExtensionSpec(
+                functionData = data,
+                doc = "test doc"
+            )
 
         assertEquals(
             expected =
@@ -68,17 +74,19 @@ class ExtensionsReader {
     }
 
     private fun testUILabelBindGenericAny(featureContext: PackageFunctionContext) {
-        val data: PackageFunctionReader.Data? = PackageFunctionReader.read(
-            featureContext,
-            "shared"
-        )
+        val data: PlatformExtensionFunctionsFeature.Data? =
+            PlatformExtensionFunctionsFeature.Processing.read(
+                context = featureContext,
+                moduleName = "shared"
+            )
 
         assertNotNull(data)
 
-        val extensionSpec: ExtensionSpec = PackageFunctionReader.buildExtensionSpec(
-            functionData = data,
-            doc = "test doc"
-        )
+        val extensionSpec: ExtensionSpec =
+            PlatformExtensionFunctionsFeature.Processing.buildExtensionSpec(
+                functionData = data,
+                doc = "test doc"
+            )
 
         assertEquals(
             expected =
@@ -125,17 +133,19 @@ class ExtensionsReader {
     }
 
     private fun testUIControlSetEventHandler(featureContext: PackageFunctionContext) {
-        val data: PackageFunctionReader.Data? = PackageFunctionReader.read(
-            featureContext,
-            "shared"
-        )
+        val data: PlatformExtensionFunctionsFeature.Data? =
+            PlatformExtensionFunctionsFeature.Processing.read(
+                context = featureContext,
+                moduleName = "shared"
+            )
 
         assertNotNull(data)
 
-        val extensionSpec: ExtensionSpec = PackageFunctionReader.buildExtensionSpec(
-            functionData = data,
-            doc = "test doc"
-        )
+        val extensionSpec: ExtensionSpec =
+            PlatformExtensionFunctionsFeature.Processing.buildExtensionSpec(
+                functionData = data,
+                doc = "test doc"
+            )
 
         assertEquals(
             expected =
@@ -155,17 +165,19 @@ class ExtensionsReader {
     }
 
     private fun testNotificationCenterSetEventHandler(featureContext: PackageFunctionContext) {
-        val data: PackageFunctionReader.Data? = PackageFunctionReader.read(
-            featureContext,
-            "shared"
-        )
+        val data: PlatformExtensionFunctionsFeature.Data? =
+            PlatformExtensionFunctionsFeature.Processing.read(
+                context = featureContext,
+                moduleName = "shared"
+            )
 
         assertNotNull(data)
 
-        val extensionSpec: ExtensionSpec = PackageFunctionReader.buildExtensionSpec(
-            functionData = data,
-            doc = "test doc"
-        )
+        val extensionSpec: ExtensionSpec =
+            PlatformExtensionFunctionsFeature.Processing.buildExtensionSpec(
+                functionData = data,
+                doc = "test doc"
+            )
 
         assertEquals(
             expected =

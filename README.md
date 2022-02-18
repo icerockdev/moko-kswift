@@ -283,7 +283,7 @@ First create `buildSrc`, if you don't. `build.gradle` will contains:
 
 ```groovy
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
+    id("org.jetbrains.kotlin.jvm") version "1.6.10"
 }
 
 repositories {
