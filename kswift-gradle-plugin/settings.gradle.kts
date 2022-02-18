@@ -28,12 +28,13 @@ dependencyResolutionManagement {
 
         maven("https://jitpack.io")
     }
-
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
+// uncomment this on Windows. 
+//
+//    versionCatalogs {
+//        create("libs") {
+//            from(files("../gradle/libs.versions.toml"))
+//        }
+//    }
 }
 
 includeBuild("../kswift-build-logic")

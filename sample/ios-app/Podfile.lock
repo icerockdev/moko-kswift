@@ -23,11 +23,11 @@ EXTERNAL SOURCES:
     :path: "../mpp-library"
 
 SPEC CHECKSUMS:
-  mpp_library_pods: 1832be3e7967e1e8a0fc564777a5b7b2df1fd116
+  mpp_library_pods: 2898aa5582d082ae73a1a7478760dbdc7b9b14aa
   mpp_library_podsSwift: 61a3b520b6c9f8f88be78338579d08ccc5c2113c
   MultiPlatformLibrary: e778b00f0244457dbfd60a071e6dea6822d72d24
   MultiPlatformLibrarySwift: 5fd18f0349a2f6561deb6d8be3f7fe35fec6cd9a
 
 PODFILE CHECKSUM: a97fc6edc5e9b73e7270e05c66045254f3a80c87
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.11.2

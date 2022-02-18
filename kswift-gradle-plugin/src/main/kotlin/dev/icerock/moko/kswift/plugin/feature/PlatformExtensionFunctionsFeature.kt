@@ -18,12 +18,16 @@ import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
+import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
+import io.outfoxx.swiftpoet.TypeVariableName.Bound.Constraint
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmFunction
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
+import kotlinx.metadata.KmVariance
 import kotlinx.metadata.klib.annotations
 import kotlinx.metadata.klib.file
 import kotlin.reflect.KClass
@@ -37,52 +41,133 @@ class PlatformExtensionFunctionsFeature(
         featureContext: PackageFunctionContext,
         processorContext: ProcessorContext
     ) {
-        val func: KmFunction = featureContext.func
         val kotlinFrameworkName: String = processorContext.framework.baseName
 
-        val receiver = func.receiverParameterType ?: return
+        val functionData: PackageFunctionReader.Data =
+            PackageFunctionReader.read(featureContext, kotlinFrameworkName) ?: return
 
-        val classifier = receiver.classifier
-        val classTypeName = buildClassTypeName(classifier) ?: return
+        val extensionSpec: ExtensionSpec = PackageFunctionReader.buildExtensionSpec(
+            functionData = functionData,
+            doc = "selector: ${featureContext.prefixedUniqueId}"
+        )
+
+        val fileSpecBuilder: FileSpec.Builder = processorContext.fileSpecBuilder
+
+        fileSpecBuilder.addImport(functionData.classTypeName.moduleName)
+        fileSpecBuilder.addImport(kotlinFrameworkName)
+        fileSpecBuilder.addExtension(extensionSpec)
+    }
+
+    class Config : BaseConfig<PackageFunctionContext> {
+        override var filter: Filter<PackageFunctionContext> = Filter.Exclude(emptySet())
+    }
+
+    companion object : Factory<PackageFunctionContext, PlatformExtensionFunctionsFeature, Config> {
+        override fun create(block: Config.() -> Unit): PlatformExtensionFunctionsFeature {
+            val config = Config().apply(block)
+            return PlatformExtensionFunctionsFeature(featureContext, config.filter)
+        }
+
+        override val featureContext: KClass<PackageFunctionContext> = PackageFunctionContext::class
+
+        @JvmStatic
+        override val factory = Companion
+    }
+}
+
+internal object PackageFunctionReader {
+    private const val PLATFORM_CLASS_PARTS_COUNT = 3
+
+    fun buildExtensionSpec(functionData: Data, doc: String): ExtensionSpec {
+        return ExtensionSpec.builder(functionData.classTypeName.toSwift())
+            .addFunction(
+                FunctionSpec.builder(functionData.funcName)
+                    .addDoc(doc)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addTypeVariables(functionData.typeVariables)
+                    .addModifiers(functionData.modifiers)
+                    .addParameters(functionData.funcParams)
+                    .returns(functionData.returnType)
+                    .addCode(functionData.code)
+                    .build()
+            )
+            .addModifiers(Modifier.PUBLIC)
+            .build()
+    }
+
+    fun read(context: PackageFunctionContext, moduleName: String): Data? {
+        val func: KmFunction = context.func
+        val receiver: KmType = func.receiverParameterType ?: return null
+
+        val classifier: KmClassifier = receiver.classifier
+        val classTypeName: PlatformClassTypeName = buildClassTypeName(classifier) ?: return null
 
         val funcName: String = func.name
-        val fileName: String = func.file?.name ?: return
+        val fileName: String = func.file?.name ?: return null
         val swiftedClass: String = fileName.replace(".kt", "Kt")
+
+        val typeVariables: Map<Int, TypeVariableName> = buildTypeVariables(context, moduleName)
+
+        val funcParams: List<ParameterSpec> =
+            buildFunctionParameters(context, moduleName, typeVariables)
+
+        val modifiers: List<Modifier> = if (classTypeName is PlatformClassTypeName.Companion) {
+            listOf(Modifier.CLASS)
+        } else emptyList()
+
         val callParams: List<String> = func.valueParameters.map { param ->
             buildString {
                 append(buildFunctionParameterName(param))
                 append(": ")
                 append(param.name)
+
+                val type: KmType? = param.type
+                if (type?.arguments?.any { it.type?.classifier is KmClassifier.TypeParameter } == true) {
+                    append(" as! ")
+                    val fullTypeWithoutTypeParameter: TypeName = type.toTypeName(
+                        moduleName = moduleName,
+                        isUsedInGenerics = false,
+                        typeVariables = typeVariables,
+                        removeTypeVariables = true
+                    )
+                    append(fullTypeWithoutTypeParameter.toString())
+                }
             }
         }
         val callParamsLine: String = listOf("self").plus(callParams).joinToString(", ")
 
-        val funcParams: List<ParameterSpec> =
-            buildFunctionParameters(featureContext, kotlinFrameworkName)
+        return Data(
+            classTypeName = classTypeName.typeName,
+            funcName = funcName,
+            typeVariables = typeVariables.values.toList(),
+            funcParams = funcParams,
+            modifiers = modifiers,
+            returnType = func.returnType.toTypeName(moduleName),
+            code = "return $swiftedClass.$funcName($callParamsLine)\n"
+        )
+    }
 
-        val extensionSpec: ExtensionSpec = ExtensionSpec.builder(classTypeName.typeName.toSwift())
-            .addFunction(
-                FunctionSpec.builder(funcName)
-                    .addDoc("selector: ${featureContext.prefixedUniqueId}")
-                    .addModifiers(Modifier.PUBLIC)
-                    .apply {
-                        if (classTypeName is PlatformClassTypeName.Companion) {
-                            addModifiers(Modifier.CLASS)
-                        }
+    private fun buildTypeVariables(
+        context: PackageFunctionContext,
+        moduleName: String
+    ): Map<Int, TypeVariableName> {
+        val func: KmFunction = context.func
+
+        return func.typeParameters.associate { ktTypeParam ->
+            ktTypeParam.id to when (ktTypeParam.variance) {
+                KmVariance.INVARIANT -> TypeVariableName.typeVariable(
+                    ktTypeParam.name,
+                    ktTypeParam.upperBounds.map { type ->
+                        TypeVariableName.bound(
+                            Constraint.CONFORMS_TO,
+                            type.toTypeName(moduleName, isUsedInGenerics = true)
+                        )
                     }
-                    .addParameters(funcParams)
-                    .returns(func.returnType.toTypeName(kotlinFrameworkName))
-                    .addCode("return $swiftedClass.$funcName($callParamsLine)\n")
-                    .build()
-            )
-            .addModifiers(Modifier.PUBLIC)
-            .build()
-
-        val fileSpecBuilder: FileSpec.Builder = processorContext.fileSpecBuilder
-
-        fileSpecBuilder.addImport(classTypeName.typeName.moduleName)
-        fileSpecBuilder.addImport(kotlinFrameworkName)
-        fileSpecBuilder.addExtension(extensionSpec)
+                )
+                KmVariance.IN -> TODO()
+                KmVariance.OUT -> TODO()
+            }
+        }
     }
 
     @Suppress("ReturnCount")
@@ -109,24 +194,17 @@ class PlatformExtensionFunctionsFeature(
         else PlatformClassTypeName.Normal(declaredTypeName)
     }
 
-    sealed interface PlatformClassTypeName {
-        val typeName: DeclaredTypeName
-
-        data class Normal(override val typeName: DeclaredTypeName) : PlatformClassTypeName
-
-        data class Companion(override val typeName: DeclaredTypeName) : PlatformClassTypeName
-    }
-
     private fun buildFunctionParameters(
         featureContext: PackageFunctionContext,
-        kotlinFrameworkName: String
+        kotlinFrameworkName: String,
+        typeVariables: Map<Int, TypeVariableName>
     ): List<ParameterSpec> {
         val func: KmFunction = featureContext.func
         val classes: List<KmClass> = featureContext.classes
         return func.valueParameters.map { param ->
             val paramType: KmType = param.type
                 ?: throw IllegalArgumentException("extension ${func.name} have null type for $param")
-            val type = paramType.toTypeName(kotlinFrameworkName)
+            val type = paramType.toTypeName(kotlinFrameworkName, typeVariables = typeVariables)
 
             val paramTypeClassifier = paramType.classifier
             if (paramTypeClassifier !is KmClassifier.Class) {
@@ -156,21 +234,21 @@ class PlatformExtensionFunctionsFeature(
             ?.getStringArgument("newParamName") ?: param.name
     }
 
-    class Config : BaseConfig<PackageFunctionContext> {
-        override var filter: Filter<PackageFunctionContext> = Filter.Exclude(emptySet())
+    sealed interface PlatformClassTypeName {
+        val typeName: DeclaredTypeName
+
+        data class Normal(override val typeName: DeclaredTypeName) : PlatformClassTypeName
+
+        data class Companion(override val typeName: DeclaredTypeName) : PlatformClassTypeName
     }
 
-    companion object : Factory<PackageFunctionContext, PlatformExtensionFunctionsFeature, Config> {
-        override fun create(block: Config.() -> Unit): PlatformExtensionFunctionsFeature {
-            val config = Config().apply(block)
-            return PlatformExtensionFunctionsFeature(featureContext, config.filter)
-        }
-
-        override val featureContext: KClass<PackageFunctionContext> = PackageFunctionContext::class
-
-        private const val PLATFORM_CLASS_PARTS_COUNT = 3
-
-        @JvmStatic
-        override val factory = Companion
-    }
+    data class Data(
+        val classTypeName: DeclaredTypeName,
+        val funcName: String,
+        val typeVariables: List<TypeVariableName>,
+        val funcParams: List<ParameterSpec>,
+        val modifiers: List<Modifier>,
+        val returnType: TypeName,
+        val code: String
+    )
 }
