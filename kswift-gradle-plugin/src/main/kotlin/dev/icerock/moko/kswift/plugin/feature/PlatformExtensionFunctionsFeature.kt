@@ -12,10 +12,12 @@ import dev.icerock.moko.kswift.plugin.getStringArgument
 import dev.icerock.moko.kswift.plugin.toSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.AttributeSpec
+import io.outfoxx.swiftpoet.AttributeSpec.Companion.ESCAPING
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.Modifier
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.ParameterizedTypeName
@@ -284,6 +286,7 @@ class PlatformExtensionFunctionsFeature(
                 }
 
                 ParameterSpec.builder(parameterName = param.name, type = usedType)
+                    .apply { if (type is FunctionTypeName) addAttribute(ESCAPING) }
                     .build()
             }
         }

@@ -103,7 +103,7 @@ fun KmType.kotlinTypeToTypeName(
             FunctionTypeName.get(
                 parameters = listOf(ParameterSpec.unnamed(inputType)),
                 returnType = outputType
-            ).makeEscaping()
+            )
         }
         else -> {
             val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->

@@ -25,8 +25,6 @@ dependencyResolutionManagement {
                 includeGroup("org.jetbrains.kotlinx")
             }
         }
-
-        maven("https://jitpack.io")
     }
 
     versionCatalogs {
