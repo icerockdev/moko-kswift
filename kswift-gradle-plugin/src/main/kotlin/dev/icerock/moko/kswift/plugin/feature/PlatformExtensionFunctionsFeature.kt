@@ -9,7 +9,7 @@ import dev.icerock.moko.kswift.plugin.context.PackageFunctionContext
 import dev.icerock.moko.kswift.plugin.context.classes
 import dev.icerock.moko.kswift.plugin.findByClassName
 import dev.icerock.moko.kswift.plugin.getStringArgument
-import dev.icerock.moko.kswift.plugin.toSwift
+import dev.icerock.moko.kswift.plugin.objcNameToSwift
 import dev.icerock.moko.kswift.plugin.toTypeName
 import io.outfoxx.swiftpoet.AttributeSpec
 import io.outfoxx.swiftpoet.AttributeSpec.Companion.ESCAPING
@@ -98,10 +98,9 @@ class PlatformExtensionFunctionsFeature(
     }
 
     internal object Processing {
-        private const val PLATFORM_CLASS_PARTS_COUNT = 3
 
         fun buildExtensionSpec(functionData: Data, doc: String): ExtensionSpec {
-            return ExtensionSpec.builder(functionData.classTypeName.toSwift())
+            return ExtensionSpec.builder(functionData.classTypeName.objcNameToSwift())
                 .addFunction(
                     FunctionSpec.builder(functionData.funcName)
                         .addDoc(doc + "\n")
@@ -123,6 +122,9 @@ class PlatformExtensionFunctionsFeature(
             val func: KmFunction = context.func
             val receiver: KmType = func.receiverParameterType ?: return null
 
+            val fileName: String = func.file?.name ?: return null
+            val swiftedClass: String = fileName.replace(".kt", "Kt")
+
             val typeVariables: Map<Int, TypeVariableName> = buildTypeVariables(context, moduleName)
 
             val classTypeName: PlatformClassTypeName = buildClassTypeName(
@@ -132,8 +134,6 @@ class PlatformExtensionFunctionsFeature(
             ) ?: return null
 
             val funcName: String = func.name
-            val fileName: String = func.file?.name ?: return null
-            val swiftedClass: String = fileName.replace(".kt", "Kt")
 
             val funcParams: List<ParameterSpec> = buildFunctionParameters(
                 featureContext = context,
@@ -214,31 +214,8 @@ class PlatformExtensionFunctionsFeature(
             moduleName: String,
             typeVariables: Map<Int, TypeVariableName>
         ): PlatformClassTypeName? {
-            val classifier: KmClassifier = type.classifier
-
-            if (classifier is KmClassifier.Class) {
-                val receiverName: String = classifier.name
-                val receiverParts: List<String> = receiverName.split("/")
-                if (receiverParts.size < PLATFORM_CLASS_PARTS_COUNT) return null
-                if (receiverParts[0] != "platform") return null
-
-                val frameworkName: String = receiverParts[1]
-                val className: String = receiverParts[2]
-
-                val (simpleName, isCompanion) = if (className.endsWith(".Companion")) {
-                    className.removeSuffix(".Companion") to true
-                } else {
-                    className to false
-                }
-
-                val declaredTypeName = DeclaredTypeName(
-                    moduleName = frameworkName,
-                    simpleName = simpleName
-                )
-
-                return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
-                else PlatformClassTypeName.Normal(declaredTypeName)
-            }
+            val isCompanion: Boolean = (type.classifier as? KmClassifier.Class)
+                ?.name?.endsWith(".Companion") == true
 
             val typeName: TypeName = type.toTypeName(
                 moduleName = moduleName,
@@ -246,8 +223,10 @@ class PlatformExtensionFunctionsFeature(
                 removeTypeVariables = true
             )
 
-            val declaredTypeName: DeclaredTypeName? = typeName as? DeclaredTypeName
-            return declaredTypeName?.let { PlatformClassTypeName.Normal(it) }
+            val declaredTypeName: DeclaredTypeName = typeName as? DeclaredTypeName ?: return null
+
+            return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
+            else PlatformClassTypeName.Normal(declaredTypeName)
         }
 
         private fun buildFunctionParameters(

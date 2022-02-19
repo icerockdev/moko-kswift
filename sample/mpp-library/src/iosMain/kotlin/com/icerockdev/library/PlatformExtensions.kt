@@ -6,6 +6,8 @@ package com.icerockdev.library
 
 import dev.icerock.moko.kswift.KSwiftExclude
 import dev.icerock.moko.kswift.KSwiftOverrideName
+import platform.UIKit.UIControl
+import platform.UIKit.UIControlEvents
 import platform.UIKit.UILabel
 
 fun UILabel.fillByKotlin() {
@@ -37,3 +39,20 @@ fun UILabel.fillByKotlin(provider: CDataProvider<String>) {
 
 @KSwiftExclude
 fun UILabel.excludedFun() = Unit
+
+fun <T : UIControl> T.setEventHandler(
+    event: UIControlEvents,
+    lambda: (T) -> Unit
+): Closeable {
+    TODO()
+}
+
+/*
+fun <T: Any> NSNotificationCenter.setEventHandler(
+    notification: NSNotificationName,
+    ref: T,
+    lambda: T.() -> Unit
+): Closeable {
+    TODO()
+}
+*/

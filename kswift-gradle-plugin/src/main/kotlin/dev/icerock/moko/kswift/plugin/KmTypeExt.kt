@@ -12,6 +12,7 @@ import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
+import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
@@ -38,13 +39,14 @@ fun KmType.toTypeName(
                 ?: throw IllegalArgumentException("can't read type alias $this")
         }
         is KmClassifier.Class -> {
-            return classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
-                ?: kotlinTypeToTypeName(
-                    moduleName,
-                    classifier.name,
-                    typeVariables,
-                    removeTypeVariables
-                )
+            val name: TypeName? =
+                classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
+            return name ?: kotlinTypeToTypeName(
+                moduleName,
+                classifier.name,
+                typeVariables,
+                removeTypeVariables
+            )
         }
     }
 }
@@ -62,13 +64,18 @@ fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean):
         } else {
             BOOL
         }
+        "kotlin/ULong" -> UINT64
         "kotlin/Unit" -> VOID
         "kotlin/Any" -> ANY_OBJECT
         else -> {
             if (this.startsWith("platform/")) {
+                val moduleAndClass: List<String> = this.split("/").drop(1)
+                val module: String = moduleAndClass[0]
+                val className: String = moduleAndClass[1]
+
                 DeclaredTypeName.typeName(
-                    this.split("/").drop(1).joinToString(".")
-                ).toSwift()
+                    listOf(module, className).joinToString(".")
+                ).objcNameToSwift()
             } else null
         }
     }
@@ -120,9 +127,9 @@ fun KmType.kotlinTypeToTypeName(
     }
 }
 
-fun DeclaredTypeName.toSwift(): DeclaredTypeName {
-    return when {
-        moduleName == "Foundation" && simpleName == "NSBundle" -> peerType("Bundle")
+fun DeclaredTypeName.objcNameToSwift(): DeclaredTypeName {
+    return when (moduleName) {
+        "Foundation" -> peerType(simpleName.removePrefix("NS"))
         else -> this
     }
 }
