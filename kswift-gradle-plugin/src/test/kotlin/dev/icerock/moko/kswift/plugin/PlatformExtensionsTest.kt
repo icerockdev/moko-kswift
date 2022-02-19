@@ -156,7 +156,7 @@ class PlatformExtensionsTest {
                */
               @discardableResult
               public func setEventHandler<T : UIKit.UIControl>(event: shared.ULong, lambda: @escaping (T) -> Swift.Void) -> shared.Closeable {
-                return UIControlExtKt.setEventHandler(self, event: event, lambda: lambda as! @escaping (UIKit.UIControl) -> Swift.Void)
+                return UIControlExtKt.setEventHandler(self, event: event, lambda: lambda as! (UIKit.UIControl) -> Swift.Void)
               }
             }
             """.trimIndent(),
@@ -192,7 +192,7 @@ class PlatformExtensionsTest {
                 ref: T,
                 lambda: @escaping (T) -> Swift.Void
               ) -> shared.Closeable {
-                return NSNotificationCenterExtKt.setEventHandler(self, notification: notification, ref: ref, lambda: lambda as! @escaping (Swift.AnyObject) -> Swift.Void)
+                return NSNotificationCenterExtKt.setEventHandler(self, notification: notification, ref: ref, lambda: lambda as! (Swift.AnyObject) -> Swift.Void)
               }
             }
             """.trimIndent(),
