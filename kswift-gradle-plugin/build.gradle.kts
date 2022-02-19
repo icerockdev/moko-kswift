@@ -25,10 +25,17 @@ dependencies {
     testImplementation(libs.kotlinTestJUnit)
 }
 
-tasks.withType<Test>().configureEach {
+tasks.withType<AbstractTestTask> {
     testLogging {
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+        )
         showStandardStreams = true
     }
+    outputs.upToDateWhen { false }
 }
 
 gradlePlugin {

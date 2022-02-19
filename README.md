@@ -46,7 +46,7 @@ KSwift give you API for adding your own generator based on KLib metadata informa
 # Requirements
 
 - Gradle version 6.0+
-- Kotlin 1.5.20
+- Kotlin 1.6.10
 
 # Installation
 
@@ -66,7 +66,7 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("dev.icerock.moko:kswift-gradle-plugin:0.3.0")
+        classpath("dev.icerock.moko:kswift-gradle-plugin:0.4.0")
     }
 }
 ```
@@ -99,7 +99,7 @@ project where framework compiles `build.gradle`
 
 ```groovy
 plugins {
-    id("dev.icerock.moko.kswift") version "0.3.0"
+    id("dev.icerock.moko.kswift") version "0.4.0"
 }
 ```
 
@@ -119,7 +119,7 @@ project `build.gradle`
 
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:kswift-runtime:0.3.0") // if you want use annotations
+    commonMainApi("dev.icerock.moko:kswift-runtime:0.4.0") // if you want use annotations
 }
 ```
 
@@ -283,7 +283,7 @@ First create `buildSrc`, if you don't. `build.gradle` will contains:
 
 ```groovy
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
+    id("org.jetbrains.kotlin.jvm") version "1.6.10"
 }
 
 repositories {

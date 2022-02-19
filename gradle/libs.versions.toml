@@ -1,13 +1,12 @@
 [versions]
-kotlinVersion = "1.5.20"
-androidGradleVersion = "4.1.2"
+kotlinVersion = "1.6.10"
 androidAppCompatVersion = "1.2.0"
 materialDesignVersion = "1.0.0"
 androidLifecycleVersion = "2.1.0"
 androidCoreTestingVersion = "2.1.0"
-coroutinesVersion = "1.5.0-native-mt"
+coroutinesVersion = "1.6.0-native-mt"
 mokoTestVersion = "0.4.0"
-mokoKSwiftVersion = "0.3.0"
+mokoKSwiftVersion = "0.4.0"
 
 mokoMvvmVersion = "0.11.0"
 mokoResourcesVersion = "0.16.2"
@@ -33,9 +32,11 @@ mokoResources = { module = "dev.icerock.moko:resources" , version.ref = "mokoRes
 kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoetVersion" }
 swiftPoet = { module = "com.github.icerockdev:swiftpoet", version.ref = "swiftPoetVersion" }
 
-#kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion" }
-kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
-androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradleVersion" }
 kotlinCompilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
 kotlinxMetadataKLib = { module = "org.jetbrains.kotlinx:kotlinx-metadata-klib", version.ref = "kotlinxMetadataKLibVersion" }
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinVersion" }
+
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
+mobileMultiplatformGradlePlugin = { module = "dev.icerock:mobile-multiplatform", version = "0.13.0" }
+androidGradlePlugin = { module = "com.android.tools.build:gradle", version = "7.0.4" }
+detektGradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version = "1.15.0" }

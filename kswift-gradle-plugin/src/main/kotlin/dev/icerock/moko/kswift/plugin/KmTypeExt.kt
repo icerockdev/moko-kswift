@@ -11,19 +11,46 @@ import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.ParameterSpec
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeVariableName
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 
-fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): TypeName {
-    val classifier = classifier
-    if (classifier !is KmClassifier.Class) {
-        throw IllegalArgumentException("illegal type classifier $this $classifier")
+@Suppress("ReturnCount")
+fun KmType.toTypeName(
+    moduleName: String,
+    isUsedInGenerics: Boolean = false,
+    typeVariables: Map<Int, TypeVariableName> = emptyMap(),
+    removeTypeVariables: Boolean = false
+): TypeName {
+    return when (val classifier = classifier) {
+        is KmClassifier.TypeParameter -> {
+            val typeVariable: TypeVariableName? = typeVariables[classifier.id]
+            if (typeVariable != null) {
+                return if (!removeTypeVariables) typeVariable
+                else typeVariable.bounds.firstOrNull()?.type ?: ANY_OBJECT
+            } else throw IllegalArgumentException("can't read type parameter $this without type variables list")
+        }
+        is KmClassifier.TypeAlias -> {
+            classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
+                ?: throw IllegalArgumentException("can't read type alias $this")
+        }
+        is KmClassifier.Class -> {
+            return classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
+                ?: kotlinTypeToTypeName(
+                    moduleName,
+                    classifier.name,
+                    typeVariables,
+                    removeTypeVariables
+                )
+        }
     }
+}
 
-    return when (val classifierName = classifier.name) {
+fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean): TypeName? {
+    return when (this) {
         "kotlin/String" -> if (isUsedInGenerics) {
             DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
         } else {
@@ -36,30 +63,22 @@ fun KmType.toTypeName(moduleName: String, isUsedInGenerics: Boolean = false): Ty
             BOOL
         }
         "kotlin/Unit" -> VOID
-        "kotlin/Function1" -> {
-            val inputType: TypeName = arguments[0].type?.toTypeName(moduleName, false)!!
-            val outputType: TypeName = arguments[1].type?.toTypeName(moduleName, false)!!
-            FunctionTypeName.get(
-                parameters = listOf(ParameterSpec.unnamed(inputType)),
-                returnType = outputType
-            ).makeEscaping()
-        }
         "kotlin/Any" -> ANY_OBJECT
         else -> {
-            if (classifierName.startsWith("platform/")) {
+            if (this.startsWith("platform/")) {
                 DeclaredTypeName.typeName(
-                    classifierName.split("/").drop(1).joinToString(".")
+                    this.split("/").drop(1).joinToString(".")
                 ).toSwift()
-            } else {
-                kotlinTypeToTypeName(moduleName, classifierName)
-            }
+            } else null
         }
     }
 }
 
 fun KmType.kotlinTypeToTypeName(
     moduleName: String,
-    classifierName: ClassName
+    classifierName: ClassName,
+    typeVariables: Map<Int, TypeVariableName>,
+    removeTypeVariables: Boolean
 ): TypeName {
     val typeName = DeclaredTypeName(
         moduleName = moduleName,
@@ -67,11 +86,38 @@ fun KmType.kotlinTypeToTypeName(
     )
     if (this.arguments.isEmpty()) return typeName
 
-    val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->
-        typeProj.type?.toTypeName(moduleName = moduleName, isUsedInGenerics = true)
+    return when (classifierName) {
+        "kotlin/Function1" -> {
+            val inputType: TypeName = arguments[0].type?.toTypeName(
+                moduleName = moduleName,
+                isUsedInGenerics = false,
+                typeVariables = typeVariables,
+                removeTypeVariables = removeTypeVariables
+            )!!
+            val outputType: TypeName = arguments[1].type?.toTypeName(
+                moduleName = moduleName,
+                isUsedInGenerics = false,
+                typeVariables = typeVariables,
+                removeTypeVariables = removeTypeVariables
+            )!!
+            FunctionTypeName.get(
+                parameters = listOf(ParameterSpec.unnamed(inputType)),
+                returnType = outputType
+            ).makeEscaping()
+        }
+        else -> {
+            val arguments: List<TypeName> = this.arguments.mapNotNull { typeProj ->
+                typeProj.type?.toTypeName(
+                    moduleName = moduleName,
+                    isUsedInGenerics = true,
+                    typeVariables = typeVariables,
+                    removeTypeVariables = removeTypeVariables
+                )
+            }
+            @Suppress("SpreadOperator")
+            typeName.parameterizedBy(*arguments.toTypedArray())
+        }
     }
-    @Suppress("SpreadOperator")
-    return typeName.parameterizedBy(*arguments.toTypedArray())
 }
 
 fun DeclaredTypeName.toSwift(): DeclaredTypeName {
