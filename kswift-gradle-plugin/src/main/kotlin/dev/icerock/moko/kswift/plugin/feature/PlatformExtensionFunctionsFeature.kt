@@ -129,6 +129,7 @@ class PlatformExtensionFunctionsFeature(
 
             val classTypeName: PlatformClassTypeName = buildClassTypeName(
                 type = receiver,
+                context = context,
                 moduleName = moduleName,
                 typeVariables = typeVariables
             ) ?: return null
@@ -211,6 +212,7 @@ class PlatformExtensionFunctionsFeature(
         @Suppress("ReturnCount")
         private fun buildClassTypeName(
             type: KmType,
+            context: PackageFunctionContext,
             moduleName: String,
             typeVariables: Map<Int, TypeVariableName>
         ): PlatformClassTypeName? {
@@ -224,6 +226,21 @@ class PlatformExtensionFunctionsFeature(
             )
 
             val declaredTypeName: DeclaredTypeName = typeName as? DeclaredTypeName ?: return null
+
+            if (declaredTypeName.moduleName == moduleName) {
+                // extensions for kotlin classes will be available out of box
+                if (isCompanion) return null
+
+                // generate extensions only for interfaces
+                val className = (type.classifier as? KmClassifier.Class)?.name
+                if (className != null) {
+                    val clazz: KmClass? = context.classes.firstOrNull { it.name == className }
+                    if (clazz != null) {
+                        val isInterface: Boolean = Flag.Class.IS_INTERFACE(clazz.flags)
+                        if (!isInterface) return null
+                    }
+                }
+            }
 
             return if (isCompanion) PlatformClassTypeName.Companion(declaredTypeName)
             else PlatformClassTypeName.Normal(declaredTypeName)

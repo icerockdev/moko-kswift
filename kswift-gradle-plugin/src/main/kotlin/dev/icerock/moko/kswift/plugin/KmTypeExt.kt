@@ -69,7 +69,8 @@ fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean):
         "kotlin/Any" -> ANY_OBJECT
         else -> {
             if (this.startsWith("platform/")) {
-                val moduleAndClass: List<String> = this.split("/").drop(1)
+                val withoutCompanion: String = this.removeSuffix(".Companion")
+                val moduleAndClass: List<String> = withoutCompanion.split("/").drop(1)
                 val module: String = moduleAndClass[0]
                 val className: String = moduleAndClass[1]
 

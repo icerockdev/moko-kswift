@@ -6,6 +6,7 @@ package com.icerockdev.library
 
 import dev.icerock.moko.kswift.KSwiftExclude
 import dev.icerock.moko.kswift.KSwiftOverrideName
+import platform.Foundation.NSNotificationCenter
 import platform.UIKit.UIControl
 import platform.UIKit.UIControlEvents
 import platform.UIKit.UILabel
@@ -56,3 +57,5 @@ fun <T: Any> NSNotificationCenter.setEventHandler(
     TODO()
 }
 */
+
+fun NSNotificationCenter.Companion.extensionOnPlatformCompanion() = Unit
