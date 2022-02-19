@@ -14,9 +14,11 @@ val String.extensionPropertyOnString: String get() = "123"
 
 fun String.extensionFunctionOnString() = Unit
 
-fun List<String>.extensionOnList(): String = "test"
+fun List<String>.extensionOnList(): String = joinToString()
 
 class SomeClass {
+    fun test() = Unit
+
     companion object
 }
 
