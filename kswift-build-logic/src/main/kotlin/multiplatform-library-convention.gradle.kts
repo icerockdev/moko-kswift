@@ -14,10 +14,15 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     ios()
+    iosSimulatorArm64()
 
-    macosX64("macOS")
+    macosX64()
+    macosArm64()
     tvos()
+    tvosSimulatorArm64()
     watchos()
+    watchosX86()
+    watchosSimulatorArm64()
 
     jvm()
     js(BOTH) {

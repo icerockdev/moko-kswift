@@ -9,10 +9,8 @@
 /* Begin PBXBuildFile section */
 		13C620EBD66031F3B1C0EE15 /* Pods_ios_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C62ECD018700C29BD2F127F /* Pods_ios_app.framework */; };
 		4531D99626BAF83F006F6A8A /* PlatformExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D99526BAF83F006F6A8A /* PlatformExtensionsTests.swift */; };
-		4531D99E26BC19E0006F6A8A /* MvvmLiveDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */; };
 		4531D9A026BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */; };
 		4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */; };
-		4531DAAC26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */; };
 		4531DAB426BE4A7D006F6A8A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531DAB326BE4A7D006F6A8A /* AppDelegate.swift */; };
 		4531DAB626BE4A7D006F6A8A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531DAB526BE4A7D006F6A8A /* SceneDelegate.swift */; };
 		4531DAB826BE4A7D006F6A8A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4531DAB726BE4A7D006F6A8A /* ViewController.swift */; };
@@ -46,10 +44,8 @@
 		4531D99326BAF83F006F6A8A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4531D99526BAF83F006F6A8A /* PlatformExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformExtensionsTests.swift; sourceTree = "<group>"; };
 		4531D99726BAF83F006F6A8A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MvvmLiveDataTests.swift; sourceTree = "<group>"; };
 		4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SealedInterfaceToSwiftEnumTests.swift; sourceTree = "<group>"; };
 		4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SealedClassToSwiftEnumTests.swift; sourceTree = "<group>"; };
-		4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceStateSwiftEnumTests.swift; sourceTree = "<group>"; };
 		4531DAB126BE4A7D006F6A8A /* pods-test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pods-test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4531DAB326BE4A7D006F6A8A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4531DAB526BE4A7D006F6A8A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -147,10 +143,8 @@
 			children = (
 				4531D99526BAF83F006F6A8A /* PlatformExtensionsTests.swift */,
 				4531D99726BAF83F006F6A8A /* Info.plist */,
-				4531D99D26BC19E0006F6A8A /* MvvmLiveDataTests.swift */,
 				4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */,
 				4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */,
-				4531DAAB26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift */,
 				45F9E7F126D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift */,
 			);
 			path = Tests;
@@ -449,10 +443,8 @@
 			files = (
 				4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */,
 				4531D99626BAF83F006F6A8A /* PlatformExtensionsTests.swift in Sources */,
-				4531DAAC26BDA5AC006F6A8A /* ResourceStateSwiftEnumTests.swift in Sources */,
 				4531D9A026BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift in Sources */,
 				45F9E7F226D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift in Sources */,
-				4531D99E26BC19E0006F6A8A /* MvvmLiveDataTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
