@@ -62,8 +62,6 @@ buildscript {
         mavenCentral()
         google()
         gradlePluginPortal()
-
-        maven("https://jitpack.io")
     }
     dependencies {
         classpath("dev.icerock.moko:kswift-gradle-plugin:0.4.0")
@@ -89,8 +87,6 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
-
-        maven("https://jitpack.io")
     }
 }
 ```

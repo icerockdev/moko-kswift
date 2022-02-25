@@ -19,7 +19,10 @@ kotlin {
     macosX64()
     macosArm64()
     tvos()
+    tvosSimulatorArm64()
     watchos()
+    watchosX86()
+    watchosSimulatorArm64()
 
     jvm()
     js(BOTH) {
