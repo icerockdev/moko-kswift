@@ -8,3 +8,7 @@ plugins {
     id("javadoc-stub-convention")
     id("publication-convention")
 }
+
+tasks.getByName("publishToMavenLocal").dependsOn(
+    gradle.includedBuild("kswift-gradle-plugin").task(":publishToMavenLocal")
+)
