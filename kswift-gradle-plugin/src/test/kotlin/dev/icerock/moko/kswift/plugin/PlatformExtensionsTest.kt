@@ -155,7 +155,7 @@ class PlatformExtensionsTest {
                * test doc
                */
               @discardableResult
-              public func setEventHandler<T : UIKit.UIControl>(event: shared.ULong, lambda: @escaping (T) -> Swift.Void) -> shared.Closeable {
+              public func setEventHandler<T : UIKit.UIControl>(event: Swift.UInt64, lambda: @escaping (T) -> Swift.Void) -> shared.Closeable {
                 return UIControlExtKt.setEventHandler(self, event: event, lambda: lambda as! (UIKit.UIControl) -> Swift.Void)
               }
             }
@@ -182,7 +182,7 @@ class PlatformExtensionsTest {
         assertEquals(
             expected =
             """
-            public extension Foundation.NSNotificationCenter {
+            public extension Foundation.NotificationCenter {
               /**
                * test doc
                */
