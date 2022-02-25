@@ -32,7 +32,11 @@ class SealedToSwiftEnumFeature(
         val kotlinFrameworkName: String = processorContext.framework.baseName
         val kmClass: KmClass = featureContext.clazz
 
+        if (Flag.IS_PUBLIC(kmClass.flags).not()) return
+
         val sealedCases: List<EnumCase> = buildEnumCases(kotlinFrameworkName, featureContext)
+        if (sealedCases.isEmpty()) return
+
         val typeVariables: List<TypeVariableName> =
             kmClass.buildTypeVariableNames(kotlinFrameworkName)
 
@@ -112,9 +116,12 @@ class SealedToSwiftEnumFeature(
         featureContext: ClassContext
     ): List<EnumCase> {
         val kmClass = featureContext.clazz
-        return kmClass.sealedSubclasses.map { sealedClassName ->
+        return kmClass.sealedSubclasses.mapNotNull { sealedClassName ->
             val sealedClass: KmClass = featureContext.parentContext
                 .fragment.classes.first { it.name == sealedClassName }
+
+            if (Flag.IS_PUBLIC(sealedClass.flags).not()) return@mapNotNull null
+
             buildEnumCase(kotlinFrameworkName, featureContext, sealedClassName, sealedClass)
         }
     }

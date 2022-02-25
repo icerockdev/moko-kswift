@@ -6,9 +6,9 @@ package com.icerockdev.library
 
 interface SomeInterface
 
-fun SomeInterface.extensionOnInterface() {
-    TODO()
-}
+fun SomeInterface.extensionOnInterface() = Unit
+
+internal fun SomeInterface.internalExtensionOnInterface() = Unit
 
 val String.extensionPropertyOnString: String get() = "123"
 

@@ -31,3 +31,16 @@ class TestStateClassSource {
     val data: UIStateClass<String> = UIStateClass.Data(value = "test")
     val error: UIStateClass<String> = UIStateClass.Error(throwable = IllegalStateException())
 }
+
+internal sealed interface InternalSealedTest {
+    object Case: InternalSealedTest
+}
+
+sealed class InternalInsideSealedTest {
+    internal object InternalSealed: InternalInsideSealedTest()
+}
+
+sealed class PublicInternalInsideSealedTest {
+    internal object InternalSealed: PublicInternalInsideSealedTest()
+    object PublicSealed: PublicInternalInsideSealedTest()
+}

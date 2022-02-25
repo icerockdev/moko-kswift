@@ -120,6 +120,8 @@ class PlatformExtensionFunctionsFeature(
         @Suppress("ReturnCount")
         fun read(context: PackageFunctionContext, moduleName: String): Data? {
             val func: KmFunction = context.func
+            if (Flag.IS_PUBLIC(func.flags).not()) return null
+
             val receiver: KmType = func.receiverParameterType ?: return null
 
             val fileName: String = func.file?.name ?: return null
