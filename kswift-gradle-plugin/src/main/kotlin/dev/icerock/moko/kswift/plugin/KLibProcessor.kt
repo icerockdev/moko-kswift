@@ -34,7 +34,10 @@ class KLibProcessor(
             return
         }
 
-        val fileSpecBuilder: FileSpec.Builder = FileSpec.builder(library.nameWithoutExtension)
+        val fileName: String = metadata.name
+            .replace("[<>]".toRegex(), "")
+            .replace("[.:]".toRegex(), "_")
+        val fileSpecBuilder: FileSpec.Builder = FileSpec.builder(fileName)
 
         val processorContext = ProcessorContext(
             fileSpecBuilder = fileSpecBuilder,
