@@ -27,3 +27,5 @@ fun SomeClass.Companion.extensionOnCompanion() = Unit
 fun SomeClass.extensionOnKotlinClass() = Unit
 
 fun IntProgression.Companion.extensionOnKotlinCompanion() = Unit
+
+fun String.stringToThrowable(): Throwable = TODO()

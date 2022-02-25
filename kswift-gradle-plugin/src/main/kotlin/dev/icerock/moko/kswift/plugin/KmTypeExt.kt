@@ -77,6 +77,13 @@ fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean):
                 DeclaredTypeName.typeName(
                     listOf(module, className).joinToString(".")
                 ).objcNameToSwift()
+            } else if (this.startsWith("kotlin/Function")) {
+                null
+            } else if (this.startsWith("kotlin/") && this.count { it == '/' } == 1) {
+                DeclaredTypeName(
+                    moduleName = moduleName,
+                    simpleName = "Kotlin" + this.split("/").last()
+                )
             } else null
         }
     }
