@@ -26,6 +26,8 @@ class SealedToSwiftEnumFeature(
     override val featureContext: KClass<ClassContext>,
     override val filter: Filter<ClassContext>
 ) : ProcessorFeature<ClassContext>() {
+
+    @Suppress("ReturnCount")
     override fun doProcess(featureContext: ClassContext, processorContext: ProcessorContext) {
         if (featureContext.clazz.sealedSubclasses.isEmpty()) return
 

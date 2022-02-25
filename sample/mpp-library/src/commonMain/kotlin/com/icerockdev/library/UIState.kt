@@ -33,14 +33,14 @@ class TestStateClassSource {
 }
 
 internal sealed interface InternalSealedTest {
-    object Case: InternalSealedTest
+    object Case : InternalSealedTest
 }
 
 sealed class InternalInsideSealedTest {
-    internal object InternalSealed: InternalInsideSealedTest()
+    internal object InternalSealed : InternalInsideSealedTest()
 }
 
 sealed class PublicInternalInsideSealedTest {
-    internal object InternalSealed: PublicInternalInsideSealedTest()
-    object PublicSealed: PublicInternalInsideSealedTest()
+    internal object InternalSealed : PublicInternalInsideSealedTest()
+    object PublicSealed : PublicInternalInsideSealedTest()
 }
