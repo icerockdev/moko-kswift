@@ -13,6 +13,7 @@ import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
 import io.outfoxx.swiftpoet.TypeVariableName
@@ -58,6 +59,13 @@ class SealedToSwiftEnumFeature(
                     sealedCases = sealedCases,
                     className = className,
                     originalClassName = originalClassName
+                )
+            )
+            .addProperty(
+                buildSealedProperty(
+                    featureContext = featureContext,
+                    kotlinFrameworkName = kotlinFrameworkName,
+                    sealedCases = sealedCases
                 )
             )
             .build()
@@ -154,7 +162,9 @@ class SealedToSwiftEnumFeature(
             } else {
                 "let obj = obj as? $caseArg"
             },
-            initBlock = if (isObject) "" else "(obj)"
+            initBlock = if (isObject) "" else "(obj)",
+            caseArg = caseArg,
+            caseBlock = if (isObject) "" else "(let obj)"
         )
     }
 
@@ -162,7 +172,9 @@ class SealedToSwiftEnumFeature(
         val name: String,
         val param: TypeName?,
         val initCheck: String,
-        val initBlock: String
+        val initBlock: String,
+        val caseArg: TypeName,
+        val caseBlock: String
     ) {
         val enumCaseSpec: EnumerationCaseSpec
             get() {
@@ -172,6 +184,42 @@ class SealedToSwiftEnumFeature(
                     EnumerationCaseSpec.builder(name, param)
                 }.build()
             }
+    }
+
+    private fun buildSealedProperty(
+        featureContext: ClassContext,
+        kotlinFrameworkName: String,
+        sealedCases: List<EnumCase>
+    ): PropertySpec {
+        val returnType: TypeName = featureContext.clazz.getDeclaredTypeNameWithGenerics(
+            kotlinFrameworkName = kotlinFrameworkName,
+            classes = featureContext.kLibClasses
+        )
+        return PropertySpec.builder(
+            "sealed", type = returnType
+        ).getter(
+            FunctionSpec.getterBuilder().addCode(
+                CodeBlock.builder().apply {
+                    add("switch self {\n")
+                    sealedCases.forEach { enumCase ->
+                        buildString {
+                            append("case .")
+                            append(enumCase.name)
+                            append(enumCase.caseBlock)
+                            append(":\n")
+                        }.also { add(it) }
+                        indent()
+                        if (enumCase.param == null) {
+                            add("return ${enumCase.caseArg}() as! $returnType\n")
+                        } else {
+                            add("return obj as! $returnType\n")
+                        }
+                        unindent()
+                    }
+                    add("}\n")
+                }.build()
+            ).build()
+        ).build()
     }
 
     class Config : BaseConfig<ClassContext> {
