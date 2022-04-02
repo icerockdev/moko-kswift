@@ -191,11 +191,13 @@ class SealedToSwiftEnumFeature(
         kotlinFrameworkName: String,
         sealedCases: List<EnumCase>
     ): PropertySpec {
-        return PropertySpec.builder("sealed", type = featureContext.clazz.getDeclaredTypeNameWithGenerics(
+        val returnType: TypeName = featureContext.clazz.getDeclaredTypeNameWithGenerics(
             kotlinFrameworkName = kotlinFrameworkName,
             classes = featureContext.kLibClasses
-            ))
-            .getter(FunctionSpec.getterBuilder().addCode(
+        )
+        return PropertySpec.builder(
+            "sealed", type = returnType
+        ).getter(
             FunctionSpec.getterBuilder().addCode(
                 CodeBlock.builder().apply {
                     add("switch self {\n")
@@ -208,9 +210,9 @@ class SealedToSwiftEnumFeature(
                         }.also { add(it) }
                         indent()
                         if (enumCase.param == null) {
-                            add("return ${enumCase.caseArg}()\n")
+                            add("return ${enumCase.caseArg}() as! $returnType\n")
                         } else {
-                            add("return obj\n")
+                            add("return obj as! $returnType\n")
                         }
                         unindent()
                     }
