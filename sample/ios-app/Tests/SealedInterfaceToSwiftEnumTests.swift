@@ -36,21 +36,25 @@ class SealedToSwiftEnumTests: XCTestCase {
     
     func testLoadingState() throws {
         if case .loading = testSource.loadingKs { } else { XCTFail() }
+        XCTAssertTrue(testSource.loadingKs.sealed is UIStateLoading)
     }
     
     func testEmptyState() throws {
         if case .empty = testSource.emptyKs { } else { XCTFail() }
+        XCTAssertTrue(testSource.emptyKs.sealed is UIStateEmpty)
     }
     
     func testDataState() throws {
         if case .data(let data) = testSource.dataKs {
             XCTAssertEqual(data.value, "test")
         } else { XCTFail() }
+        XCTAssertTrue(testSource.dataKs.sealed is UIStateData<NSString>)
     }
     
     func testErrorState() throws {
         if case .error(let error) = testSource.errorKs {
             XCTAssertTrue(error.throwable is KotlinIllegalStateException)
         } else { XCTFail() }
+        XCTAssertTrue(testSource.errorKs.sealed is UIStateError)
     }
 }

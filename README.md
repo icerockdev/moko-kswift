@@ -303,9 +303,13 @@ Then in `buildSrc/src/main/kotlin` create `MyKSwiftGenerator`:
 import dev.icerock.moko.kswift.plugin.context.ClassContext
 import dev.icerock.moko.kswift.plugin.feature.ProcessorContext
 import dev.icerock.moko.kswift.plugin.feature.ProcessorFeature
+import dev.icerock.moko.kswift.plugin.feature.BaseConfig
+import dev.icerock.moko.kswift.plugin.feature.Filter
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.ExtensionSpec
 import io.outfoxx.swiftpoet.FileSpec
+import kotlin.reflect.KClass
+
 
 class MyKSwiftGenerator(
     override val featureContext: KClass<ClassContext>,
@@ -337,7 +341,7 @@ class MyKSwiftGenerator(
         }
 
         override val featureContext: KClass<ClassContext> = ClassContext::class
-        
+
         @JvmStatic
         override val factory = Companion
     }
