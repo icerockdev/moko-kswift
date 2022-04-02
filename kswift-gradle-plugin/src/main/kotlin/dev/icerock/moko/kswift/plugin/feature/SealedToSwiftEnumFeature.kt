@@ -9,11 +9,14 @@ import dev.icerock.moko.kswift.plugin.context.ClassContext
 import dev.icerock.moko.kswift.plugin.context.kLibClasses
 import dev.icerock.moko.kswift.plugin.getDeclaredTypeNameWithGenerics
 import dev.icerock.moko.kswift.plugin.getSimpleName
-import dev.icerock.moko.kswift.plugin.feature.Filter
-import dev.icerock.moko.kswift.plugin.feature.ProcessorContext
-import dev.icerock.moko.kswift.plugin.feature.ProcessorFeature
-import dev.icerock.moko.kswift.plugin.feature.BaseConfig
-import io.outfoxx.swiftpoet.*
+import io.outfoxx.swiftpoet.CodeBlock
+import io.outfoxx.swiftpoet.EnumerationCaseSpec
+import io.outfoxx.swiftpoet.FunctionSpec
+import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.PropertySpec
+import io.outfoxx.swiftpoet.TypeName
+import io.outfoxx.swiftpoet.TypeSpec
+import io.outfoxx.swiftpoet.TypeVariableName
 import kotlinx.metadata.ClassName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
@@ -62,9 +65,7 @@ class SealedToSwiftEnumFeature(
                 buildSealedProperty(
                     featureContext = featureContext,
                     kotlinFrameworkName = kotlinFrameworkName,
-                    sealedCases = sealedCases,
-                    className = className,
-                    originalClassName = originalClassName
+                    sealedCases = sealedCases
                 )
             )
             .build()
@@ -188,18 +189,17 @@ class SealedToSwiftEnumFeature(
     private fun buildSealedProperty(
         featureContext: ClassContext,
         kotlinFrameworkName: String,
-        sealedCases: List<EnumCase>,
-        className: String,
-        originalClassName: String
+        sealedCases: List<EnumCase>
     ): PropertySpec {
         return PropertySpec.builder("sealed", type = featureContext.clazz.getDeclaredTypeNameWithGenerics(
             kotlinFrameworkName = kotlinFrameworkName,
             classes = featureContext.kLibClasses
             ))
             .getter(FunctionSpec.getterBuilder().addCode(
+            FunctionSpec.getterBuilder().addCode(
                 CodeBlock.builder().apply {
                     add("switch self {\n")
-                    sealedCases.forEachIndexed { index, enumCase ->
+                    sealedCases.forEach { enumCase ->
                         buildString {
                             append("case .")
                             append(enumCase.name)
@@ -215,10 +215,9 @@ class SealedToSwiftEnumFeature(
                         unindent()
                     }
                     add("}\n")
-                }
-                    .build()
-            ).build())
-            .build()
+                }.build()
+            ).build()
+        ).build()
     }
 
     class Config : BaseConfig<ClassContext> {
