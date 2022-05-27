@@ -210,9 +210,9 @@ class SealedToSwiftEnumFeature(
                         }.also { add(it) }
                         indent()
                         if (enumCase.param == null) {
-                            add("return ${enumCase.caseArg}() as! $returnType\n")
+                            add("return ${enumCase.caseArg}() as $returnType\n")
                         } else {
-                            add("return obj as! $returnType\n")
+                            add("return obj as $returnType\n")
                         }
                         unindent()
                     }
