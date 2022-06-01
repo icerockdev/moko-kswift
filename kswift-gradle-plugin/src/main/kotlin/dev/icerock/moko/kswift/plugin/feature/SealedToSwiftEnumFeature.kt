@@ -112,7 +112,7 @@ class SealedToSwiftEnumFeature(
                         }
                         add("} else {\n")
                         indent()
-                        add("fatalError(\"$className not syncronized with $originalClassName class\")\n")
+                        add("fatalError(\"$className not synchronized with $originalClassName class\")\n")
                         unindent()
                         add("}\n")
                     }
