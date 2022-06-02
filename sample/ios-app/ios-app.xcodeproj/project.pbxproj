@@ -25,6 +25,8 @@
 		45F9E7F226D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45F9E7F126D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift */; };
 		65373AE744DF99D6120E6CD0 /* Pods_pods_test.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 170EAFB0A847A7E3A3CC557E /* Pods_pods_test.framework */; };
 		696500490BA3A16CF420DC2F /* Pods_ios_app_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D801D62C89CE2E003D435252 /* Pods_ios_app_Tests.framework */; };
+		D867A9A4284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D867A9A3284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift */; };
+		D867A9A628490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +69,8 @@
 		9AACFD2445FE7D02ED352AD0 /* Pods-pods-test.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pods-test.release.xcconfig"; path = "Pods/Target Support Files/Pods-pods-test/Pods-pods-test.release.xcconfig"; sourceTree = "<group>"; };
 		A644D2F1C5377C40A53FCD6A /* Pods-ios-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-app.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-app/Pods-ios-app.release.xcconfig"; sourceTree = "<group>"; };
 		D801D62C89CE2E003D435252 /* Pods_ios_app_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_app_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D867A9A3284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonGenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
+		D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
 		DC187E7E0DAA30025ABCF8B8 /* Pods-ios-app-Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-app-Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-app-Tests/Pods-ios-app-Tests.release.xcconfig"; sourceTree = "<group>"; };
 		DFBDF7D3559D080FDCA444A6 /* Pods-ios-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-app.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-app/Pods-ios-app.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -146,6 +150,8 @@
 				4531D99F26BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift */,
 				4531D9A126BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift */,
 				45F9E7F126D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift */,
+				D867A9A3284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift */,
+				D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -442,6 +448,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */,
+				D867A9A4284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift in Sources */,
+				D867A9A628490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift in Sources */,
 				4531D99626BAF83F006F6A8A /* PlatformExtensionsTests.swift in Sources */,
 				4531D9A026BCEF93006F6A8A /* SealedInterfaceToSwiftEnumTests.swift in Sources */,
 				45F9E7F226D3E87A00233CAD /* AnyObjectSealedClassToEnum.swift in Sources */,
