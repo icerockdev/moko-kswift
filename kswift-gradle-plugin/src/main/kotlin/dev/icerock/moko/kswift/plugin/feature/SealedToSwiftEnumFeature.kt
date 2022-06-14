@@ -195,31 +195,32 @@ class SealedToSwiftEnumFeature(
             kotlinFrameworkName = kotlinFrameworkName,
             classes = featureContext.kLibClasses
         )
-        return PropertySpec.builder(
-            "sealed", type = returnType
-        ).getter(
-            FunctionSpec.getterBuilder().addCode(
-                CodeBlock.builder().apply {
-                    add("switch self {\n")
-                    sealedCases.forEach { enumCase ->
-                        buildString {
-                            append("case .")
-                            append(enumCase.name)
-                            append(enumCase.caseBlock)
-                            append(":\n")
-                        }.also { add(it) }
-                        indent()
-                        if (enumCase.param == null) {
-                            add("return ${enumCase.caseArg}() as! $returnType\n")
-                        } else {
-                            add("return obj as! $returnType\n")
+        return PropertySpec.builder("sealed", type = returnType)
+            .addModifiers(Modifier.PUBLIC)
+            .getter(
+                FunctionSpec.getterBuilder().addCode(
+                    CodeBlock.builder().apply {
+                        add("switch self {\n")
+                        sealedCases.forEach { enumCase ->
+                            buildString {
+                                append("case .")
+                                append(enumCase.name)
+                                append(enumCase.caseBlock)
+                                append(":\n")
+                            }.also { add(it) }
+                            indent()
+                            if (enumCase.param == null) {
+                                add("return ${enumCase.caseArg}() as! $returnType\n")
+                            } else {
+                                add("return obj as! $returnType\n")
+                            }
+                            unindent()
                         }
-                        unindent()
-                    }
-                    add("}\n")
-                }.build()
-            ).build()
-        ).build()
+                        add("}\n")
+                    }.build()
+                ).build()
+            )
+            .build()
     }
 
     class Config : BaseConfig<ClassContext> {
