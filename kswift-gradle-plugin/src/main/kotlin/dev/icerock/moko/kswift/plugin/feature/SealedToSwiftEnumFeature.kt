@@ -112,7 +112,7 @@ class SealedToSwiftEnumFeature(
                         }
                         add("} else {\n")
                         indent()
-                        add("fatalError(\"$className not syncronized with $originalClassName class\")\n")
+                        add("fatalError(\"$className not synchronized with $originalClassName class\")\n")
                         unindent()
                         add("}\n")
                     }
@@ -197,51 +197,52 @@ class SealedToSwiftEnumFeature(
         )
         return PropertySpec.builder(
             "sealed", type = returnType
-        ).getter(
-            FunctionSpec.getterBuilder().addCode(
-                CodeBlock.builder().apply {
-                    /** A regex pattern that is used to match generic type parameters. E.g. `<T>` */
-                    val genericMatchingRegex = Regex("<.+?>")
-                    add("switch self {\n")
-                    sealedCases.forEach { enumCase ->
-                        buildString {
-                            append("case .")
-                            append(enumCase.name)
-                            append(enumCase.caseBlock)
-                            append(":\n")
-                        }.also { add(it) }
-                        indent()
-                        if (enumCase.param == null) {
-                            if (genericMatchingRegex.containsMatchIn(returnType.toString())) {
-                                // The return type is generic and there is no parameter, so it can
-                                // be assumed that the case is NOT generic. Thus the case needs to
-                                // be force-cast.
-                                add("return ${enumCase.caseArg}() as! $returnType\n")
-                            } else {
-                                // The return type is NOT generic and there is no parameter, so a
-                                // regular cast can be used.
-                                add("return ${enumCase.caseArg}() as $returnType\n")
+        ).addModifiers(Modifier.PUBLIC)
+            .getter(
+                FunctionSpec.getterBuilder()
+                    .addCode(
+                        CodeBlock.builder().apply {
+                            /** A regex pattern that is used to match generic type parameters. E.g. `<T>` */
+                            val genericMatchingRegex = Regex("<.+?>")
+                            add("switch self {\n")
+                            sealedCases.forEach { enumCase ->
+                                buildString {
+                                    append("case .")
+                                    append(enumCase.name)
+                                    append(enumCase.caseBlock)
+                                    append(":\n")
+                                }.also { add(it) }
+                                indent()
+                                if (enumCase.param == null) {
+                                    if (genericMatchingRegex.containsMatchIn(returnType.toString())) {
+                                        // The return type is generic and there is no parameter, so it can
+                                        // be assumed that the case is NOT generic. Thus the case needs to
+                                        // be force-cast.
+                                        add("return ${enumCase.caseArg}() as! $returnType\n")
+                                    } else {
+                                        // The return type is NOT generic and there is no parameter, so a
+                                        // regular cast can be used.
+                                        add("return ${enumCase.caseArg}() as $returnType\n")
+                                    }
+                                } else {
+                                    // There is a parameter
+                                    if (genericMatchingRegex.find(enumCase.param.toString())?.value
+                                        == genericMatchingRegex.find(returnType.toString())?.value) {
+                                        // The parameter and return type have the same generic pattern. This
+                                        // is true if both are NOT generic OR if both are generic. Thus a
+                                        // regular cast can be used.
+                                        add("return obj as $returnType\n")
+                                    } else {
+                                        // If the parameter and return type have differing generic patterns
+                                        // then a force-cast is needed.
+                                        add("return obj as! $returnType\n")
+                                    }
+                                }
                             }
-                        } else {
-                            // There is a parameter
-                            if (genericMatchingRegex.find(enumCase.param.toString())?.value
-                                == genericMatchingRegex.find(returnType.toString())?.value) {
-                                // The parameter and return type have the same generic pattern. This
-                                // is true if both are NOT generic OR if both are generic. Thus a
-                                // regular cast can be used.
-                                add("return obj as $returnType\n")
-                            } else {
-                                // If the parameter and return type have differing generic patterns
-                                // then a force-cast is needed.
-                                add("return obj as! $returnType\n")
-                            }
-                        }
-                        unindent()
-                    }
-                    add("}\n")
-                }.build()
+                            add("}\n")
+                        }.build()
+                    ).build()
             ).build()
-        ).build()
     }
 
     class Config : BaseConfig<ClassContext> {
