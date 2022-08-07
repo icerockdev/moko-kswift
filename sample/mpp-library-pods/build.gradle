@@ -3,10 +3,8 @@
  */
 
 plugins {
-    id("com.android.library")
-    id("android-base-convention")
-    id("detekt-convention")
-    id("org.jetbrains.kotlin.multiplatform")
+    id("dev.icerock.moko.gradle.multiplatform.mobile")
+    id("dev.icerock.moko.gradle.detekt")
     id("org.jetbrains.kotlin.native.cocoapods")
     id("dev.icerock.moko.kswift")
 }
@@ -19,9 +17,6 @@ android {
 }
 
 kotlin {
-    android()
-    ios()
-
     cocoapods {
         // Configure fields required by CocoaPods.
         summary = "Some description for a Kotlin/Native module"

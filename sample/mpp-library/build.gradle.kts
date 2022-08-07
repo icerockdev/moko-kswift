@@ -3,26 +3,10 @@
  */
 
 plugins {
-    id("com.android.library")
-    id("android-base-convention")
-    id("detekt-convention")
-    id("org.jetbrains.kotlin.multiplatform")
-    id("dev.icerock.mobile.multiplatform.android-manifest")
+    id("dev.icerock.moko.gradle.multiplatform.mobile")
     id("dev.icerock.mobile.multiplatform.ios-framework")
+    id("dev.icerock.moko.gradle.detekt")
     id("dev.icerock.moko.kswift")
-}
-
-kotlin {
-    android()
-    ios()
-    iosSimulatorArm64()
-
-    sourceSets {
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
-
-        iosSimulatorArm64Main.dependsOn(iosMain)
-    }
 }
 
 kswift {

@@ -13,6 +13,7 @@ import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
+import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
@@ -112,7 +113,7 @@ class SealedToSwiftEnumFeature(
                         }
                         add("} else {\n")
                         indent()
-                        add("fatalError(\"$className not syncronized with $originalClassName class\")\n")
+                        add("fatalError(\"$className not synchronized with $originalClassName class\")\n")
                         unindent()
                         add("}\n")
                     }
@@ -168,6 +169,85 @@ class SealedToSwiftEnumFeature(
         )
     }
 
+    private fun buildSealedProperty(
+        featureContext: ClassContext,
+        kotlinFrameworkName: String,
+        sealedCases: List<EnumCase>
+    ): PropertySpec {
+        val returnType: TypeName = featureContext.clazz.getDeclaredTypeNameWithGenerics(
+            kotlinFrameworkName = kotlinFrameworkName,
+            classes = featureContext.kLibClasses
+        )
+        return PropertySpec.builder("sealed", type = returnType)
+            .addModifiers(Modifier.PUBLIC)
+            .getter(
+                FunctionSpec
+                    .getterBuilder()
+                    .addCode(buildSealedPropertyBody(sealedCases, returnType))
+                    .build()
+            ).build()
+    }
+
+    private fun buildSealedPropertyBody(
+        sealedCases: List<EnumCase>,
+        returnType: TypeName
+    ): CodeBlock = CodeBlock.builder().apply {
+        add("switch self {\n")
+        sealedCases.forEach { enumCase ->
+            buildString {
+                append("case .")
+                append(enumCase.name)
+                append(enumCase.caseBlock)
+                append(":\n")
+            }.also { add(it) }
+            indent()
+            addSealedCaseReturnCode(enumCase, returnType)
+            unindent()
+        }
+        add("}\n")
+    }.build()
+
+    private fun CodeBlock.Builder.addSealedCaseReturnCode(
+        enumCase: EnumCase,
+        returnType: TypeName
+    ) {
+        val paramType: TypeName? = enumCase.param
+        val cast: String
+        val returnedName: String
+
+        if (paramType == null) {
+            returnedName = "${enumCase.caseArg}()"
+            cast = if (returnType is ParameterizedTypeName) {
+                // The return type is generic and there is no parameter, so it can
+                // be assumed that the case is NOT generic. Thus the case needs to
+                // be force-cast.
+                "as!"
+            } else {
+                // The return type is NOT generic and there is no parameter, so a
+                // regular cast can be used.
+                "as"
+            }
+        } else {
+            // There is a parameter
+            returnedName = "obj"
+            cast = if (paramType is ParameterizedTypeName && returnType is ParameterizedTypeName) {
+                if (paramType.typeArguments == returnType.typeArguments) {
+                    // The parameter and return type have the same generic pattern. This
+                    // is true if both are NOT generic OR if both are generic. Thus a
+                    // regular cast can be used.
+                    "as"
+                } else {
+                    "as!"
+                }
+            } else {
+                // If the parameter and return type have differing generic patterns
+                // then a force-cast is needed.
+                "as!"
+            }
+        }
+        add("return $returnedName $cast $returnType\n")
+    }
+
     data class EnumCase(
         val name: String,
         val param: TypeName?,
@@ -184,42 +264,6 @@ class SealedToSwiftEnumFeature(
                     EnumerationCaseSpec.builder(name, param)
                 }.build()
             }
-    }
-
-    private fun buildSealedProperty(
-        featureContext: ClassContext,
-        kotlinFrameworkName: String,
-        sealedCases: List<EnumCase>
-    ): PropertySpec {
-        val returnType: TypeName = featureContext.clazz.getDeclaredTypeNameWithGenerics(
-            kotlinFrameworkName = kotlinFrameworkName,
-            classes = featureContext.kLibClasses
-        )
-        return PropertySpec.builder(
-            "sealed", type = returnType
-        ).getter(
-            FunctionSpec.getterBuilder().addCode(
-                CodeBlock.builder().apply {
-                    add("switch self {\n")
-                    sealedCases.forEach { enumCase ->
-                        buildString {
-                            append("case .")
-                            append(enumCase.name)
-                            append(enumCase.caseBlock)
-                            append(":\n")
-                        }.also { add(it) }
-                        indent()
-                        if (enumCase.param == null) {
-                            add("return ${enumCase.caseArg}() as! $returnType\n")
-                        } else {
-                            add("return obj as! $returnType\n")
-                        }
-                        unindent()
-                    }
-                    add("}\n")
-                }.build()
-            ).build()
-        ).build()
     }
 
     class Config : BaseConfig<ClassContext> {

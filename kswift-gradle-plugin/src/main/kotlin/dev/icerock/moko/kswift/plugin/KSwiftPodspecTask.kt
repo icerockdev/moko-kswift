@@ -43,7 +43,7 @@ open class KSwiftPodspecTask : DefaultTask() {
 
     @get:InputDirectory
     val frameworkDir: File
-        get() = linkTask.destinationDir
+        get() = linkTask.outputFile.get()
 
     @get:OutputDirectory
     val outputDir: File

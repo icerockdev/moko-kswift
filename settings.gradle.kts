@@ -11,16 +11,9 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
-
-        jcenter {
-            content {
-                includeGroup("org.jetbrains.kotlinx")
-            }
-        }
     }
 }
 
-includeBuild("kswift-build-logic")
 includeBuild("kswift-gradle-plugin")
 
 include(":kswift-runtime")

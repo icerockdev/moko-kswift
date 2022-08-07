@@ -101,6 +101,7 @@ fun KmType.kotlinTypeToTypeName(
     )
     if (this.arguments.isEmpty()) return typeName
 
+    @Suppress("UnsafeCallOnNullableType")
     return when (classifierName) {
         "kotlin/Function1" -> {
             val inputType: TypeName = arguments[0].type?.toTypeName(
