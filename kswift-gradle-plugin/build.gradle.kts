@@ -15,7 +15,7 @@ group = "dev.icerock.moko"
 version = libs.versions.mokoKSwiftVersion.get()
 
 dependencies {
-    compileOnly(libs.kotlinGradlePlugin)
+    compileOnly(libs.kotlinGradlePluginNext)
 
     implementation(gradleKotlinDsl())
     implementation(libs.kotlinCompilerEmbeddable)

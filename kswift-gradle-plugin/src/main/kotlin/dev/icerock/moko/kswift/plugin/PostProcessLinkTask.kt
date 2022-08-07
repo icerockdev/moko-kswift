@@ -24,8 +24,8 @@ internal class PostProcessLinkTask(
         val outputDir = File(framework.outputDirectory, swiftFrameworkName)
         outputDir.deleteRecursively()
 
-        linkTask.exportLibraries
-            .plus(linkTask.intermediateLibrary.get())
+        linkTask.inputs.files
+            .filter { it.extension == "klib" }
             .filter { file ->
                 val name = file.nameWithoutExtension
                 if (kSwiftExtension.includedLibs.isNotEmpty()) {
