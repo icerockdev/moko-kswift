@@ -13,18 +13,21 @@ pluginManagement {
 
         gradlePluginPortal()
     }
+
+    resolutionStrategy {
+        eachPlugin {
+            if(requested.id.id.startsWith("dev.icerock.moko.gradle")) {
+                // FIXME use single source of truth
+                useModule("dev.icerock.moko:moko-gradle-plugin:0.2.0")
+            }
+        }
+    }
 }
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
-
-        jcenter {
-            content {
-                includeGroup("org.jetbrains.kotlinx")
-            }
-        }
     }
 
     versionCatalogs {
@@ -33,5 +36,3 @@ dependencyResolutionManagement {
         }
     }
 }
-
-includeBuild("../kswift-build-logic")

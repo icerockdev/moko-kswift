@@ -16,6 +16,7 @@ abstract class FeatureContext {
 
     abstract val uniqueId: String
 
+    @Suppress("UnsafeCallOnNullableType")
     val prefixedUniqueId: String get() = this::class.simpleName!! + "/" + uniqueId
 
     abstract val annotations: List<KmAnnotation>

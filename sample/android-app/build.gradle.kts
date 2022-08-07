@@ -3,7 +3,7 @@
  */
 
 plugins {
-    id("android-app-convention")
+    id("dev.icerock.moko.gradle.android.application")
 }
 
 android {

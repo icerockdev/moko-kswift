@@ -3,12 +3,9 @@
  */
 
 plugins {
-    id("multiplatform-library-convention")
-    id("dev.icerock.mobile.multiplatform.android-manifest")
-    id("javadoc-stub-convention")
-    id("publication-convention")
+    id("dev.icerock.moko.gradle.multiplatform.all")
+    id("dev.icerock.moko.gradle.publication")
+    id("dev.icerock.moko.gradle.publication.hosts")
+    id("dev.icerock.moko.gradle.stub.javadoc")
+    id("dev.icerock.moko.gradle.detekt")
 }
-
-tasks.getByName("publishToMavenLocal").dependsOn(
-    gradle.includedBuild("kswift-gradle-plugin").task(":publishToMavenLocal")
-)
