@@ -3,9 +3,10 @@
  */
 
 plugins {
-    id("gradle-plugin-convention")
-    id("detekt-convention")
-    id("publication-convention")
+    id("dev.icerock.moko.gradle.publication")
+    id("dev.icerock.moko.gradle.detekt")
+    id("dev.icerock.moko.gradle.jvm")
+    id("dev.icerock.moko.gradle.tests")
     id("com.gradle.plugin-publish") version ("0.15.0")
     id("java-gradle-plugin")
 }
@@ -23,19 +24,6 @@ dependencies {
     api(libs.kotlinxMetadataKLib)
 
     testImplementation(libs.kotlinTestJUnit)
-}
-
-tasks.withType<AbstractTestTask> {
-    testLogging {
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-        events = setOf(
-            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
-            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
-            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-        )
-        showStandardStreams = true
-    }
-    outputs.upToDateWhen { false }
 }
 
 gradlePlugin {
@@ -64,8 +52,4 @@ pluginBundle {
         artifactId = project.name
         version = project.version as String
     }
-}
-
-publishing.publications.register("mavenJava", MavenPublication::class) {
-    from(components["java"])
 }

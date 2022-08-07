@@ -8,5 +8,5 @@ class TestStateSource {
     val loading: UIState<String> = UIState.Loading
     val empty: UIState<String> = UIState.Empty
     val data: UIState<String> = UIState.Data(value = "test")
-    val error: UIState<String> = UIState.Error(throwable = IllegalStateException())
+    val error: UIState<String> = UIState.Error(throwable = IllegalStateException("some error"))
 }

@@ -36,7 +36,11 @@ kotlinCompilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embe
 kotlinxMetadataKLib = { module = "org.jetbrains.kotlinx:kotlinx-metadata-klib", version.ref = "kotlinxMetadataKLibVersion" }
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinVersion" }
 
+# gradle plugins
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
-mobileMultiplatformGradlePlugin = { module = "dev.icerock:mobile-multiplatform", version = "0.13.0" }
+# we use next version of kotlin gradle plugin in gradle plugin api to support 1.6 and 1.7 both
+kotlinGradlePluginNext = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version = "1.7.0" }
+mokoGradlePlugin = { module = "dev.icerock.moko:moko-gradle-plugin", version = "0.2.0" }
+mobileMultiplatformGradlePlugin = { module = "dev.icerock:mobile-multiplatform", version = "0.14.1" }
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version = "7.0.4" }
 detektGradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version = "1.15.0" }

@@ -13,17 +13,21 @@ sealed interface Filter<CTX : FeatureContext> {
 
     data class Exclude<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
         override fun isShouldProcess(featureContext: CTX): Boolean {
-            return names.contains(featureContext.prefixedUniqueId).not() &&
-                    featureContext.annotations
-                        .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_EXCLUDE) == null
+            val isExcludedByAnnotation: Boolean = featureContext.annotations
+                .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_EXCLUDE) != null
+            val isExcludedByNames: Boolean = names.contains(featureContext.prefixedUniqueId)
+
+            return !isExcludedByAnnotation && !isExcludedByNames
         }
     }
 
     data class Include<CTX : FeatureContext>(val names: Set<String>) : Filter<CTX> {
         override fun isShouldProcess(featureContext: CTX): Boolean {
-            return names.contains(featureContext.prefixedUniqueId) ||
-                    featureContext.annotations
-                        .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_INCLUDE) != null
+            val isIncludedByAnnotation: Boolean = featureContext.annotations
+                .findByClassName(KSwiftRuntimeAnnotations.KSWIFT_INCLUDE) != null
+            val isIncludedByNames: Boolean = names.contains(featureContext.prefixedUniqueId)
+
+            return isIncludedByAnnotation || isIncludedByNames
         }
     }
 }

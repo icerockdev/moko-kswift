@@ -10,7 +10,11 @@ buildscript {
     }
 
     dependencies {
-        classpath(":kswift-build-logic")
+        classpath(libs.mobileMultiplatformGradlePlugin)
+        classpath(libs.kotlinGradlePlugin)
+        classpath(libs.mokoGradlePlugin)
+        classpath(libs.androidGradlePlugin)
+        classpath(libs.detektGradlePlugin)
         classpath("dev.icerock.moko:kswift-gradle-plugin")
     }
 }
