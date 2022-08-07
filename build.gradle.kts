@@ -19,11 +19,11 @@ buildscript {
     }
 }
 
+apply(plugin = "dev.icerock.moko.gradle.publication.nexus")
+val mokoVersion = libs.versions.mokoKSwiftVersion.get()
 allprojects {
-    plugins.withId("org.gradle.maven-publish") {
-        group = "dev.icerock.moko"
-        version = libs.versions.mokoKSwiftVersion.get()
-    }
+    group = "dev.icerock.moko"
+    version = mokoVersion
 }
 
 // temporary fix for Apple Silicon (remove after 1.6.20 update)
