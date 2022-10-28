@@ -146,7 +146,7 @@ class SealedToSwiftEnumFeature(
         val kmClass = featureContext.clazz
         val name: String = if (subclassName.startsWith(kmClass.name)) {
             subclassName.removePrefix(kmClass.name).removePrefix(".")
-        } else subclassName
+        } else subclassName.removePrefix(kmClass.name.substringBeforeLast("/")).removePrefix("/")
         val decapitalizedName: String = name.decapitalize(Locale.ROOT)
 
         val isObject: Boolean = Flag.Class.IS_OBJECT(sealedCaseClass.flags)
