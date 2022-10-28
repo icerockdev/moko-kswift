@@ -64,7 +64,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("dev.icerock.moko:kswift-gradle-plugin:0.6.0")
+        classpath("dev.icerock.moko:kswift-gradle-plugin:0.6.1")
     }
 }
 ```
@@ -95,7 +95,7 @@ project where framework compiles `build.gradle`
 
 ```groovy
 plugins {
-    id("dev.icerock.moko.kswift") version "0.6.0"
+    id("dev.icerock.moko.kswift") version "0.6.1"
 }
 ```
 
@@ -115,7 +115,7 @@ project `build.gradle`
 
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:kswift-runtime:0.6.0") // if you want use annotations
+    commonMainApi("dev.icerock.moko:kswift-runtime:0.6.1") // if you want use annotations
 }
 ```
 
