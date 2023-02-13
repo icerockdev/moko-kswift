@@ -10,8 +10,8 @@ pluginManagement {
     repositories {
         mavenCentral()
         google()
-
         gradlePluginPortal()
+        maven("https://jitpack.io")
     }
 
     resolutionStrategy {
@@ -28,6 +28,7 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
+        maven("https://jitpack.io")
     }
 
     versionCatalogs {
