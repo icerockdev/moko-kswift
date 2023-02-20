@@ -1,4 +1,4 @@
-package dev.icerock.moko.kswift.plugin.model
+package com.icerockdev.library.associatedenum
 
 @Suppress("LongLine")
 sealed interface TestingSealed

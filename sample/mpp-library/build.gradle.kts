@@ -11,7 +11,7 @@ plugins {
 
 kswift {
     install(dev.icerock.moko.kswift.plugin.feature.PlatformExtensionFunctionsFeature)
-    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftEnumFeature)
+    install(dev.icerock.moko.kswift.plugin.feature.SealedToSwiftAssociatedEnumFeature)
 
     excludeLibrary("kotlinx-coroutines-core")
 

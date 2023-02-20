@@ -15,6 +15,7 @@ import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FLOAT32
 import io.outfoxx.swiftpoet.FLOAT64
+import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.FunctionTypeName
 import io.outfoxx.swiftpoet.INT16
@@ -54,14 +55,27 @@ class SealedToSwiftAssociatedEnumFeature(
 
     @Suppress("ReturnCount")
     override fun doProcess(featureContext: ClassContext, processorContext: ProcessorContext) {
-        if (featureContext.clazz.sealedSubclasses.isEmpty()) return
-
         val kotlinFrameworkName: String = processorContext.framework.baseName
+
+        doProcess(
+            featureContext = featureContext,
+            fileSpecBuilder = processorContext.fileSpecBuilder,
+            kotlinFrameworkName = kotlinFrameworkName,
+        )
+    }
+
+    fun doProcess(
+        featureContext: ClassContext,
+        fileSpecBuilder: FileSpec.Builder,
+        kotlinFrameworkName: String,
+    ) {
         val kmClass: KmClass = featureContext.clazz
 
         if (Flag.IS_PUBLIC(kmClass.flags).not()) return
 
         val originalClassName: String = getSimpleName(kmClass.name, featureContext.kLibClasses)
+
+        if (featureContext.clazz.sealedSubclasses.isEmpty()) return
 
         println("Generating enum for sealed class $originalClassName")
 
@@ -97,7 +111,7 @@ class SealedToSwiftAssociatedEnumFeature(
             )
             .build()
 
-        processorContext.fileSpecBuilder.addType(enumType)
+        fileSpecBuilder.addType(enumType)
     }
 
     private fun buildEnumConstructor(
@@ -282,7 +296,10 @@ class SealedToSwiftAssociatedEnumFeature(
                             paramType?.optional == true -> {
                                 val unwrapped = paramType.unwrapOptional()
                                 when ((unwrapped as? ParameterizedTypeName)?.rawType) {
-                                    DICTIONARY -> paramType.toDictionaryCaster(it.first, true)
+                                    DICTIONARY -> {
+                                        // TODO: unwrapped for other classes?
+                                        unwrapped.toDictionaryCaster(it.first, true)
+                                    }
                                     SET -> paramType.toSetCaster(it.first, true)
                                     ARRAY -> paramType.toArrayCaster(it.first, true)
                                     else -> paramType.generateInitParameter(it.first)
