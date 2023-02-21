@@ -14,13 +14,14 @@ import org.gradle.configurationcache.extensions.capitalized
 
 @Suppress("LongParameterList")
 fun buildTypeSpec(
-    className: String,
     featureContext: ClassContext,
     typeVariables: List<TypeVariableName>,
     sealedCases: List<AssociatedEnumCase>,
     kotlinFrameworkName: String,
     originalClassName: String,
 ): TypeSpec {
+    val className: String = originalClassName.replace(".", "").plus("Ks")
+
     val enumType: TypeSpec = TypeSpec.enumBuilder(className)
         .addDoc("selector: ${featureContext.prefixedUniqueId}")
         .apply {

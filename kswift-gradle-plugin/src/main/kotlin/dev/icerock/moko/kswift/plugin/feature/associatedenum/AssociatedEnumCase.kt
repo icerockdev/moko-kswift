@@ -70,6 +70,7 @@ data class AssociatedEnumCase(
     } else {
         "(" + explodedParams.joinToString { "let ${it.first}" } + ")"
     }
+
     internal val enumCaseSpec: EnumerationCaseSpec
         get() {
             return if (param == null) {

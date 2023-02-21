@@ -11,9 +11,8 @@ import java.util.Locale
 fun buildEnumCases(
     kotlinFrameworkName: String,
     featureContext: ClassContext,
-): List<AssociatedEnumCase> {
-    val kmClass = featureContext.clazz
-    return kmClass.sealedSubclasses.mapNotNull { sealedClassName ->
+): List<AssociatedEnumCase> = featureContext.clazz.sealedSubclasses
+    .mapNotNull { sealedClassName ->
         val sealedClass: KmClass = featureContext.parentContext
             .fragment.classes.first { it.name == sealedClassName }
 
@@ -26,7 +25,6 @@ fun buildEnumCases(
             sealedCaseClass = sealedClass,
         )
     }
-}
 
 private fun buildEnumCase(
     kotlinFrameworkName: String,

@@ -9,9 +9,10 @@ import dev.icerock.moko.kswift.plugin.feature.associatedenum.buildTypeSpec
 import dev.icerock.moko.kswift.plugin.getSimpleName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.TypeSpec
-import io.outfoxx.swiftpoet.TypeVariableName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import kotlin.reflect.KClass
 
 class SealedToSwiftAssociatedEnumFeature(
@@ -43,19 +44,17 @@ class SealedToSwiftAssociatedEnumFeature(
 
         if (featureContext.clazz.sealedSubclasses.isEmpty()) return
 
-        println("Generating enum for sealed class $originalClassName")
-
         val sealedCases: List<AssociatedEnumCase> = buildEnumCases(kotlinFrameworkName, featureContext)
-        if (sealedCases.isEmpty()) return
+        if (sealedCases.isEmpty()) {
+            logger.debug("No public subclasses found for sealed class $originalClassName")
+            return
+        } else {
+            logger.debug("Generating enum for sealed class $originalClassName (${sealedCases.size} public subclasses)")
+        }
 
-        val typeVariables: List<TypeVariableName> =
-            kmClass.buildTypeVariableNames(kotlinFrameworkName)
-
-        val className: String = originalClassName.replace(".", "").plus("Ks")
         val enumType: TypeSpec = buildTypeSpec(
-            className = className,
             featureContext = featureContext,
-            typeVariables = typeVariables,
+            typeVariables = kmClass.buildTypeVariableNames(kotlinFrameworkName),
             sealedCases = sealedCases,
             kotlinFrameworkName = kotlinFrameworkName,
             originalClassName = originalClassName,
@@ -78,5 +77,7 @@ class SealedToSwiftAssociatedEnumFeature(
 
         @JvmStatic
         override val factory = Companion
+
+        val logger: Logger = Logging.getLogger("SealedToSwiftAssociatedEnumFeature")
     }
 }
