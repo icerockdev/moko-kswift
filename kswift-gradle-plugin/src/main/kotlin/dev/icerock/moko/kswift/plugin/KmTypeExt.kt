@@ -16,6 +16,7 @@ import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
+import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 
@@ -142,3 +143,9 @@ fun DeclaredTypeName.objcNameToSwift(): DeclaredTypeName {
         else -> this
     }
 }
+
+val KmType.isNullable: Boolean
+    get() = Flag.Type.IS_NULLABLE(flags)
+
+val KmType.hasGenerics: Boolean
+    get() = this.arguments.isNotEmpty()

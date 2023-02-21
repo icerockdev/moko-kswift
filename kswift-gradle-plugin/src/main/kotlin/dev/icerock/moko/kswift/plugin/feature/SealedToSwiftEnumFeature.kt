@@ -26,7 +26,7 @@ import kotlin.reflect.KClass
 
 class SealedToSwiftEnumFeature(
     override val featureContext: KClass<ClassContext>,
-    override val filter: Filter<ClassContext>
+    override val filter: Filter<ClassContext>,
 ) : ProcessorFeature<ClassContext>() {
 
     @Suppress("ReturnCount")
@@ -59,15 +59,15 @@ class SealedToSwiftEnumFeature(
                     kotlinFrameworkName = kotlinFrameworkName,
                     sealedCases = sealedCases,
                     className = className,
-                    originalClassName = originalClassName
-                )
+                    originalClassName = originalClassName,
+                ),
             )
             .addProperty(
                 buildSealedProperty(
                     featureContext = featureContext,
                     kotlinFrameworkName = kotlinFrameworkName,
-                    sealedCases = sealedCases
-                )
+                    sealedCases = sealedCases,
+                ),
             )
             .build()
 
@@ -79,7 +79,7 @@ class SealedToSwiftEnumFeature(
         kotlinFrameworkName: String,
         sealedCases: List<EnumCase>,
         className: String,
-        originalClassName: String
+        originalClassName: String,
     ): FunctionSpec {
         return FunctionSpec.builder("init")
             .addModifiers(Modifier.PUBLIC)
@@ -88,8 +88,8 @@ class SealedToSwiftEnumFeature(
                 name = "obj",
                 type = featureContext.clazz.getDeclaredTypeNameWithGenerics(
                     kotlinFrameworkName = kotlinFrameworkName,
-                    classes = featureContext.kLibClasses
-                )
+                    classes = featureContext.kLibClasses,
+                ),
             )
             .addCode(
                 CodeBlock.builder()
@@ -117,14 +117,14 @@ class SealedToSwiftEnumFeature(
                         unindent()
                         add("}\n")
                     }
-                    .build()
+                    .build(),
             )
             .build()
     }
 
     private fun buildEnumCases(
         kotlinFrameworkName: String,
-        featureContext: ClassContext
+        featureContext: ClassContext,
     ): List<EnumCase> {
         val kmClass = featureContext.clazz
         return kmClass.sealedSubclasses.mapNotNull { sealedClassName ->
@@ -141,18 +141,20 @@ class SealedToSwiftEnumFeature(
         kotlinFrameworkName: String,
         featureContext: ClassContext,
         subclassName: ClassName,
-        sealedCaseClass: KmClass
+        sealedCaseClass: KmClass,
     ): EnumCase {
         val kmClass = featureContext.clazz
         val name: String = if (subclassName.startsWith(kmClass.name)) {
             subclassName.removePrefix(kmClass.name).removePrefix(".")
-        } else subclassName.removePrefix(kmClass.name.substringBeforeLast("/")).removePrefix("/")
+        } else {
+            subclassName.removePrefix(kmClass.name.substringBeforeLast("/")).removePrefix("/")
+        }
         val decapitalizedName: String = name.decapitalize(Locale.ROOT)
 
         val isObject: Boolean = Flag.Class.IS_OBJECT(sealedCaseClass.flags)
         val caseArg = sealedCaseClass.getDeclaredTypeNameWithGenerics(
             kotlinFrameworkName = kotlinFrameworkName,
-            classes = featureContext.kLibClasses
+            classes = featureContext.kLibClasses,
         )
 
         return EnumCase(
@@ -165,18 +167,18 @@ class SealedToSwiftEnumFeature(
             },
             initBlock = if (isObject) "" else "(obj)",
             caseArg = caseArg,
-            caseBlock = if (isObject) "" else "(let obj)"
+            caseBlock = if (isObject) "" else "(let obj)",
         )
     }
 
     private fun buildSealedProperty(
         featureContext: ClassContext,
         kotlinFrameworkName: String,
-        sealedCases: List<EnumCase>
+        sealedCases: List<EnumCase>,
     ): PropertySpec {
         val returnType: TypeName = featureContext.clazz.getDeclaredTypeNameWithGenerics(
             kotlinFrameworkName = kotlinFrameworkName,
-            classes = featureContext.kLibClasses
+            classes = featureContext.kLibClasses,
         )
         return PropertySpec.builder("sealed", type = returnType)
             .addModifiers(Modifier.PUBLIC)
@@ -184,13 +186,13 @@ class SealedToSwiftEnumFeature(
                 FunctionSpec
                     .getterBuilder()
                     .addCode(buildSealedPropertyBody(sealedCases, returnType))
-                    .build()
+                    .build(),
             ).build()
     }
 
     private fun buildSealedPropertyBody(
         sealedCases: List<EnumCase>,
-        returnType: TypeName
+        returnType: TypeName,
     ): CodeBlock = CodeBlock.builder().apply {
         add("switch self {\n")
         sealedCases.forEach { enumCase ->
@@ -209,7 +211,7 @@ class SealedToSwiftEnumFeature(
 
     private fun CodeBlock.Builder.addSealedCaseReturnCode(
         enumCase: EnumCase,
-        returnType: TypeName
+        returnType: TypeName,
     ) {
         val paramType: TypeName? = enumCase.param
         val cast: String
@@ -219,7 +221,7 @@ class SealedToSwiftEnumFeature(
             returnedName = "${enumCase.caseArg}()"
             cast = if (returnType is ParameterizedTypeName) {
                 // The return type is generic and there is no parameter, so it can
-                // be assumed that the case is NOT generic. Thus the case needs to
+                // be assumed that the case is NOT generic. Thus, the case needs to
                 // be force-cast.
                 "as!"
             } else {
@@ -233,7 +235,7 @@ class SealedToSwiftEnumFeature(
             cast = if (paramType is ParameterizedTypeName && returnType is ParameterizedTypeName) {
                 if (paramType.typeArguments == returnType.typeArguments) {
                     // The parameter and return type have the same generic pattern. This
-                    // is true if both are NOT generic OR if both are generic. Thus a
+                    // is true if both are NOT generic OR if both are generic. Thus, a
                     // regular cast can be used.
                     "as"
                 } else {
@@ -254,7 +256,7 @@ class SealedToSwiftEnumFeature(
         val initCheck: String,
         val initBlock: String,
         val caseArg: TypeName,
-        val caseBlock: String
+        val caseBlock: String,
     ) {
         val enumCaseSpec: EnumerationCaseSpec
             get() {
