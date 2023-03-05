@@ -5,12 +5,13 @@ import dev.icerock.moko.kswift.plugin.context.LibraryContext
 import dev.icerock.moko.kswift.plugin.feature.Filter
 import dev.icerock.moko.kswift.plugin.feature.SealedToSwiftAssociatedEnumFeature
 import io.outfoxx.swiftpoet.FileSpec
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlinx.metadata.klib.KlibModuleMetadata
 import org.jetbrains.kotlin.library.ToolingSingleFileKlibResolveStrategy
 import org.jetbrains.kotlin.library.resolveSingleFileKlib
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
+@Suppress("LongMethod")
 class SealedToSwiftAssociatedEnumFeatureTest {
     @Test
     fun `associated enum feature should produce type mapped output`() {
@@ -18,7 +19,11 @@ class SealedToSwiftAssociatedEnumFeatureTest {
         val klibPath = this::class.java.classLoader.getResource("associated-enum.klib")
         val konanFile = org.jetbrains.kotlin.konan.file.File(klibPath.toURI().path)
         // Need to use tooling strategy here since the klib was generated with 1.8
-        val library = resolveSingleFileKlib(konanFile, strategy = ToolingSingleFileKlibResolveStrategy)
+        // kotlinc-native TestingSealed.kt -p library -o associated-enum
+        val library = resolveSingleFileKlib(
+            libraryFile = konanFile,
+            strategy = ToolingSingleFileKlibResolveStrategy,
+        )
         val metadata = KlibModuleMetadata.read(KotlinMetadataLibraryProvider(library))
         val libraryContext = LibraryContext(metadata)
         val fileSpecBuilder = FileSpec.builder(moduleName = "module", fileName = "file")
