@@ -10,7 +10,7 @@ import io.outfoxx.swiftpoet.INT32
 import io.outfoxx.swiftpoet.INT64
 import io.outfoxx.swiftpoet.INT8
 import io.outfoxx.swiftpoet.ParameterizedTypeName
-import io.outfoxx.swiftpoet.UIN16
+import io.outfoxx.swiftpoet.UINT16
 import io.outfoxx.swiftpoet.UINT32
 import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.UINT8
@@ -27,7 +27,7 @@ internal val kotlinToSwiftTypeMap: Map<String, DeclaredTypeName> = mapOf(
     "kotlin/UByte" to UINT8,
     "kotlin/UInt" to UINT32,
     "kotlin/ULong" to UINT64,
-    "kotlin/UShort" to UIN16,
+    "kotlin/UShort" to UINT16,
 )
 
 internal val swiftTypeToKotlinMap: Map<DeclaredTypeName, String> = mapOf(
@@ -42,7 +42,7 @@ internal val swiftTypeToKotlinMap: Map<DeclaredTypeName, String> = mapOf(
     UINT8 to "kotlin/UByte",
     UINT32 to "kotlin/UInt",
     UINT64 to "kotlin/ULong",
-    UIN16 to "kotlin/UShort",
+    UINT16 to "kotlin/UShort",
 )
 
 internal val swiftOptionalTypeToKotlinMap: Map<ParameterizedTypeName, String> =
