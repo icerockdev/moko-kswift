@@ -38,10 +38,12 @@ data class AssociatedEnumCase(
                     val paramType = (it.second as? ParameterizedTypeName)
                     when {
                         tupleType != null -> tupleType.generateTuple(it.first)
-                        it.second.isCharacter -> "${it.first}: Character(UnicodeScalar(obj.${it.first})!)"
-                        paramType?.rawType == DICTIONARY -> paramType.toDictionaryCaster(
-                            it.first,
-                        )
+                        it.second.isCharacter -> {
+                            "${it.first}: Character(UnicodeScalar(obj.${it.first})!)"
+                        }
+                        paramType?.rawType == DICTIONARY -> {
+                            paramType.toDictionaryCaster(it.first)
+                        }
 
                         paramType?.rawType == SET -> paramType.toSetCaster(it.first)
                         paramType?.rawType == ARRAY -> paramType.toArrayCaster(it.first)

@@ -1,0 +1,33 @@
+[*.{kt,kts}]
+ktlint_code_style=android
+ktlint_experimental_type-argument-list-spacing=enabled
+ktlint_experimental_function-signature=enabled
+ktlint_experimental_block-comment-initial-star-alignment=enabled
+ktlint_experimental_unnecessary-parentheses-before-trailing-lambda=enabled
+ktlint_experimental_class-naming=enabled
+ktlint_experimental_package-naming=enabled
+ktlint_experimental_fun-keyword-spacing=enabled
+ktlint_experimental_function-return-type-spacing=enabled
+ktlint_experimental_function-start-of-body-spacing=enabled
+ktlint_experimental_function-type-reference-spacing=enabled
+ktlint_experimental_modifier-list-spacing=enabled
+ktlint_experimental_nullable-type-spacing=enabled
+ktlint_experimental_parameter-list-spacing=enabled
+ktlint_experimental_spacing-between-function-name-and-opening-parenthesis=enabled
+ktlint_experimental_type-argument-list-spacing=enabled
+ktlint_experimental_type-parameter-list-spacing=enabled
+ktlint_experimental_comment-wrapping=enabled
+ktlint_experimental_context-receiver-wrapping=enabled
+ktlint_experimental_kdoc-wrapping=enabled
+
+
+ktlint_ignore_back_ticked_identifier=true
+ij_kotlin_allow_trailing_comma=true
+ij_kotlin_allow_trailing_comma_on_call_site=true
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+# ktlint_function_signature_body_expression_wrapping = default
+# ktlint_function_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than = -1
+# ktlint_ignore_back_ticked_identifier = false
+# max_line_length = -1

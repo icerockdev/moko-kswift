@@ -88,9 +88,7 @@ private fun buildEnumConstructor(
                     }
                     add("} else {\n")
                     indent()
-                    add(
-                        "fatalError(\"$className not synchronized with $originalClassName class\")\n",
-                    )
+                    add("fatalError(\"$className not synchronized with $originalClassName class\")\n")
                     unindent()
                     add("}\n")
                 }
@@ -118,27 +116,25 @@ private fun buildSealedProperty(
         ).build()
 }
 
-private fun buildSealedPropertyBody(
-    sealedCases: List<AssociatedEnumCase>,
-): CodeBlock = CodeBlock.builder().apply {
-    add("switch self {\n")
-    sealedCases.forEach { enumCase ->
-        buildString {
-            append("case .")
-            append(enumCase.name)
-            append(enumCase.caseBlock)
-            append(":\n")
-        }.also { add(it) }
-        indent()
-        addSealedCaseReturnCode(enumCase)
-        unindent()
+private fun buildSealedPropertyBody(sealedCases: List<AssociatedEnumCase>): CodeBlock = CodeBlock
+    .builder().apply {
+        add("switch self {\n")
+        sealedCases.forEach { enumCase ->
+            buildString {
+                append("case .")
+                append(enumCase.name)
+                append(enumCase.caseBlock)
+                append(":\n")
+            }.also { add(it) }
+            indent()
+            addSealedCaseReturnCode(enumCase)
+            unindent()
+        }
+        add("}\n")
     }
-    add("}\n")
-}.build()
+    .build()
 
-private fun CodeBlock.Builder.addSealedCaseReturnCode(
-    enumCase: AssociatedEnumCase,
-) {
+private fun CodeBlock.Builder.addSealedCaseReturnCode(enumCase: AssociatedEnumCase) {
     val parameters = enumCase.swiftToKotlinConstructor
     add("return ${enumCase.name.capitalized()}($parameters)\n")
 }
