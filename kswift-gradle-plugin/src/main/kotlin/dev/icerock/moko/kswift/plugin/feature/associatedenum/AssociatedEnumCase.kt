@@ -80,7 +80,7 @@ data class AssociatedEnumCase(
                     (param.second as? ParameterizedTypeName)?.let {
                         if (it.rawType.moduleName != "Swift") {
                             param.first to it.rawType.parameterizedBy(
-                                *it.typeArguments.stripInnerGenerics().toTypedArray(),
+                                it.typeArguments.stripInnerGenerics(),
                             )
                         } else {
                             null
@@ -89,7 +89,7 @@ data class AssociatedEnumCase(
                 }
                 EnumerationCaseSpec.builder(
                     name = name,
-                    type = TupleTypeName.of(*stripGenericsFromObjC.toTypedArray()),
+                    type = TupleTypeName.of(stripGenericsFromObjC),
                 ).build()
             } else {
                 EnumerationCaseSpec.builder(name, param).build()

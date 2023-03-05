@@ -78,7 +78,7 @@ internal fun TypeName.addGenericsAndOptional(
             },
             isOuterSwift = isSwift,
         )
-        this.parameterizedBy(*genericTypes.toTypedArray())
+        this.parameterizedBy(genericTypes)
     } else {
         this
     }.let {

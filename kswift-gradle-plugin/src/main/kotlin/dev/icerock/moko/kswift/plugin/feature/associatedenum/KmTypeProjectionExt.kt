@@ -7,20 +7,18 @@ import io.outfoxx.swiftpoet.TypeName
 import kotlinx.metadata.KmTypeProjection
 
 internal fun List<KmTypeProjection>.generateTupleType(moduleName: String): TupleTypeName =
-    TupleTypeName.of(
-        *this
-            .map { projection ->
-                (projection.type?.kotlinTypeNameToInner(moduleName, NamingMode.SWIFT, true) ?: ANY_OBJECT)
-                    .let {
-                        if (projection.type?.isNullable == true && !it.optional) {
-                            it.wrapOptional()
-                        } else {
-                            it
-                        }
+    TupleTypeName(
+        this.map { projection ->
+            (projection.type?.kotlinTypeNameToInner(moduleName, NamingMode.SWIFT, true) ?: ANY_OBJECT)
+                .let {
+                    if (projection.type?.isNullable == true && !it.optional) {
+                        it.wrapOptional()
+                    } else {
+                        it
                     }
-            }
-            .map { "" to it }
-            .toTypedArray(),
+                }
+        }
+            .map { "" to it },
     )
 
 internal fun List<KmTypeProjection>.getTypes(

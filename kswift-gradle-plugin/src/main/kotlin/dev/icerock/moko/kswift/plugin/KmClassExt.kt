@@ -35,7 +35,7 @@ fun KmClass.getDeclaredTypeNameWithGenerics(
     return getDeclaredTypeName(kotlinFrameworkName, classes)
         .let { type ->
             if (haveGenerics.not() || isInterface) type
-            else type.parameterizedBy(*typeVariables.toTypedArray())
+            else type.parameterizedBy(typeVariables)
         }
 }
 

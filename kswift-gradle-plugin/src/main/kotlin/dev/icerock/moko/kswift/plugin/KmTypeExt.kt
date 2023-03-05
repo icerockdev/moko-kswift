@@ -132,7 +132,7 @@ fun KmType.kotlinTypeToTypeName(
                 )
             }
             @Suppress("SpreadOperator")
-            typeName.parameterizedBy(*arguments.toTypedArray())
+            typeName.parameterizedBy(arguments)
         }
     }
 }

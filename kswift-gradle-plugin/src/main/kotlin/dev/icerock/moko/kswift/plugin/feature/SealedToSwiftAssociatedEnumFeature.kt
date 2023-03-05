@@ -46,10 +46,10 @@ class SealedToSwiftAssociatedEnumFeature(
 
         val sealedCases: List<AssociatedEnumCase> = buildEnumCases(kotlinFrameworkName, featureContext)
         if (sealedCases.isEmpty()) {
-            logger.debug("No public subclasses found for sealed class $originalClassName")
+            logger.warn("No public subclasses found for sealed class $originalClassName")
             return
         } else {
-            logger.debug("Generating enum for sealed class $originalClassName (${sealedCases.size} public subclasses)")
+            logger.lifecycle("Generating enum for sealed class $originalClassName (${sealedCases.size} public subclasses)")
         }
 
         val enumType: TypeSpec = buildTypeSpec(
