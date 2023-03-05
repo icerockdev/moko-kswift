@@ -23,7 +23,7 @@ data class AssociatedEnumCase(
     private val explodedParams: List<Pair<String, TypeName>> = constructorParams.map {
         Pair(
             it.name,
-            it.type?.kotlinPrimitiveTypeNameToSwift(frameworkName)
+            it.type?.kotlinTypeToSwiftTypeName(frameworkName)
                 ?: DeclaredTypeName.typeName("Swift.FailedToGetReturnType"),
         )
     }
@@ -49,7 +49,6 @@ data class AssociatedEnumCase(
                             val unwrapped = paramType.unwrapOptional()
                             when ((unwrapped as? ParameterizedTypeName)?.rawType) {
                                 DICTIONARY -> {
-                                    // TODO: unwrapped for other classes?
                                     unwrapped.toDictionaryCaster(it.first, true)
                                 }
                                 SET -> paramType.toSetCaster(it.first, true)

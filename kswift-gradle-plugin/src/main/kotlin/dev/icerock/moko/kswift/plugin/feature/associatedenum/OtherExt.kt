@@ -46,6 +46,7 @@ internal fun KmType.kotlinTypeNameToInner(
     )
 }
 
+@Suppress("CyclomaticComplexMethod")
 private fun String.kotlinPrimitiveTypeNameToSwift(
     moduleName: String,
     arguments: List<KmTypeProjection>,
@@ -79,7 +80,7 @@ private fun String.kotlinPrimitiveTypeNameToSwift(
     }
 }
 
-internal fun KmType.kotlinPrimitiveTypeNameToSwift(moduleName: String): TypeName? {
+internal fun KmType.kotlinTypeToSwiftTypeName(moduleName: String): TypeName? {
     val typeName = this.nameAsString
 
     return when {

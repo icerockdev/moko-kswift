@@ -31,7 +31,7 @@ class SealedToSwiftAssociatedEnumFeatureTest {
                 ).doProcess(
                     featureContext = it,
                     fileSpecBuilder = fileSpecBuilder,
-                    kotlinFrameworkName = "shared"
+                    kotlinFrameworkName = "shared",
                 )
             }
         }
