@@ -5,13 +5,13 @@ import dev.icerock.moko.kswift.plugin.context.LibraryContext
 import dev.icerock.moko.kswift.plugin.feature.Filter
 import dev.icerock.moko.kswift.plugin.feature.SealedToSwiftAssociatedEnumFeature
 import io.outfoxx.swiftpoet.FileSpec
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlinx.metadata.klib.KlibModuleMetadata
 import org.jetbrains.kotlin.library.ToolingSingleFileKlibResolveStrategy
 import org.jetbrains.kotlin.library.resolveSingleFileKlib
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "MaxLineLength")
 class SealedToSwiftAssociatedEnumFeatureTest {
     @Test
     fun `associated enum feature should produce type mapped output`() {

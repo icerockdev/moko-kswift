@@ -9,11 +9,11 @@ import dev.icerock.moko.kswift.plugin.feature.associatedenum.buildTypeSpec
 import dev.icerock.moko.kswift.plugin.getSimpleName
 import io.outfoxx.swiftpoet.FileSpec
 import io.outfoxx.swiftpoet.TypeSpec
-import kotlin.reflect.KClass
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import kotlin.reflect.KClass
 
 class SealedToSwiftAssociatedEnumFeature(
     override val featureContext: KClass<ClassContext>,
@@ -37,12 +37,11 @@ class SealedToSwiftAssociatedEnumFeature(
         kotlinFrameworkName: String,
     ) {
         val kmClass: KmClass = featureContext.clazz
-
-        if (Flag.IS_PUBLIC(kmClass.flags).not()) return
-
         val originalClassName: String = getSimpleName(kmClass.name, featureContext.kLibClasses)
 
-        if (featureContext.clazz.sealedSubclasses.isEmpty()) return
+        if (!Flag.IS_PUBLIC(kmClass.flags) || featureContext.clazz.sealedSubclasses.isEmpty()) {
+            return
+        }
 
         val sealedCases: List<AssociatedEnumCase> = buildEnumCases(
             kotlinFrameworkName = kotlinFrameworkName,

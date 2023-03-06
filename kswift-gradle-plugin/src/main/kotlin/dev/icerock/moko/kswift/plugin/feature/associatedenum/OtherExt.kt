@@ -26,17 +26,12 @@ internal fun KmType.kotlinTypeNameToInner(
     return when {
         typeName == null -> null
         typeName.startsWith("kotlin/") -> {
-            when (namingMode) {
-                NamingMode.KOTLIN -> typeName.kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
-                NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(moduleName, arguments)
-                NamingMode.OBJC -> typeName.kotlinPrimitiveTypeNameToObjectiveC(moduleName)
-                NamingMode.KOTLIN_NO_STRING ->
-                    typeName
-                        .kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
-                        .let { if (it == STRING) NSSTRING else it }
-            }
+            kotlinPrimitiveToTypeNameWithNamingMode(
+                namingMode = namingMode,
+                typeName = typeName,
+                moduleName = moduleName,
+            )
         }
-
         else -> getDeclaredTypeNameFromNonPrimitive(typeName, moduleName)
     }?.addGenericsAndOptional(
         kmType = this,
@@ -46,7 +41,21 @@ internal fun KmType.kotlinTypeNameToInner(
     )
 }
 
-@Suppress("CyclomaticComplexMethod")
+private fun KmType.kotlinPrimitiveToTypeNameWithNamingMode(
+    namingMode: NamingMode,
+    typeName: String,
+    moduleName: String,
+) = when (namingMode) {
+    NamingMode.KOTLIN -> typeName.kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
+    NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(moduleName, arguments)
+    NamingMode.OBJC -> typeName.kotlinPrimitiveTypeNameToObjectiveC(moduleName)
+    NamingMode.KOTLIN_NO_STRING ->
+        typeName
+            .kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
+            .let { if (it == STRING) NSSTRING else it }
+}
+
+@Suppress("CyclomaticComplexMethod", "ComplexMethod")
 private fun String.kotlinPrimitiveTypeNameToSwift(
     moduleName: String,
     arguments: List<KmTypeProjection>,

@@ -11,6 +11,9 @@ import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.KmValueParameter
 
+private const val PAIR = 2
+private const val TRIPLE = 3
+
 data class AssociatedEnumCase(
     val frameworkName: String,
     val name: String,
@@ -101,53 +104,57 @@ data class AssociatedEnumCase(
         "$paramName: " + when {
             paramType.isCharacter -> "$paramName.utf16.first!"
             paramType is TupleTypeName -> {
-                if (paramType.types.size == 2) {
-                    val first = paramType.types[0]
-                    val firstType = first.second
-                    val second = paramType.types[1]
-                    val secondType = second.second
+                when (paramType.types.size) {
+                    PAIR -> {
+                        val first = paramType.types[0]
+                        val firstType = first.second
+                        val second = paramType.types[1]
+                        val secondType = second.second
 
-                    "KotlinPair<"
-                        .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
-                        .plus(", ")
-                        .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
-                        .plus(">(first: ")
-                        .plus(
-                            firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
-                        )
-                        .plus(", second: ")
-                        .plus(
-                            secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
-                        )
-                        .plus(")")
-                } else if (paramType.types.size == 3) {
-                    val first = paramType.types[0]
-                    val firstType = first.second
-                    val second = paramType.types[1]
-                    val secondType = second.second
-                    val third = paramType.types[2]
-                    val thirdType = third.second
-                    "KotlinTriple<"
-                        .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
-                        .plus(", ")
-                        .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
-                        .plus(", ")
-                        .plus(thirdType.kotlinInteropTypeWithFallback.toNSString())
-                        .plus(">(first: ")
-                        .plus(
-                            firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
-                        )
-                        .plus(", second: ")
-                        .plus(
-                            secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
-                        )
-                        .plus(", third: ")
-                        .plus(
-                            thirdType.generateKotlinConstructorIfNecessary("$paramName.2"),
-                        )
-                        .plus(")")
-                } else {
-                    "unknown tuple type"
+                        "KotlinPair<"
+                            .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
+                            .plus(", ")
+                            .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
+                            .plus(">(first: ")
+                            .plus(
+                                firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
+                            )
+                            .plus(", second: ")
+                            .plus(
+                                secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
+                            )
+                            .plus(")")
+                    }
+                    TRIPLE -> {
+                        val first = paramType.types[0]
+                        val firstType = first.second
+                        val second = paramType.types[1]
+                        val secondType = second.second
+                        val third = paramType.types[2]
+                        val thirdType = third.second
+                        "KotlinTriple<"
+                            .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
+                            .plus(", ")
+                            .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
+                            .plus(", ")
+                            .plus(thirdType.kotlinInteropTypeWithFallback.toNSString())
+                            .plus(">(first: ")
+                            .plus(
+                                firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
+                            )
+                            .plus(", second: ")
+                            .plus(
+                                secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
+                            )
+                            .plus(", third: ")
+                            .plus(
+                                thirdType.generateKotlinConstructorIfNecessary("$paramName.2"),
+                            )
+                            .plus(")")
+                    }
+                    else -> {
+                        "unknown tuple type"
+                    }
                 }
             }
 

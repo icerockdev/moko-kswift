@@ -3,10 +3,10 @@ package dev.icerock.moko.kswift.plugin.feature.associatedenum
 import dev.icerock.moko.kswift.plugin.context.ClassContext
 import dev.icerock.moko.kswift.plugin.context.kLibClasses
 import dev.icerock.moko.kswift.plugin.getDeclaredTypeNameWithGenerics
-import java.util.Locale
 import kotlinx.metadata.ClassName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
+import java.util.Locale
 
 fun buildEnumCases(
     kotlinFrameworkName: String,
