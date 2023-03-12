@@ -1,5 +1,6 @@
 package dev.icerock.moko.kswift.plugin.feature.associatedenum
 
+import dev.icerock.moko.kswift.plugin.isNullable
 import dev.icerock.moko.kswift.plugin.objcNameToSwift
 import io.outfoxx.swiftpoet.ANY_OBJECT
 import io.outfoxx.swiftpoet.ARRAY
@@ -11,8 +12,10 @@ import io.outfoxx.swiftpoet.SET
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.VOID
+import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
+import kotlinx.metadata.KmTypeParameter
 import kotlinx.metadata.KmTypeProjection
 
 private val NSSTRING = DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
@@ -21,8 +24,9 @@ internal fun KmType.kotlinTypeNameToInner(
     moduleName: String,
     namingMode: NamingMode,
     isOuterSwift: Boolean,
+    typeParameters: List<KmTypeParameter>,
 ): TypeName? {
-    val typeName = this.nameAsString
+    val typeName = this.nameAsString(typeParameters)
     return when {
         typeName == null -> null
         typeName.startsWith("kotlin/") -> {
@@ -30,6 +34,7 @@ internal fun KmType.kotlinTypeNameToInner(
                 namingMode = namingMode,
                 typeName = typeName,
                 moduleName = moduleName,
+                typeParameters = typeParameters,
             )
         }
         else -> getDeclaredTypeNameFromNonPrimitive(typeName, moduleName)
@@ -38,6 +43,7 @@ internal fun KmType.kotlinTypeNameToInner(
         moduleName = moduleName,
         namingMode = namingMode,
         isOuterSwift = isOuterSwift,
+        typeParameters = typeParameters,
     )
 }
 
@@ -45,9 +51,10 @@ private fun KmType.kotlinPrimitiveToTypeNameWithNamingMode(
     namingMode: NamingMode,
     typeName: String,
     moduleName: String,
+    typeParameters: List<KmTypeParameter>,
 ) = when (namingMode) {
     NamingMode.KOTLIN -> typeName.kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
-    NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(moduleName, arguments)
+    NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(moduleName, arguments, typeParameters)
     NamingMode.OBJC -> typeName.kotlinPrimitiveTypeNameToObjectiveC(moduleName)
     NamingMode.KOTLIN_NO_STRING ->
         typeName
@@ -55,19 +62,19 @@ private fun KmType.kotlinPrimitiveToTypeNameWithNamingMode(
             .let { if (it == STRING) NSSTRING else it }
 }
 
-@Suppress("CyclomaticComplexMethod", "ComplexMethod")
 private fun String.kotlinPrimitiveTypeNameToSwift(
     moduleName: String,
     arguments: List<KmTypeProjection>,
+    typeParameters: List<KmTypeParameter>,
 ): TypeName {
     require(this.startsWith("kotlin/"))
     return when (this) {
         "kotlin/Char" -> DeclaredTypeName.typeName("Swift.Character")
         "kotlin/Comparable" -> DeclaredTypeName.typeName("Swift.Comparable")
-        "kotlin/Pair" -> arguments.generateTupleType(moduleName)
+        "kotlin/Pair" -> arguments.generateTupleType(moduleName, typeParameters)
         "kotlin/Result" -> ANY_OBJECT
         "kotlin/String" -> STRING
-        "kotlin/Triple" -> arguments.generateTupleType(moduleName)
+        "kotlin/Triple" -> arguments.generateTupleType(moduleName, typeParameters)
         "kotlin/Throwable" -> DeclaredTypeName(
             moduleName = moduleName,
             simpleName = "KotlinThrowable",
@@ -77,25 +84,32 @@ private fun String.kotlinPrimitiveTypeNameToSwift(
         "kotlin/collections/List" -> ARRAY
         "kotlin/collections/Map" -> DICTIONARY
         "kotlin/collections/Set" -> SET
-        else -> {
-            if (this.startsWith("kotlin/Function")) {
-                val typedArgs = arguments.getTypes(moduleName, NamingMode.KOTLIN, false)
-                val types = typedArgs.map { ParameterSpec.unnamed(it) }.dropLast(1)
-                FunctionTypeName.get(types, typedArgs.last())
-            } else {
-                kotlinToSwiftTypeMap[this] ?: this.kotlinInteropName(moduleName)
-            }
-        }
+        else -> unknownKotlinPrimitiveTypeToSwift(arguments, moduleName, typeParameters)
     }
 }
 
-internal fun KmType.kotlinTypeToSwiftTypeName(moduleName: String): TypeName? {
-    val typeName = this.nameAsString
+private fun String.unknownKotlinPrimitiveTypeToSwift(
+    arguments: List<KmTypeProjection>,
+    moduleName: String,
+    typeParameters: List<KmTypeParameter>,
+) = if (this.startsWith("kotlin/Function")) {
+    val typedArgs = arguments.getTypes(moduleName, NamingMode.KOTLIN, false, typeParameters)
+    val types = typedArgs.map { ParameterSpec.unnamed(it) }.dropLast(1)
+    FunctionTypeName.get(types, typedArgs.last())
+} else {
+    kotlinToSwiftTypeMap[this] ?: this.kotlinInteropName(moduleName)
+}
+
+internal fun KmType.kotlinTypeToSwiftTypeName(
+    moduleName: String,
+    typeParameters: List<KmTypeParameter>,
+): TypeName? {
+    val typeName = this.nameAsString(typeParameters)
 
     return when {
         typeName == null -> null
         typeName.startsWith("kotlin/") ->
-            typeName.kotlinPrimitiveTypeNameToSwift(moduleName, this.arguments)
+            typeName.kotlinPrimitiveTypeNameToSwift(moduleName, this.arguments, typeParameters)
 
         else -> getDeclaredTypeNameFromNonPrimitive(typeName, moduleName)
     }?.addGenericsAndOptional(
@@ -103,15 +117,28 @@ internal fun KmType.kotlinTypeToSwiftTypeName(moduleName: String): TypeName? {
         moduleName = moduleName,
         namingMode = null,
         isOuterSwift = true,
+        typeParameters = typeParameters,
     )
 }
 
-private val KmType.nameAsString: String?
-    get() = when (val classifier = this.classifier) {
+private fun KmType.nameAsString(typeParameters: List<KmTypeParameter>): String? =
+    when (val classifier = this.classifier) {
         is KmClassifier.Class -> classifier.name
-        is KmClassifier.TypeParameter -> null
+        is KmClassifier.TypeParameter -> {
+            typeParameters.recursivelyResolveToName(classifier.id)
+        }
         is KmClassifier.TypeAlias -> classifier.name
     }
+
+private fun List<KmTypeParameter>.recursivelyResolveToName(id: Int): String? {
+    return try {
+        this[id].name + if (this[id].upperBounds.firstOrNull()?.isNullable != false) "?" else ""
+    } catch (e: IndexOutOfBoundsException) {
+        (id - this.size).takeIf { it >= 0 }?.let { indexInParent ->
+            this.recursivelyResolveToName(indexInParent)
+        }
+    }
+}
 
 private fun String.kotlinPrimitiveTypeNameToKotlinInterop(moduleName: String): TypeName {
     require(this.startsWith("kotlin/"))

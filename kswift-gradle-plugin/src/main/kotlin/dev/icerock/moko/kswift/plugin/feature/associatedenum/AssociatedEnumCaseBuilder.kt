@@ -40,7 +40,8 @@ private fun buildEnumCase(
     }
     val decapitalizedName: String = name.decapitalize(Locale.ROOT)
 
-    val isObject: Boolean = Flag.Class.IS_OBJECT(sealedCaseClass.flags)
+    val isObject: Boolean = Flag.Class.IS_OBJECT(sealedCaseClass.flags) ||
+        sealedCaseClass.constructors.first().valueParameters.isEmpty()
     val caseArg = sealedCaseClass.getDeclaredTypeNameWithGenerics(
         kotlinFrameworkName = kotlinFrameworkName,
         classes = featureContext.kLibClasses,
@@ -58,5 +59,6 @@ private fun buildEnumCase(
         caseArg = caseArg,
         isObject = isObject,
         constructorParams = sealedCaseClass.constructors.first().valueParameters,
+        typeParameters = sealedCaseClass.typeParameters,
     )
 }

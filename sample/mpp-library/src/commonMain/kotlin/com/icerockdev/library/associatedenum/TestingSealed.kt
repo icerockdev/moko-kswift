@@ -73,3 +73,10 @@ class OwnHasGeneric<T> {
 enum class OwnEnum {
     A, B, C
 }
+
+sealed class LoadingState<T, P : Any> {
+    class Loading<T, P : Any> : LoadingState<T, P>()
+    data class Success<T, P : Any>(val payload: T) : LoadingState<T, P>()
+    data class Other<T, P : Any>(val otherPayload: P) : LoadingState<T, P>()
+    data class ErrorOnLoad<T, P : Any>(val error: String) : LoadingState<T, P>()
+}

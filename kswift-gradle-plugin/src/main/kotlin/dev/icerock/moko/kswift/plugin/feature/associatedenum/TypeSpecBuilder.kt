@@ -136,5 +136,5 @@ private fun buildSealedPropertyBody(sealedCases: List<AssociatedEnumCase>): Code
 
 private fun CodeBlock.Builder.addSealedCaseReturnCode(enumCase: AssociatedEnumCase) {
     val parameters = enumCase.swiftToKotlinConstructor
-    add("return ${enumCase.name.capitalized()}($parameters)\n")
+    add("return ${enumCase.caseArg}($parameters)\n")
 }

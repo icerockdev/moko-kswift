@@ -9,6 +9,7 @@ import io.outfoxx.swiftpoet.SET
 import io.outfoxx.swiftpoet.TupleTypeName
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.parameterizedBy
+import kotlinx.metadata.KmTypeParameter
 import kotlinx.metadata.KmValueParameter
 
 private const val PAIR = 2
@@ -22,11 +23,12 @@ data class AssociatedEnumCase(
     val caseArg: TypeName,
     val isObject: Boolean,
     val constructorParams: List<KmValueParameter>,
+    val typeParameters: List<KmTypeParameter>,
 ) {
     private val explodedParams: List<Pair<String, TypeName>> = constructorParams.map {
         Pair(
             it.name,
-            it.type?.kotlinTypeToSwiftTypeName(frameworkName)
+            it.type?.kotlinTypeToSwiftTypeName(frameworkName, typeParameters)
                 ?: DeclaredTypeName.typeName("Swift.FailedToGetReturnType"),
         )
     }
@@ -100,67 +102,68 @@ data class AssociatedEnumCase(
             }
         }
 
-    internal val swiftToKotlinConstructor: String = explodedParams.joinToString { (paramName, paramType) ->
-        "$paramName: " + when {
-            paramType.isCharacter -> "$paramName.utf16.first!"
-            paramType is TupleTypeName -> {
-                when (paramType.types.size) {
-                    PAIR -> {
-                        val first = paramType.types[0]
-                        val firstType = first.second
-                        val second = paramType.types[1]
-                        val secondType = second.second
+    internal val swiftToKotlinConstructor: String = explodedParams
+        .joinToString { (paramName, paramType) ->
+            "$paramName: " + when {
+                paramType.isCharacter -> "$paramName.utf16.first!"
+                paramType is TupleTypeName -> {
+                    when (paramType.types.size) {
+                        PAIR -> {
+                            val first = paramType.types[0]
+                            val firstType = first.second
+                            val second = paramType.types[1]
+                            val secondType = second.second
 
-                        "KotlinPair<"
-                            .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
-                            .plus(", ")
-                            .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
-                            .plus(">(first: ")
-                            .plus(
-                                firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
-                            )
-                            .plus(", second: ")
-                            .plus(
-                                secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
-                            )
-                            .plus(")")
-                    }
-                    TRIPLE -> {
-                        val first = paramType.types[0]
-                        val firstType = first.second
-                        val second = paramType.types[1]
-                        val secondType = second.second
-                        val third = paramType.types[2]
-                        val thirdType = third.second
-                        "KotlinTriple<"
-                            .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
-                            .plus(", ")
-                            .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
-                            .plus(", ")
-                            .plus(thirdType.kotlinInteropTypeWithFallback.toNSString())
-                            .plus(">(first: ")
-                            .plus(
-                                firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
-                            )
-                            .plus(", second: ")
-                            .plus(
-                                secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
-                            )
-                            .plus(", third: ")
-                            .plus(
-                                thirdType.generateKotlinConstructorIfNecessary("$paramName.2"),
-                            )
-                            .plus(")")
-                    }
-                    else -> {
-                        "unknown tuple type"
+                            "KotlinPair<"
+                                .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
+                                .plus(", ")
+                                .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
+                                .plus(">(first: ")
+                                .plus(
+                                    firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
+                                )
+                                .plus(", second: ")
+                                .plus(
+                                    secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
+                                )
+                                .plus(")")
+                        }
+                        TRIPLE -> {
+                            val first = paramType.types[0]
+                            val firstType = first.second
+                            val second = paramType.types[1]
+                            val secondType = second.second
+                            val third = paramType.types[2]
+                            val thirdType = third.second
+                            "KotlinTriple<"
+                                .plus(firstType.kotlinInteropTypeWithFallback.toNSString())
+                                .plus(", ")
+                                .plus(secondType.kotlinInteropTypeWithFallback.toNSString())
+                                .plus(", ")
+                                .plus(thirdType.kotlinInteropTypeWithFallback.toNSString())
+                                .plus(">(first: ")
+                                .plus(
+                                    firstType.generateKotlinConstructorIfNecessary("$paramName.0"),
+                                )
+                                .plus(", second: ")
+                                .plus(
+                                    secondType.generateKotlinConstructorIfNecessary("$paramName.1"),
+                                )
+                                .plus(", third: ")
+                                .plus(
+                                    thirdType.generateKotlinConstructorIfNecessary("$paramName.2"),
+                                )
+                                .plus(")")
+                        }
+                        else -> {
+                            "unknown tuple type"
+                        }
                     }
                 }
-            }
 
-            else -> paramType.generateKotlinConstructorIfNecessaryForParameter(paramName)
+                else -> paramType.generateKotlinConstructorIfNecessaryForParameter(paramName)
+            }
         }
-    }
 }
 
 private fun String.toNSString(): String =

@@ -15,7 +15,6 @@ import kotlin.test.assertEquals
 class SealedToSwiftAssociatedEnumFeatureTest {
     @Test
     fun `associated enum feature should produce type mapped output`() {
-        // Generated from TestSealed.kt
         val klibPath = this::class.java.classLoader.getResource("associated-enum.klib")
         val konanFile = org.jetbrains.kotlin.konan.file.File(klibPath.toURI().path)
         // Need to use tooling strategy here since the klib was generated with 1.8
@@ -47,7 +46,45 @@ class SealedToSwiftAssociatedEnumFeatureTest {
 import shared
 
 /**
- * selector: ClassContext/associatedenum/com/icerockdev/library/associatedenum/TestingSealed */
+ * selector: ClassContext/associated-enum/com/icerockdev/library/associatedenum/LoadingState */
+public enum LoadingStateKs<T : AnyObject, P : AnyObject> {
+
+  case errorOnLoad(error: String)
+  case loading
+  case other(otherPayload: P)
+  case success(payload: T?)
+
+  public var sealed: LoadingState<T, P> {
+    switch self {
+    case .errorOnLoad(let error):
+      return shared.LoadingStateErrorOnLoad<T, P>(error: error)
+    case .loading:
+      return shared.LoadingStateLoading<T, P>()
+    case .other(let otherPayload):
+      return shared.LoadingStateOther<T, P>(otherPayload: otherPayload)
+    case .success(let payload):
+      return shared.LoadingStateSuccess<T, P>(payload: payload)
+    }
+  }
+
+  public init(_ obj: LoadingState<T, P>) {
+    if let obj = obj as? shared.LoadingStateErrorOnLoad<T, P> {
+      self = .errorOnLoad(error: obj.error as String)
+    } else if obj is shared.LoadingStateLoading<T, P> {
+      self = .loading
+    } else if let obj = obj as? shared.LoadingStateOther<T, P> {
+      self = .other(otherPayload: obj.otherPayload)
+    } else if let obj = obj as? shared.LoadingStateSuccess<T, P> {
+      self = .success(payload: obj.payload)
+    } else {
+      fatalError("LoadingStateKs not synchronized with LoadingState class")
+    }
+  }
+
+}
+
+/**
+ * selector: ClassContext/associated-enum/com/icerockdev/library/associatedenum/TestingSealed */
 public enum TestingSealedKs {
 
   case hasChar(mychar: Character)
@@ -101,91 +138,91 @@ public enum TestingSealedKs {
   public var sealed: TestingSealed {
     switch self {
     case .hasChar(let mychar):
-      return HasChar(mychar: mychar.utf16.first!)
+      return shared.HasChar(mychar: mychar.utf16.first!)
     case .hasEnum(let myenum):
-      return HasEnum(myenum: myenum)
+      return shared.HasEnum(myenum: myenum)
     case .hasFunction(let myfunc):
-      return HasFunction(myfunc: myfunc)
+      return shared.HasFunction(myfunc: myfunc)
     case .hasInnerList(let innerList):
-      return HasInnerList(innerList: innerList)
+      return shared.HasInnerList(innerList: innerList)
     case .hasInnerNullable(let innerList):
-      return HasInnerNullable(innerList: innerList)
+      return shared.HasInnerNullable(innerList: innerList)
     case .hasListInt(let hasGeneric):
-      return HasListInt(hasGeneric: hasGeneric)
+      return shared.HasListInt(hasGeneric: hasGeneric)
     case .hasListIntNullable(let hasGeneric):
-      return HasListIntNullable(hasGeneric: hasGeneric)
+      return shared.HasListIntNullable(hasGeneric: hasGeneric)
     case .hasListOwn(let hasGeneric):
-      return HasListOwn(hasGeneric: hasGeneric)
+      return shared.HasListOwn(hasGeneric: hasGeneric)
     case .hasListString(let hasGeneric):
-      return HasListString(hasGeneric: hasGeneric)
+      return shared.HasListString(hasGeneric: hasGeneric)
     case .hasListStringNullable(let hasGeneric):
-      return HasListStringNullable(hasGeneric: hasGeneric)
+      return shared.HasListStringNullable(hasGeneric: hasGeneric)
     case .hasListStringOuterNullable(let hasGeneric):
-      return HasListStringOuterNullable(hasGeneric: hasGeneric != nil ? hasGeneric : nil)
+      return shared.HasListStringOuterNullable(hasGeneric: hasGeneric != nil ? hasGeneric : nil)
     case .hasMap(let map):
-      return HasMap(map: map)
+      return shared.HasMap(map: map)
     case .hasMapNullableOuter(let map):
-      return HasMapNullableOuter(map: map != nil ? map : nil)
+      return shared.HasMapNullableOuter(map: map != nil ? map : nil)
     case .hasMapNullableParams(let map):
-      return HasMapNullableParams(map: map)
+      return shared.HasMapNullableParams(map: map)
     case .hasMultipleOwnParams(let p1, let p2):
-      return HasMultipleOwnParams(p1: p1, p2: p2 != nil ? p2 : nil)
+      return shared.HasMultipleOwnParams(p1: p1, p2: p2 != nil ? p2 : nil)
     case .hasNestedGeneric(let nested):
-      return HasNestedGeneric(nested: nested)
+      return shared.HasNestedGeneric(nested: nested)
     case .hasNullableInnerList(let innerList):
-      return HasNullableInnerList(innerList: innerList)
+      return shared.HasNullableInnerList(innerList: innerList)
     case .hasNullableOuterList(let innerList):
-      return HasNullableOuterList(innerList: innerList != nil ? innerList : nil)
+      return shared.HasNullableOuterList(innerList: innerList != nil ? innerList : nil)
     case .hasOtherNullables(let mystring, let optstring, let myfloat, let optfloat, let mydouble, let optdouble):
-      return HasOtherNullables(mystring: mystring, optstring: optstring != nil ? optstring : nil, myfloat: myfloat, optfloat: optfloat != nil ? KotlinFloat(value: optfloat!) : nil, mydouble: mydouble, optdouble: optdouble != nil ? KotlinDouble(value: optdouble!) : nil)
+      return shared.HasOtherNullables(mystring: mystring, optstring: optstring != nil ? optstring : nil, myfloat: myfloat, optfloat: optfloat != nil ? KotlinFloat(value: optfloat!) : nil, mydouble: mydouble, optdouble: optdouble != nil ? KotlinDouble(value: optdouble!) : nil)
     case .hasOwnClass(let ownClass):
-      return HasOwnClass(ownClass: ownClass)
+      return shared.HasOwnClass(ownClass: ownClass)
     case .hasOwnClassWithGeneric(let ownClassWithGeneric):
-      return HasOwnClassWithGeneric(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGeneric(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericAny(let ownClassWithGeneric):
-      return HasOwnClassWithGenericAny(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericAny(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericEnum(let ownClassWithGeneric):
-      return HasOwnClassWithGenericEnum(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericEnum(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericInnerMap(let ownClassWithGeneric):
-      return HasOwnClassWithGenericInnerMap(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericInnerMap(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericInnerPair(let ownClassWithGeneric):
-      return HasOwnClassWithGenericInnerPair(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericInnerPair(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericInnerSet(let ownClassWithGeneric):
-      return HasOwnClassWithGenericInnerSet(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericInnerSet(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericNested(let ownClassWithGeneric):
-      return HasOwnClassWithGenericNested(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericNested(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericNullable(let ownClassWithGeneric):
-      return HasOwnClassWithGenericNullable(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericNullable(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericThrowable(let ownClassWithGeneric):
-      return HasOwnClassWithGenericThrowable(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericThrowable(ownClassWithGeneric: ownClassWithGeneric)
     case .hasOwnClassWithGenericWildcard(let ownClassWithGeneric):
-      return HasOwnClassWithGenericWildcard(ownClassWithGeneric: ownClassWithGeneric)
+      return shared.HasOwnClassWithGenericWildcard(ownClassWithGeneric: ownClassWithGeneric)
     case .hasPairBool(let pair):
-      return HasPairBool(pair: KotlinPair<KotlinBoolean, KotlinBoolean>(first: KotlinBoolean(value: pair.0), second: pair.1 != nil ? KotlinBoolean(value: pair.1!) : nil))
+      return shared.HasPairBool(pair: KotlinPair<KotlinBoolean, KotlinBoolean>(first: KotlinBoolean(value: pair.0), second: pair.1 != nil ? KotlinBoolean(value: pair.1!) : nil))
     case .hasPairFloat(let pair):
-      return HasPairFloat(pair: KotlinPair<KotlinFloat, KotlinFloat>(first: KotlinFloat(value: pair.0), second: pair.1 != nil ? KotlinFloat(value: pair.1!) : nil))
+      return shared.HasPairFloat(pair: KotlinPair<KotlinFloat, KotlinFloat>(first: KotlinFloat(value: pair.0), second: pair.1 != nil ? KotlinFloat(value: pair.1!) : nil))
     case .hasPairGeneric(let pair):
-      return HasPairGeneric(pair: KotlinPair<KotlinUByte, shared.OwnClass>(first: KotlinUByte(value: pair.0), second: pair.1 != nil ? pair.1 : nil))
+      return shared.HasPairGeneric(pair: KotlinPair<KotlinUByte, shared.OwnClass>(first: KotlinUByte(value: pair.0), second: pair.1 != nil ? pair.1 : nil))
     case .hasPairString(let pair):
-      return HasPairString(pair: KotlinPair<NSString, NSString>(first: pair.0 as NSString, second: pair.1 != nil ? pair.1! as NSString : nil))
+      return shared.HasPairString(pair: KotlinPair<NSString, NSString>(first: pair.0 as NSString, second: pair.1 != nil ? pair.1! as NSString : nil))
     case .hasSet(let myset):
-      return HasSet(myset: myset)
+      return shared.HasSet(myset: myset)
     case .hasSetNullableInt(let myset):
-      return HasSetNullableInt(myset: myset)
+      return shared.HasSetNullableInt(myset: myset)
     case .hasSetNullableOuter(let myset):
-      return HasSetNullableOuter(myset: myset != nil ? myset : nil)
+      return shared.HasSetNullableOuter(myset: myset != nil ? myset : nil)
     case .hasSetString(let myset):
-      return HasSetString(myset: myset)
+      return shared.HasSetString(myset: myset)
     case .hasSetStringNullable(let myset):
-      return HasSetStringNullable(myset: myset)
+      return shared.HasSetStringNullable(myset: myset)
     case .hasSomeNullables(let myint, let myintopt, let uintnotoptional, let uintoptional, let mybool, let optbool):
-      return HasSomeNullables(myint: myint, myintopt: myintopt != nil ? KotlinInt(value: myintopt!) : nil, uintnotoptional: uintnotoptional, uintoptional: uintoptional != nil ? KotlinUInt(value: uintoptional!) : nil, mybool: mybool, optbool: optbool != nil ? KotlinBoolean(value: optbool!) : nil)
+      return shared.HasSomeNullables(myint: myint, myintopt: myintopt != nil ? KotlinInt(value: myintopt!) : nil, uintnotoptional: uintnotoptional, uintoptional: uintoptional != nil ? KotlinUInt(value: uintoptional!) : nil, mybool: mybool, optbool: optbool != nil ? KotlinBoolean(value: optbool!) : nil)
     case .hasThrowable(let throwable):
-      return HasThrowable(throwable: throwable)
+      return shared.HasThrowable(throwable: throwable)
     case .hasTriple(let triple):
-      return HasTriple(triple: KotlinTriple<KotlinFloat, KotlinInt, shared.OwnClass>(first: KotlinFloat(value: triple.0), second: triple.1 != nil ? KotlinInt(value: triple.1!) : nil, third: triple.2))
+      return shared.HasTriple(triple: KotlinTriple<KotlinFloat, KotlinInt, shared.OwnClass>(first: KotlinFloat(value: triple.0), second: triple.1 != nil ? KotlinInt(value: triple.1!) : nil, third: triple.2))
     case .justAnObj:
-      return JustAnObj()
+      return shared.JustAnObj()
     }
   }
 

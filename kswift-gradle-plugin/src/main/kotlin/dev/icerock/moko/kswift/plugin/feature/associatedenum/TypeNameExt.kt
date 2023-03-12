@@ -11,6 +11,7 @@ import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.KmType
+import kotlinx.metadata.KmTypeParameter
 
 internal val TypeName.isCharacter: Boolean
     get() = this.name == "Swift.Character"
@@ -63,6 +64,7 @@ internal fun TypeName.addGenericsAndOptional(
     moduleName: String,
     namingMode: NamingMode?,
     isOuterSwift: Boolean,
+    typeParameters: List<KmTypeParameter>,
 ): TypeName {
     val isSwift = (this as? DeclaredTypeName)?.moduleName == "Swift"
 
@@ -77,6 +79,7 @@ internal fun TypeName.addGenericsAndOptional(
                 else -> NamingMode.OBJC
             },
             isOuterSwift = isSwift,
+            typeParameters = typeParameters,
         )
         this.parameterizedBy(genericTypes)
     } else {
