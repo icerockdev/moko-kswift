@@ -12,7 +12,6 @@ import io.outfoxx.swiftpoet.SET
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.VOID
-import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmTypeParameter
@@ -54,7 +53,11 @@ private fun KmType.kotlinPrimitiveToTypeNameWithNamingMode(
     typeParameters: List<KmTypeParameter>,
 ) = when (namingMode) {
     NamingMode.KOTLIN -> typeName.kotlinPrimitiveTypeNameToKotlinInterop(moduleName)
-    NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(moduleName, arguments, typeParameters)
+    NamingMode.SWIFT -> typeName.kotlinPrimitiveTypeNameToSwift(
+        moduleName = moduleName,
+        arguments = arguments,
+        typeParameters = typeParameters,
+    )
     NamingMode.OBJC -> typeName.kotlinPrimitiveTypeNameToObjectiveC(moduleName)
     NamingMode.KOTLIN_NO_STRING ->
         typeName
@@ -131,12 +134,16 @@ private fun KmType.nameAsString(typeParameters: List<KmTypeParameter>): String? 
     }
 
 private fun List<KmTypeParameter>.recursivelyResolveToName(id: Int): String? {
-    return try {
-        this[id].name + if (this[id].upperBounds.firstOrNull()?.isNullable != false) "?" else ""
-    } catch (e: IndexOutOfBoundsException) {
-        (id - this.size).takeIf { it >= 0 }?.let { indexInParent ->
-            this.recursivelyResolveToName(indexInParent)
+    return when {
+        id >= this.size -> this.recursivelyResolveToName(id - this.size)
+        id >= 0 -> {
+            this[id].name + if (this[id].upperBounds.firstOrNull()?.isNullable != false) {
+                "?"
+            } else {
+                ""
+            }
         }
+        else -> null
     }
 }
 
