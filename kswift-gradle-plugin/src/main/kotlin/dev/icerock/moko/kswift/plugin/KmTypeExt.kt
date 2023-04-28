@@ -5,10 +5,14 @@
 package dev.icerock.moko.kswift.plugin
 
 import io.outfoxx.swiftpoet.ANY_OBJECT
+import io.outfoxx.swiftpoet.ARRAY
 import io.outfoxx.swiftpoet.BOOL
+import io.outfoxx.swiftpoet.DICTIONARY
 import io.outfoxx.swiftpoet.DeclaredTypeName
 import io.outfoxx.swiftpoet.FunctionTypeName
+import io.outfoxx.swiftpoet.INT32
 import io.outfoxx.swiftpoet.ParameterSpec
+import io.outfoxx.swiftpoet.SET
 import io.outfoxx.swiftpoet.STRING
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeVariableName
@@ -16,8 +20,10 @@ import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
+import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
+import kotlinx.metadata.KmTypeProjection
 
 @Suppress("ReturnCount")
 fun KmType.toTypeName(
@@ -35,12 +41,12 @@ fun KmType.toTypeName(
             } else throw IllegalArgumentException("can't read type parameter $this without type variables list")
         }
         is KmClassifier.TypeAlias -> {
-            classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
+            classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics, arguments)
                 ?: throw IllegalArgumentException("can't read type alias $this")
         }
         is KmClassifier.Class -> {
             val name: TypeName? =
-                classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
+                classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics, arguments)
             return name ?: kotlinTypeToTypeName(
                 moduleName,
                 classifier.name,
@@ -51,14 +57,23 @@ fun KmType.toTypeName(
     }
 }
 
-fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean): TypeName? {
+@Suppress("LongMethod", "ComplexMethod")
+fun String.kotlinTypeNameToSwift(
+    moduleName: String,
+    isUsedInGenerics: Boolean,
+    arguments: MutableList<KmTypeProjection>
+): TypeName? {
     return when (this) {
         "kotlin/String" -> if (isUsedInGenerics) {
             DeclaredTypeName(moduleName = "Foundation", simpleName = "NSString")
         } else {
             STRING
         }
-        "kotlin/Int" -> DeclaredTypeName(moduleName = "Foundation", simpleName = "NSNumber")
+        "kotlin/Int" -> if (isUsedInGenerics) {
+            DeclaredTypeName(moduleName = moduleName, simpleName = "KotlinInt")
+        } else {
+            INT32
+        }
         "kotlin/Boolean" -> if (isUsedInGenerics) {
             DeclaredTypeName(moduleName = moduleName, simpleName = "KotlinBoolean")
         } else {
@@ -67,6 +82,44 @@ fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean):
         "kotlin/ULong" -> UINT64
         "kotlin/Unit" -> VOID
         "kotlin/Any" -> ANY_OBJECT
+        "kotlin/collections/List" -> {
+            arguments.first().type?.run {
+                DeclaredTypeName.typeName(ARRAY.name).parameterizedBy(
+                    this.toTypeName(
+                        moduleName,
+                        isUsedInGenerics = this.shouldUseKotlinTypeWhenHandlingCollections()
+                    )
+                )
+            }
+        }
+        "kotlin/collections/Set" -> {
+            arguments.first().type?.run {
+                DeclaredTypeName.typeName(SET.name).parameterizedBy(
+                    this.toTypeName(
+                        moduleName,
+                        isUsedInGenerics = this.shouldUseKotlinTypeWhenHandlingCollections()
+                    )
+                )
+            }
+        }
+        "kotlin/collections/Map" -> {
+            val firstArgumentType = arguments.first().type
+            val secondArgumentType = arguments[1].type
+            if (firstArgumentType != null && secondArgumentType != null) {
+                DeclaredTypeName.typeName(DICTIONARY.name).parameterizedBy(
+                    firstArgumentType.toTypeName(
+                        moduleName,
+                        isUsedInGenerics = firstArgumentType.shouldUseKotlinTypeWhenHandlingCollections()
+                    ),
+                    secondArgumentType.toTypeName(
+                        moduleName,
+                        isUsedInGenerics = secondArgumentType.shouldUseKotlinTypeWhenHandlingCollections()
+                    )
+                )
+            } else {
+                null
+            }
+        }
         else -> {
             if (this.startsWith("platform/")) {
                 val withoutCompanion: String = this.removeSuffix(".Companion")
@@ -142,3 +195,13 @@ fun DeclaredTypeName.objcNameToSwift(): DeclaredTypeName {
         else -> this
     }
 }
+
+fun KmType.shouldUseKotlinTypeWhenHandlingOptionalType(): Boolean =
+    if (classifier.toString().contains("kotlin/String")) {
+        false
+    } else {
+        Flag.Type.IS_NULLABLE(flags)
+    }
+
+fun KmType.shouldUseKotlinTypeWhenHandlingCollections(): Boolean =
+    !classifier.toString().contains("kotlin/String")

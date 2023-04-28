@@ -12,6 +12,13 @@ import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
 import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
+import kotlinx.metadata.KmConstructor
+
+fun KmClass.isDataClass(): Boolean {
+    return Flag.Class.IS_DATA(flags)
+}
+
+fun KmClass.getPrimaryConstructor(): KmConstructor = constructors.getPrimaryConstructor()
 
 fun KmClass.buildTypeVariableNames(
     kotlinFrameworkName: String

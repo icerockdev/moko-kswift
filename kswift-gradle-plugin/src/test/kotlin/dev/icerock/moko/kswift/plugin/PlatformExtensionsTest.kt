@@ -61,16 +61,18 @@ class PlatformExtensionsTest {
         assertEquals(
             expected =
             """
-            public extension UIKit.UILabel {
-              /**
-               * test doc
-               */
-              @discardableResult
-              public func bindGenericText<T : Foundation.NSString>(liveData: shared.LiveData<T>) -> shared.Closeable {
-                return UILabelExtKt.bindGenericText(self, liveData: liveData as! shared.LiveData<Foundation.NSString>)
-              }
-            }
-            """.trimIndent(),
+    public extension UIKit.UILabel {
+    
+      /**
+       * test doc
+       */
+      @discardableResult
+      public func bindGenericText<T : Foundation.NSString>(liveData: shared.LiveData<T>) -> shared.Closeable {
+        return UILabelExtKt.bindGenericText(self, liveData: liveData as! shared.LiveData<Foundation.NSString>)
+      }
+    
+    }"""
+                .trimIndent(),
             actual = extensionSpec.toString().trim()
         )
     }
@@ -93,16 +95,18 @@ class PlatformExtensionsTest {
         assertEquals(
             expected =
             """
-            public extension UIKit.UILabel {
-              /**
-               * test doc
-               */
-              @discardableResult
-              public func bindGenericAny<T>(liveData: shared.LiveData<T>) -> shared.Closeable {
-                return UILabelExtKt.bindGenericAny(self, liveData: liveData as! shared.LiveData<Swift.AnyObject>)
-              }
-            }
-            """.trimIndent(),
+    public extension UIKit.UILabel {
+    
+      /**
+       * test doc
+       */
+      @discardableResult
+      public func bindGenericAny<T>(liveData: shared.LiveData<T>) -> shared.Closeable {
+        return UILabelExtKt.bindGenericAny(self, liveData: liveData as! shared.LiveData<Swift.AnyObject>)
+      }
+    
+    }"""
+                .trimIndent(),
             actual = extensionSpec.toString().trim()
         )
     }
@@ -152,16 +156,18 @@ class PlatformExtensionsTest {
         assertEquals(
             expected =
             """
-            public extension UIKit.UIControl {
-              /**
-               * test doc
-               */
-              @discardableResult
-              public func setEventHandler<T : UIKit.UIControl>(event: Swift.UInt64, lambda: @escaping (T) -> Swift.Void) -> shared.Closeable {
-                return UIControlExtKt.setEventHandler(self, event: event, lambda: lambda as! (UIKit.UIControl) -> Swift.Void)
-              }
-            }
-            """.trimIndent(),
+    public extension UIKit.UIControl {
+    
+      /**
+       * test doc
+       */
+      @discardableResult
+      public func setEventHandler<T : UIKit.UIControl>(event: Swift.UInt64, lambda: @escaping (T) -> Swift.Void) -> shared.Closeable {
+        return UIControlExtKt.setEventHandler(self, event: event, lambda: lambda as! (UIKit.UIControl) -> Swift.Void)
+      }
+    
+    }"""
+                .trimIndent(),
             actual = extensionSpec.toString().trim()
         )
     }
@@ -184,20 +190,22 @@ class PlatformExtensionsTest {
         assertEquals(
             expected =
             """
-            public extension Foundation.NotificationCenter {
-              /**
-               * test doc
-               */
-              @discardableResult
-              public func setEventHandler<T : Swift.AnyObject>(
-                notification: Swift.String,
-                ref: T,
-                lambda: @escaping (T) -> Swift.Void
-              ) -> shared.Closeable {
-                return NSNotificationCenterExtKt.setEventHandler(self, notification: notification, ref: ref, lambda: lambda as! (Swift.AnyObject) -> Swift.Void)
-              }
-            }
-            """.trimIndent(),
+    public extension Foundation.NotificationCenter {
+    
+      /**
+       * test doc
+       */
+      @discardableResult
+      public func setEventHandler<T : Swift.AnyObject>(
+        notification: Swift.String,
+        ref: T,
+        lambda: @escaping (T) -> Swift.Void
+      ) -> shared.Closeable {
+        return NSNotificationCenterExtKt.setEventHandler(self, notification: notification, ref: ref, lambda: lambda as! (Swift.AnyObject) -> Swift.Void)
+      }
+    
+    }"""
+                .trimIndent(),
             actual = extensionSpec.toString().trim()
         )
     }
