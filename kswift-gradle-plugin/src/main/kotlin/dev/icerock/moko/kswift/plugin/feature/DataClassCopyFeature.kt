@@ -97,6 +97,7 @@ class DataClassCopyFeature(
         val extensionSpec =
             ExtensionSpec.builder(TypeSpec.classBuilder(functionReturnType.name).build())
                 .addFunction(copyFunction)
+                .addDoc("selector: ${featureContext.prefixedUniqueId}")
                 .build()
 
         processorContext.fileSpecBuilder.addExtension(extensionSpec)
