@@ -121,6 +121,41 @@ dependencies {
 
 # Usage
 
+## Xcode configuration
+
+The Swift code generated from this plugin is not automatically included in the shared framework you might have.
+
+You have 2 options to use it in your iOS project:
+- Xcode direct file integration
+- CocoaPods integration
+
+### Xcode direct file integration
+
+You can directly import the generated file in your Xcode project like it's a file you have written on your own.
+
+To do so:
+- open the Xcode project
+- right click on "iosApp"
+- choose "Add files to iOSApp"
+- add the file from the generated folder (you might need to read the FAQ to know where the generated folder is)
+- you are now good to go!
+
+### CocoaPods integration
+
+After you have added the moko-kswift plugin to your shared module and synced your project, a new Gradle task should appear with name `kSwiftXXXXXPodspec` where `XXXXX` is the name of your shared module (so your task might be named `kSwiftsharedPodspec`).
+
+- Run the task doing `./gradlew kSwiftsharedPodspec` from the root of your project.
+  This will generate a new podspec file, `XXXXXSwift.podspec`, where `XXXXX` is still the name of your shared module (so e.g. `sharedSwift.podspec`)
+
+- Now edit the `Podfile` inside the iOS project adding this line
+  `pod 'sharedSwift', :path => '../shared'`
+  just after the one already there for the already available shared module
+  `pod 'shared', :path => '../shared'`
+
+- Now run `pod install` from the `iosApp` folder so the new framework is linked to your project.
+
+- Whenever you need a Swift file generated from moko-kswift just import the generated module (e.g. `import sharedSwift`) and you are good to go!
+
 ## Sealed classes/interfaces to Swift enum
 
 Enable feature in project `build.gradle`:

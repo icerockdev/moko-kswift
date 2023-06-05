@@ -14,7 +14,7 @@ import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClass
 
 fun KmClass.buildTypeVariableNames(
-    kotlinFrameworkName: String
+    kotlinFrameworkName: String,
 ) = this.typeParameters.map { typeParam ->
     val bounds: List<TypeVariableName.Bound> = typeParam.upperBounds
         .map { it.toTypeName(kotlinFrameworkName, isUsedInGenerics = true) }
@@ -25,7 +25,7 @@ fun KmClass.buildTypeVariableNames(
 
 fun KmClass.getDeclaredTypeNameWithGenerics(
     kotlinFrameworkName: String,
-    classes: List<KmClass>
+    classes: List<KmClass>,
 ): TypeName {
     val typeVariables: List<TypeVariableName> = buildTypeVariableNames(kotlinFrameworkName)
     val haveGenerics: Boolean = typeVariables.isNotEmpty()
@@ -34,21 +34,24 @@ fun KmClass.getDeclaredTypeNameWithGenerics(
     @Suppress("SpreadOperator")
     return getDeclaredTypeName(kotlinFrameworkName, classes)
         .let { type ->
-            if (haveGenerics.not() || isInterface) type
-            else type.parameterizedBy(*typeVariables.toTypedArray())
+            if (haveGenerics.not() || isInterface) {
+                type
+            } else {
+                type.parameterizedBy(typeVariables)
+            }
         }
 }
 
 fun KmClass.getDeclaredTypeName(
     kotlinFrameworkName: String,
-    classes: List<KmClass>
+    classes: List<KmClass>,
 ): DeclaredTypeName {
     return DeclaredTypeName(
         moduleName = kotlinFrameworkName,
         simpleName = getSimpleName(
             className = name,
-            classes = classes
-        )
+            classes = classes,
+        ),
     )
 }
 

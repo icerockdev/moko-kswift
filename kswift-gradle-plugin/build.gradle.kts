@@ -24,6 +24,7 @@ dependencies {
     api(libs.kotlinxMetadataKLib)
 
     testImplementation(libs.kotlinTestJUnit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
 }
 
 gradlePlugin {

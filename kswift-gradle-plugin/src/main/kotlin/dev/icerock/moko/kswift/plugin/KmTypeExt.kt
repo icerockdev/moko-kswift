@@ -16,6 +16,7 @@ import io.outfoxx.swiftpoet.UINT64
 import io.outfoxx.swiftpoet.VOID
 import io.outfoxx.swiftpoet.parameterizedBy
 import kotlinx.metadata.ClassName
+import kotlinx.metadata.Flag
 import kotlinx.metadata.KmClassifier
 import kotlinx.metadata.KmType
 
@@ -24,15 +25,22 @@ fun KmType.toTypeName(
     moduleName: String,
     isUsedInGenerics: Boolean = false,
     typeVariables: Map<Int, TypeVariableName> = emptyMap(),
-    removeTypeVariables: Boolean = false
+    removeTypeVariables: Boolean = false,
 ): TypeName {
     return when (val classifier = classifier) {
         is KmClassifier.TypeParameter -> {
             val typeVariable: TypeVariableName? = typeVariables[classifier.id]
             if (typeVariable != null) {
-                return if (!removeTypeVariables) typeVariable
-                else typeVariable.bounds.firstOrNull()?.type ?: ANY_OBJECT
-            } else throw IllegalArgumentException("can't read type parameter $this without type variables list")
+                return if (!removeTypeVariables) {
+                    typeVariable
+                } else {
+                    typeVariable.bounds.firstOrNull()?.type ?: ANY_OBJECT
+                }
+            } else {
+                throw IllegalArgumentException(
+                    "can't read type parameter $this without type variables list",
+                )
+            }
         }
         is KmClassifier.TypeAlias -> {
             classifier.name.kotlinTypeNameToSwift(moduleName, isUsedInGenerics)
@@ -45,7 +53,7 @@ fun KmType.toTypeName(
                 moduleName,
                 classifier.name,
                 typeVariables,
-                removeTypeVariables
+                removeTypeVariables,
             )
         }
     }
@@ -75,16 +83,18 @@ fun String.kotlinTypeNameToSwift(moduleName: String, isUsedInGenerics: Boolean):
                 val className: String = moduleAndClass[1]
 
                 DeclaredTypeName.typeName(
-                    listOf(module, className).joinToString(".")
+                    listOf(module, className).joinToString("."),
                 ).objcNameToSwift()
             } else if (this.startsWith("kotlin/Function")) {
                 null
             } else if (this.startsWith("kotlin/") && this.count { it == '/' } == 1) {
                 DeclaredTypeName(
                     moduleName = moduleName,
-                    simpleName = "Kotlin" + this.split("/").last()
+                    simpleName = "Kotlin" + this.split("/").last(),
                 )
-            } else null
+            } else {
+                null
+            }
         }
     }
 }
@@ -93,11 +103,11 @@ fun KmType.kotlinTypeToTypeName(
     moduleName: String,
     classifierName: ClassName,
     typeVariables: Map<Int, TypeVariableName>,
-    removeTypeVariables: Boolean
+    removeTypeVariables: Boolean,
 ): TypeName {
     val typeName = DeclaredTypeName(
         moduleName = moduleName,
-        simpleName = classifierName.split("/").last()
+        simpleName = classifierName.split("/").last(),
     )
     if (this.arguments.isEmpty()) return typeName
 
@@ -108,17 +118,17 @@ fun KmType.kotlinTypeToTypeName(
                 moduleName = moduleName,
                 isUsedInGenerics = false,
                 typeVariables = typeVariables,
-                removeTypeVariables = removeTypeVariables
+                removeTypeVariables = removeTypeVariables,
             )!!
             val outputType: TypeName = arguments[1].type?.toTypeName(
                 moduleName = moduleName,
                 isUsedInGenerics = false,
                 typeVariables = typeVariables,
-                removeTypeVariables = removeTypeVariables
+                removeTypeVariables = removeTypeVariables,
             )!!
             FunctionTypeName.get(
                 parameters = listOf(ParameterSpec.unnamed(inputType)),
-                returnType = outputType
+                returnType = outputType,
             )
         }
         else -> {
@@ -127,11 +137,11 @@ fun KmType.kotlinTypeToTypeName(
                     moduleName = moduleName,
                     isUsedInGenerics = true,
                     typeVariables = typeVariables,
-                    removeTypeVariables = removeTypeVariables
+                    removeTypeVariables = removeTypeVariables,
                 )
             }
             @Suppress("SpreadOperator")
-            typeName.parameterizedBy(*arguments.toTypedArray())
+            typeName.parameterizedBy(arguments)
         }
     }
 }
@@ -142,3 +152,9 @@ fun DeclaredTypeName.objcNameToSwift(): DeclaredTypeName {
         else -> this
     }
 }
+
+val KmType.isNullable: Boolean
+    get() = Flag.Type.IS_NULLABLE(flags)
+
+val KmType.hasGenerics: Boolean
+    get() = this.arguments.isNotEmpty()

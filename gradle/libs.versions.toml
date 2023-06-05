@@ -14,7 +14,7 @@ mokoResourcesVersion = "0.16.2"
 kotlinxMetadataKLibVersion = "0.0.1"
 
 kotlinPoetVersion = "1.6.0"
-swiftPoetVersion = "1.3.1"
+swiftPoetVersion = "1.5.1.4"
 
 [libraries]
 appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompatVersion" }
@@ -30,7 +30,7 @@ mokoMvvmState = { module = "dev.icerock.moko:mvvm-state" , version.ref = "mokoMv
 mokoResources = { module = "dev.icerock.moko:resources" , version.ref = "mokoResourcesVersion" }
 
 kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoetVersion" }
-swiftPoet = { module = "io.outfoxx:swiftpoet", version.ref = "swiftPoetVersion" }
+swiftPoet = { module = "com.github.hbmartin:swiftpoet", version.ref = "swiftPoetVersion" }
 
 kotlinCompilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
 kotlinxMetadataKLib = { module = "org.jetbrains.kotlinx:kotlinx-metadata-klib", version.ref = "kotlinxMetadataKLibVersion" }
