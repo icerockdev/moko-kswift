@@ -22,7 +22,6 @@ internal val TypeName.kotlinInteropTypeWithFallback: String
             ?: this.kotlinInteropFromSwiftType
             ?: this.name
         )
-        .replace("?", "")
 
 internal fun TypeName.generateKotlinConstructorIfNecessaryForParameter(paramName: String): String {
     return when {

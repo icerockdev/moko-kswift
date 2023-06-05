@@ -212,9 +212,9 @@ public enum TestingSealedKs {
     case .hasPairFloat(let pair):
       return shared.HasPairFloat(pair: KotlinPair<KotlinFloat, KotlinFloat>(first: KotlinFloat(value: pair.0), second: pair.1 != nil ? KotlinFloat(value: pair.1!) : nil))
     case .hasPairGeneric(let pair):
-      return shared.HasPairGeneric(pair: KotlinPair<KotlinUByte, shared.OwnClass>(first: KotlinUByte(value: pair.0), second: pair.1 != nil ? pair.1 : nil))
+      return shared.HasPairGeneric(pair: KotlinPair<KotlinUByte, shared.OwnClass?>(first: KotlinUByte(value: pair.0), second: pair.1 != nil ? pair.1 : nil))
     case .hasPairString(let pair):
-      return shared.HasPairString(pair: KotlinPair<NSString, NSString>(first: pair.0 as NSString, second: pair.1 != nil ? pair.1! as NSString : nil))
+      return shared.HasPairString(pair: KotlinPair<NSString, NSString?>(first: pair.0 as NSString, second: pair.1 != nil ? pair.1! as NSString : nil))
     case .hasSet(let myset):
       return shared.HasSet(myset: myset)
     case .hasSetNullableInt(let myset):
@@ -347,7 +347,6 @@ public enum TestingSealedKs {
 
 }
 """
-        println(appendable.toString().split("\n").filter { it.contains("mmutable") }.joinToString(separator = "\n"))
         assertEquals(expected, appendable.toString())
     }
 }

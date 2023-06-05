@@ -169,6 +169,8 @@ data class AssociatedEnumCase(
 private fun String.toNSString(): String =
     if (this == "String" || this == "Swift.String") {
         "NSString"
+    } else if (this == "String?" || this == "Swift.String?") {
+        "NSString?"
     } else {
         this
     }

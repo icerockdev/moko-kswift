@@ -10,9 +10,8 @@ internal fun ParameterizedTypeName.toArrayCaster(
     .plus(
         if (optional) "obj.$paramName != nil ? " else "",
     )
-    .plus("obj.$paramName as! [")
-    .plus(this.typeArguments[0].kotlinInteropTypeWithFallback)
-    .plus("]")
+    .plus("obj.$paramName as! ")
+    .plus(this.unwrapOptional().kotlinInteropTypeWithFallback)
     .plus(if (optional) " : nil" else "")
 
 internal fun ParameterizedTypeName.toSetCaster(
@@ -23,7 +22,9 @@ internal fun ParameterizedTypeName.toSetCaster(
         if (optional) "obj.$paramName != nil ? " else "",
     )
     .plus("obj.$paramName as! Set<")
-    .plus(this.typeArguments[0].kotlinInteropTypeWithFallback)
+    .plus(
+        (this.unwrapOptional() as ParameterizedTypeName).typeArguments[0].kotlinInteropTypeWithFallback
+    )
     .plus(">")
     .plus(if (optional) " : nil" else "")
 
