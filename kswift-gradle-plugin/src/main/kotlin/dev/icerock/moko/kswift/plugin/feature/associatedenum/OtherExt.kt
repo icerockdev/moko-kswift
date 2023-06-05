@@ -71,7 +71,6 @@ private fun String.kotlinPrimitiveTypeNameToSwift(
     typeParameters: List<KmTypeParameter>,
 ): TypeName {
     require(this.startsWith("kotlin/") || this.startsWith("kotlinx/collections/immutable/"))
-    println(this)
     return when (this) {
         "kotlin/Char" -> DeclaredTypeName.typeName("Swift.Character")
         "kotlin/Comparable" -> DeclaredTypeName.typeName("Swift.Comparable")

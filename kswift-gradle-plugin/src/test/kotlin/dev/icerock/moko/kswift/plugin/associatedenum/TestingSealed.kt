@@ -4,7 +4,7 @@
 
 package dev.icerock.moko.kswift.plugin.associatedenum
 
-import org.jetbrains.kotlin.kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableList
 
 @Suppress("LongLine")
 sealed interface TestingSealed

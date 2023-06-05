@@ -47,7 +47,7 @@ class SealedToSwiftAssociatedEnumFeatureTest {
 import shared
 
 /**
- * selector: ClassContext/associated-enum/com/icerockdev/library/associatedenum/LoadingState */
+ * selector: ClassContext/My_Application:shared/dev/icerock/moko/kswift/plugin/associatedenum/LoadingState */
 public enum LoadingStateKs<T : AnyObject, P : AnyObject> {
 
   case errorOnLoad(error: String)
@@ -85,7 +85,7 @@ public enum LoadingStateKs<T : AnyObject, P : AnyObject> {
 }
 
 /**
- * selector: ClassContext/associated-enum/com/icerockdev/library/associatedenum/TestingSealed */
+ * selector: ClassContext/My_Application:shared/dev/icerock/moko/kswift/plugin/associatedenum/TestingSealed */
 public enum TestingSealedKs {
 
   case hasChar(mychar: Character)
@@ -95,6 +95,9 @@ public enum TestingSealedKs {
     [KotlinBoolean],
     String
   ) -> String)
+  case hasImmutableList(innerImmutableList: [String])
+  case hasImmutableListNullable(innerImmutableListNullable: [String]?)
+  case hasImmutableListNullableInner(innerImmutableListNullableInner: [String?]?)
   case hasInnerList(innerList: [[KotlinBoolean]])
   case hasInnerNullable(innerList: [[KotlinBoolean?]])
   case hasListInt(hasGeneric: [KotlinInt])
@@ -144,6 +147,12 @@ public enum TestingSealedKs {
       return shared.HasEnum(myenum: myenum)
     case .hasFunction(let myfunc):
       return shared.HasFunction(myfunc: myfunc)
+    case .hasImmutableList(let innerImmutableList):
+      return shared.HasImmutableList(innerImmutableList: innerImmutableList)
+    case .hasImmutableListNullable(let innerImmutableListNullable):
+      return shared.HasImmutableListNullable(innerImmutableListNullable: innerImmutableListNullable != nil ? innerImmutableListNullable : nil)
+    case .hasImmutableListNullableInner(let innerImmutableListNullableInner):
+      return shared.HasImmutableListNullableInner(innerImmutableListNullableInner: innerImmutableListNullableInner != nil ? innerImmutableListNullableInner : nil)
     case .hasInnerList(let innerList):
       return shared.HasInnerList(innerList: innerList)
     case .hasInnerNullable(let innerList):
@@ -234,37 +243,43 @@ public enum TestingSealedKs {
       self = .hasEnum(myenum: obj.myenum)
     } else if let obj = obj as? shared.HasFunction {
       self = .hasFunction(myfunc: obj.myfunc)
+    } else if let obj = obj as? shared.HasImmutableList {
+      self = .hasImmutableList(innerImmutableList: obj.innerImmutableList as! [Swift.String])
+    } else if let obj = obj as? shared.HasImmutableListNullable {
+      self = .hasImmutableListNullable(innerImmutableListNullable: obj.innerImmutableListNullable != nil ? obj.innerImmutableListNullable as! [Swift.String] : nil)
+    } else if let obj = obj as? shared.HasImmutableListNullableInner {
+      self = .hasImmutableListNullableInner(innerImmutableListNullableInner: obj.innerImmutableListNullableInner != nil ? obj.innerImmutableListNullableInner as! [Swift.String?] : nil)
     } else if let obj = obj as? shared.HasInnerList {
       self = .hasInnerList(innerList: obj.innerList as! [[shared.KotlinBoolean]])
     } else if let obj = obj as? shared.HasInnerNullable {
-      self = .hasInnerNullable(innerList: obj.innerList as! [[shared.KotlinBoolean]])
+      self = .hasInnerNullable(innerList: obj.innerList as! [[shared.KotlinBoolean?]])
     } else if let obj = obj as? shared.HasListInt {
       self = .hasListInt(hasGeneric: obj.hasGeneric as! [shared.KotlinInt])
     } else if let obj = obj as? shared.HasListIntNullable {
-      self = .hasListIntNullable(hasGeneric: obj.hasGeneric as! [shared.KotlinInt])
+      self = .hasListIntNullable(hasGeneric: obj.hasGeneric as! [shared.KotlinInt?])
     } else if let obj = obj as? shared.HasListOwn {
       self = .hasListOwn(hasGeneric: obj.hasGeneric as! [shared.OwnClass])
     } else if let obj = obj as? shared.HasListString {
       self = .hasListString(hasGeneric: obj.hasGeneric as! [Swift.String])
     } else if let obj = obj as? shared.HasListStringNullable {
-      self = .hasListStringNullable(hasGeneric: obj.hasGeneric as! [Swift.String])
+      self = .hasListStringNullable(hasGeneric: obj.hasGeneric as! [Swift.String?])
     } else if let obj = obj as? shared.HasListStringOuterNullable {
-      self = .hasListStringOuterNullable(hasGeneric: obj.hasGeneric != nil ? obj.hasGeneric as! [[Swift.String]] : nil)
+      self = .hasListStringOuterNullable(hasGeneric: obj.hasGeneric != nil ? obj.hasGeneric as! [Swift.String] : nil)
     } else if let obj = obj as? shared.HasMap {
       self = .hasMap(map: obj.map as! [Swift.String : shared.KotlinInt])
     } else if let obj = obj as? shared.HasMapNullableOuter {
       self = .hasMapNullableOuter(map: obj.map != nil ? obj.map as! [Swift.String : shared.KotlinInt] : nil)
     } else if let obj = obj as? shared.HasMapNullableParams {
-      self = .hasMapNullableParams(map: obj.map as! [Swift.String : shared.KotlinInt])
+      self = .hasMapNullableParams(map: obj.map as! [Swift.String : shared.KotlinInt?])
     } else if let obj = obj as? shared.HasMultipleOwnParams {
       self = .hasMultipleOwnParams(p1: obj.p1,
       p2: obj.p2)
     } else if let obj = obj as? shared.HasNestedGeneric {
       self = .hasNestedGeneric(nested: obj.nested as! [shared.KotlinPair<Foundation.NSString, shared.KotlinInt>])
     } else if let obj = obj as? shared.HasNullableInnerList {
-      self = .hasNullableInnerList(innerList: obj.innerList as! [[shared.KotlinBoolean]])
+      self = .hasNullableInnerList(innerList: obj.innerList as! [[shared.KotlinBoolean]?])
     } else if let obj = obj as? shared.HasNullableOuterList {
-      self = .hasNullableOuterList(innerList: obj.innerList != nil ? obj.innerList as! [[[shared.KotlinBoolean]]] : nil)
+      self = .hasNullableOuterList(innerList: obj.innerList != nil ? obj.innerList as! [[shared.KotlinBoolean]] : nil)
     } else if let obj = obj as? shared.HasOtherNullables {
       self = .hasOtherNullables(mystring: obj.mystring as String,
       optstring: obj.optstring != nil ? obj.optstring! as String : nil,
@@ -305,13 +320,13 @@ public enum TestingSealedKs {
     } else if let obj = obj as? shared.HasSet {
       self = .hasSet(myset: obj.myset as! Set<shared.OwnClass>)
     } else if let obj = obj as? shared.HasSetNullableInt {
-      self = .hasSetNullableInt(myset: obj.myset as! Set<shared.KotlinInt>)
+      self = .hasSetNullableInt(myset: obj.myset as! Set<shared.KotlinInt?>)
     } else if let obj = obj as? shared.HasSetNullableOuter {
-      self = .hasSetNullableOuter(myset: obj.myset != nil ? obj.myset as! Set<Swift.Set<shared.KotlinInt>> : nil)
+      self = .hasSetNullableOuter(myset: obj.myset != nil ? obj.myset as! Set<shared.KotlinInt?> : nil)
     } else if let obj = obj as? shared.HasSetString {
       self = .hasSetString(myset: obj.myset as! Set<Swift.String>)
     } else if let obj = obj as? shared.HasSetStringNullable {
-      self = .hasSetStringNullable(myset: obj.myset as! Set<Swift.String>)
+      self = .hasSetStringNullable(myset: obj.myset as! Set<Swift.String?>)
     } else if let obj = obj as? shared.HasSomeNullables {
       self = .hasSomeNullables(myint: obj.myint,
       myintopt: obj.myintopt?.int32Value,
@@ -332,6 +347,7 @@ public enum TestingSealedKs {
 
 }
 """
+        println(appendable.toString().split("\n").filter { it.contains("mmutable") }.joinToString(separator = "\n"))
         assertEquals(expected, appendable.toString())
     }
 }
