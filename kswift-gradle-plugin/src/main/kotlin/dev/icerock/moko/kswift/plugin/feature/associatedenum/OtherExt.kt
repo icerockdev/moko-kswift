@@ -70,7 +70,8 @@ private fun String.kotlinPrimitiveTypeNameToSwift(
     arguments: List<KmTypeProjection>,
     typeParameters: List<KmTypeParameter>,
 ): TypeName {
-    require(this.startsWith("kotlin/"))
+    require(this.startsWith("kotlin/") || this.startsWith("kotlinx/collections/immutable/"))
+    println(this)
     return when (this) {
         "kotlin/Char" -> DeclaredTypeName.typeName("Swift.Character")
         "kotlin/Comparable" -> DeclaredTypeName.typeName("Swift.Comparable")
@@ -84,9 +85,15 @@ private fun String.kotlinPrimitiveTypeNameToSwift(
         )
 
         "kotlin/Unit" -> VOID
-        "kotlin/collections/List" -> ARRAY
-        "kotlin/collections/Map" -> DICTIONARY
-        "kotlin/collections/Set" -> SET
+        "kotlinx/collections/immutable/ImmutableList",
+        "kotlin/collections/List",
+        -> ARRAY
+        "kotlinx/collections/immutable/ImmutableMap",
+        "kotlin/collections/Map",
+        -> DICTIONARY
+        "kotlinx/collections/immutable/ImmutableSet",
+        "kotlin/collections/Set",
+        -> SET
         else -> unknownKotlinPrimitiveTypeToSwift(arguments, moduleName, typeParameters)
     }
 }
@@ -103,7 +110,7 @@ private fun String.unknownKotlinPrimitiveTypeToSwift(
     kotlinToSwiftTypeMap[this] ?: this.kotlinInteropName(moduleName)
 }
 
-internal fun KmType.kotlinTypeToSwiftTypeName(
+fun KmType.kotlinTypeToSwiftTypeName(
     moduleName: String,
     typeParameters: List<KmTypeParameter>,
 ): TypeName? {
@@ -111,7 +118,7 @@ internal fun KmType.kotlinTypeToSwiftTypeName(
 
     return when {
         typeName == null -> null
-        typeName.startsWith("kotlin/") ->
+        typeName.startsWith("kotlin/") || typeName.startsWith("kotlinx/collections/immutable/") ->
             typeName.kotlinPrimitiveTypeNameToSwift(moduleName, this.arguments, typeParameters)
 
         else -> getDeclaredTypeNameFromNonPrimitive(typeName, moduleName)

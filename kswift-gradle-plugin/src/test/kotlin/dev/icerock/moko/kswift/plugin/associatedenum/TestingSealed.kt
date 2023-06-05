@@ -1,4 +1,10 @@
-package com.icerockdev.library.associatedenum
+/*
+ * Copyright 2023 IceRock MAG Inc. Use of this source code is governed by the Apache 2.0 license.
+ */
+
+package dev.icerock.moko.kswift.plugin.associatedenum
+
+import org.jetbrains.kotlin.kotlinx.collections.immutable.ImmutableList
 
 @Suppress("LongLine")
 sealed interface TestingSealed
@@ -6,6 +12,7 @@ data class HasChar(val mychar: Char) : TestingSealed
 data class HasEnum(val myenum: OwnEnum) : TestingSealed
 data class HasFunction(val myfunc: (Int, List<Boolean>, String) -> String) : TestingSealed
 data class HasNullableOuterList(val innerList: List<List<Boolean>>?) : TestingSealed
+data class HasImmutableList(val innerList: ImmutableList<String>) : TestingSealed
 data class HasInnerList(val innerList: List<List<Boolean>>) : TestingSealed
 data class HasNullableInnerList(val innerList: List<List<Boolean>?>) : TestingSealed
 data class HasInnerNullable(val innerList: List<List<Boolean?>>) : TestingSealed
@@ -40,14 +47,19 @@ data class HasOwnClass(val ownClass: OwnClass) : TestingSealed
 data class HasOwnClassWithGeneric(val ownClassWithGeneric: OwnHasGeneric<String>) : TestingSealed
 data class HasOwnClassWithGenericAny(val ownClassWithGeneric: OwnHasGeneric<Any>) : TestingSealed
 data class HasOwnClassWithGenericEnum(val ownClassWithGeneric: OwnHasGeneric<Any>) : TestingSealed
-data class HasOwnClassWithGenericInnerMap(val ownClassWithGeneric: OwnHasGeneric<Map<String, Int?>>) : TestingSealed
+data class HasOwnClassWithGenericInnerMap(val ownClassWithGeneric: OwnHasGeneric<Map<String, Int?>>) :
+    TestingSealed
 data class HasOwnClassWithGenericInnerPair(
     val ownClassWithGeneric: OwnHasGeneric<Pair<String, Int?>>,
 ) : TestingSealed
-data class HasOwnClassWithGenericInnerSet(val ownClassWithGeneric: OwnHasGeneric<Set<Int?>>) : TestingSealed
-data class HasOwnClassWithGenericNested(val ownClassWithGeneric: OwnHasGeneric<OwnHasGeneric<Int>>) : TestingSealed
-data class HasOwnClassWithGenericNullable(val ownClassWithGeneric: OwnHasGeneric<UInt?>) : TestingSealed
-data class HasOwnClassWithGenericThrowable(val ownClassWithGeneric: OwnHasGeneric<Throwable>) : TestingSealed
+data class HasOwnClassWithGenericInnerSet(val ownClassWithGeneric: OwnHasGeneric<Set<Int?>>) :
+    TestingSealed
+data class HasOwnClassWithGenericNested(val ownClassWithGeneric: OwnHasGeneric<OwnHasGeneric<Int>>) :
+    TestingSealed
+data class HasOwnClassWithGenericNullable(val ownClassWithGeneric: OwnHasGeneric<UInt?>) :
+    TestingSealed
+data class HasOwnClassWithGenericThrowable(val ownClassWithGeneric: OwnHasGeneric<Throwable>) :
+    TestingSealed
 data class HasOwnClassWithGenericWildcard(val ownClassWithGeneric: OwnHasGeneric<*>) : TestingSealed
 data class HasPairGeneric(val pair: Pair<UByte, OwnClass?>) : TestingSealed
 data class HasPairBool(val pair: Pair<Boolean, Boolean?>) : TestingSealed

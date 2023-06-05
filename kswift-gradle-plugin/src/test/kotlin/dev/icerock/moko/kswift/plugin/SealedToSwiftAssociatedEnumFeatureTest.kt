@@ -19,6 +19,7 @@ class SealedToSwiftAssociatedEnumFeatureTest {
         val konanFile = org.jetbrains.kotlin.konan.file.File(klibPath.toURI().path)
         // Need to use tooling strategy here since the klib was generated with 1.8
         // kotlinc-native TestingSealed.kt -p library -o associated-enum
+        // or from project ./gradlew iosArm64MainKlibrary
         val library = resolveSingleFileKlib(
             libraryFile = konanFile,
             strategy = ToolingSingleFileKlibResolveStrategy,
