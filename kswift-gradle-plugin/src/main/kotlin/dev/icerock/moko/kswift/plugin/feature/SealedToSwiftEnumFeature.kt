@@ -13,7 +13,6 @@ import io.outfoxx.swiftpoet.CodeBlock
 import io.outfoxx.swiftpoet.EnumerationCaseSpec
 import io.outfoxx.swiftpoet.FunctionSpec
 import io.outfoxx.swiftpoet.Modifier
-import io.outfoxx.swiftpoet.ParameterizedTypeName
 import io.outfoxx.swiftpoet.PropertySpec
 import io.outfoxx.swiftpoet.TypeName
 import io.outfoxx.swiftpoet.TypeSpec
@@ -212,40 +211,24 @@ class SealedToSwiftEnumFeature(
         returnType: TypeName
     ) {
         val paramType: TypeName? = enumCase.param
-        val cast: String
+        val cast = "as?"
         val returnedName: String
 
         if (paramType == null) {
             returnedName = "${enumCase.caseArg}()"
-            cast = if (returnType is ParameterizedTypeName) {
-                // The return type is generic and there is no parameter, so it can
-                // be assumed that the case is NOT generic. Thus the case needs to
-                // be force-cast.
-                "as!"
-            } else {
-                // The return type is NOT generic and there is no parameter, so a
-                // regular cast can be used.
-                "as"
-            }
         } else {
-            // There is a parameter
             returnedName = "obj"
-            cast = if (paramType is ParameterizedTypeName && returnType is ParameterizedTypeName) {
-                if (paramType.typeArguments == returnType.typeArguments) {
-                    // The parameter and return type have the same generic pattern. This
-                    // is true if both are NOT generic OR if both are generic. Thus a
-                    // regular cast can be used.
-                    "as"
-                } else {
-                    "as!"
-                }
-            } else {
-                // If the parameter and return type have differing generic patterns
-                // then a force-cast is needed.
-                "as!"
-            }
         }
-        add("return $returnedName $cast $returnType\n")
+
+        add("if let sealedInstance = $returnedName $cast $returnType {\n")
+        indent()
+        add("return sealedInstance\n")
+        unindent()
+        add("} else {\n")
+        indent()
+        add("fatalError(\"Type mismatch in sealed property\")\n")
+        unindent()
+        add("}\n")
     }
 
     data class EnumCase(
