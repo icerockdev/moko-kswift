@@ -27,6 +27,7 @@
 		696500490BA3A16CF420DC2F /* Pods_ios_app_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D801D62C89CE2E003D435252 /* Pods_ios_app_Tests.framework */; };
 		A80C51F228FEF18A00D9629E /* ExternalNonGenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80C51F128FEF18A00D9629E /* ExternalNonGenericSealedClassesToSwiftEnumTests.swift */; };
 		A80C51F428FEF2DB00D9629E /* ExternalGenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80C51F328FEF2DB00D9629E /* ExternalGenericSealedClassesToSwiftEnumTests.swift */; };
+		A82612F029EC10910033ECF9 /* DataClassCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82612EF29EC10910033ECF9 /* DataClassCopyTests.swift */; };
 		D867A9A4284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D867A9A3284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift */; };
 		D867A9A628490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */; };
 /* End PBXBuildFile section */
@@ -72,6 +73,7 @@
 		A644D2F1C5377C40A53FCD6A /* Pods-ios-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-app.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-app/Pods-ios-app.release.xcconfig"; sourceTree = "<group>"; };
 		A80C51F128FEF18A00D9629E /* ExternalNonGenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalNonGenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
 		A80C51F328FEF2DB00D9629E /* ExternalGenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalGenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
+		A82612EF29EC10910033ECF9 /* DataClassCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataClassCopyTests.swift; sourceTree = "<group>"; };
 		D801D62C89CE2E003D435252 /* Pods_ios_app_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_app_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D867A9A3284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonGenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
 		D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericSealedClassesToSwiftEnumTests.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				D867A9A528490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift */,
 				A80C51F128FEF18A00D9629E /* ExternalNonGenericSealedClassesToSwiftEnumTests.swift */,
 				A80C51F328FEF2DB00D9629E /* ExternalGenericSealedClassesToSwiftEnumTests.swift */,
+				A82612EF29EC10910033ECF9 /* DataClassCopyTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -455,6 +458,7 @@
 			files = (
 				4531D9A226BCF698006F6A8A /* SealedClassToSwiftEnumTests.swift in Sources */,
 				A80C51F428FEF2DB00D9629E /* ExternalGenericSealedClassesToSwiftEnumTests.swift in Sources */,
+				A82612F029EC10910033ECF9 /* DataClassCopyTests.swift in Sources */,
 				A80C51F228FEF18A00D9629E /* ExternalNonGenericSealedClassesToSwiftEnumTests.swift in Sources */,
 				D867A9A4284852F40078FE14 /* NonGenericSealedClassesToSwiftEnumTests.swift in Sources */,
 				D867A9A628490D5F0078FE14 /* GenericSealedClassesToSwiftEnumTests.swift in Sources */,
