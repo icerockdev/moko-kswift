@@ -6,7 +6,7 @@ androidLifecycleVersion = "2.1.0"
 androidCoreTestingVersion = "2.1.0"
 coroutinesVersion = "1.6.0-native-mt"
 mokoTestVersion = "0.4.0"
-mokoKSwiftVersion = "0.6.1"
+mokoKSwiftVersion = "0.7.0"
 
 mokoMvvmVersion = "0.11.0"
 mokoResourcesVersion = "0.16.2"

@@ -64,7 +64,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("dev.icerock.moko:kswift-gradle-plugin:0.6.1")
+        classpath("dev.icerock.moko:kswift-gradle-plugin:0.7.0")
     }
 }
 ```
@@ -95,7 +95,7 @@ project where framework compiles `build.gradle`
 
 ```groovy
 plugins {
-    id("dev.icerock.moko.kswift") version "0.6.1"
+    id("dev.icerock.moko.kswift") version "0.7.0"
 }
 ```
 
@@ -115,7 +115,7 @@ project `build.gradle`
 
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:kswift-runtime:0.6.1") // if you want use annotations
+    commonMainApi("dev.icerock.moko:kswift-runtime:0.7.0") // if you want use annotations
 }
 ```
 
@@ -273,6 +273,45 @@ public extension UIKit.UILabel {
 
 Selector from comment can be used for filters as in first example.
 
+## Generation of Swift copy method for data classes
+
+Enable feature in project `build.gradle`:
+
+kotlin:
+```kotlin
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.DataClassCopyFeature)
+}
+```
+
+groovy:
+```groovy
+kswift {
+    install(dev.icerock.moko.kswift.plugin.feature.DataClassCopyFeature.factory)
+}
+```
+
+With this feature for data class like this:
+```kotlin
+data class DataClass(
+    val stringValue: String,
+    val optionalStringValue: String?,
+    val intValue: Int,
+    val optionalIntValue: Int?,
+    val booleanValue: Boolean,
+    val optionalBooleanValue: Boolean?
+)
+```
+
+Will be generated swift code that can be used like this:
+```swift
+let newObj = dataClass.copy(
+    stringValue: {"aNewValue"}, 
+    intValue: {1}, 
+    booleanValue: {true}
+)
+```
+
 ## Implementation of own generator
 
 First create `buildSrc`, if you don't. `build.gradle` will contains:
@@ -293,7 +332,7 @@ repositories {
 dependencies {
     implementation("com.android.tools.build:gradle:7.0.0")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-    implementation("dev.icerock.moko:kswift-gradle-plugin:0.2.0")
+    implementation("dev.icerock.moko:kswift-gradle-plugin:0.7.0")
 }
 ```
 
