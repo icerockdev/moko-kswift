@@ -239,6 +239,10 @@ class SealedToSwiftEnumFeature(
                 } else {
                     "as!"
                 }
+            } else if (paramType !is ParameterizedTypeName && returnType !is ParameterizedTypeName) {
+                // If the parameter and return type is not ParameterizedTypeName
+                // regular cast can be used.
+                "as"
             } else {
                 // If the parameter and return type have differing generic patterns
                 // then a force-cast is needed.
