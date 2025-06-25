@@ -25,7 +25,6 @@ internal class PostProcessLinkTask(
         outputDir.deleteRecursively()
 
         linkTask.inputs.files
-            .filter { it.extension == "klib" }
             .filter { file ->
                 val name = file.nameWithoutExtension
                 if (kSwiftExtension.includedLibs.isNotEmpty()) {
